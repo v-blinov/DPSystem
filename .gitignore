@@ -361,3 +361,13 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Ignore Files and Folders with some data
+bin/
+Logs/
+obj/
+mssql-data/
+
+*.sln
+.env
+appsettings.*.json
