@@ -371,3 +371,4 @@ mssql-data/
 *.sln
 .env
 appsettings.*.json
+appsettings.json
