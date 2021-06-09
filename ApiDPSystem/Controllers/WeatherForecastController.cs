@@ -1,4 +1,5 @@
 ﻿using ApiDPSystem.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace ApiDPSystem.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]/[action]")]
     public class WeatherForecastController : ControllerBase
@@ -18,13 +20,6 @@ namespace ApiDPSystem.Controllers
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
-
-        private readonly Context context;
-
-        public WeatherForecastController(Context _context)
-        {
-            context = _context;
-        }
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
