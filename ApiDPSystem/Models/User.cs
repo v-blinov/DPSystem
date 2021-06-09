@@ -1,13 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace ApiDPSystem.Models
 {
-    public class User
+    public class User : IdentityUser
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        [Required]
+        [StringLength(50, MinimumLength = 2)]
+        public string FirstName { get; set; }
+
+        [Required]
+        [StringLength(50, MinimumLength = 2)]
+        public string LastName { get; set; }
     }
 }

@@ -10,13 +10,13 @@ namespace ApiDPSystem.Data
     {
         public static void Initialize(Context db)
         {
-            if (!db.Users.Any())
-            {
-                var user1 = new User { Name = "Ivan" };
+            //if (!db.Users.Any())
+            //{
+            //    var user1 = new User { Name = "Ivan" };
 
-                db.Users.AddRange(user1);
-                db.SaveChanges();
-            }
+            //    db.Users.AddRange(user1);
+            //    db.SaveChanges();
+            //}
         }
     }
 }

@@ -21,7 +21,7 @@ namespace ApiDPSystem.Data
         public Context(DbContextOptions options) : base(options)
         {
             //Database.EnsureDeleted();
-            //Database.EnsureCreated();
+            Database.EnsureCreated();
             //SeedData.Initialize(this);
         }
         public static DbContextOptions DefaultOptions(string connectionString = null)
