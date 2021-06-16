@@ -1,17 +1,11 @@
 ﻿using ApiDPSystem.Models;
 using ApiDPSystem.Records;
+using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ApiDPSystem.Controllers
@@ -20,35 +14,41 @@ namespace ApiDPSystem.Controllers
     [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
-        private readonly UserManager<User> userManager;
-        private readonly SignInManager<User> signInManager;
-        private readonly IConfiguration configuration;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly RegisterService _registerService;
+        private readonly EmailService _emailService;
 
-
-        public AccountController(UserManager<User> userManager,
-                                 SignInManager<User> signInManager,
-                                 IConfiguration configuration)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RegisterService registerService, EmailService emailService)
         {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-            this.configuration = configuration;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _registerService = registerService;
+            _emailService = emailService;
         }
-
 
         [HttpPost]
         public async Task<IActionResult> LogIn([FromForm] LogInRecord logInModel)
         {
+            if (!ModelState.IsValid)
+            {
+                Log.Warning("В метод LogIn в контроллере AccountController отправлена невалидная модель.");
+                return BadRequest(logInModel);
+            }
+
             try
             {
-                var response = await signInManager.PasswordSignInAsync(logInModel.Email, logInModel.Password, false, false);
+                var user = await _userManager.FindByNameAsync(logInModel.Email);
+                if (user != null)
+                    if (!await _userManager.IsEmailConfirmedAsync(user))
+                        return StatusCode(StatusCodes.Status403Forbidden, "Почта не подтвержденаю");
 
-                if (response.Succeeded)
-                {
-                    var user = userManager.Users.SingleOrDefault(u => u.Email == logInModel.Email);
-                    return Ok(GenerateJwtToken(user));
-                }
-
-                return Unauthorized();
+                var result = await _signInManager.PasswordSignInAsync(logInModel.Email, logInModel.Password, logInModel.RememberMe, false);
+                
+                if (result.Succeeded)
+                    return Ok();
+                
+                return Unauthorized("Неправильный логин и(или) пароль");
             }
             catch (Exception ex)
             {
@@ -58,58 +58,57 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SignUp([FromForm] SignUpRecord signUpModel)
+        public async Task<IActionResult> Register([FromForm] RegisterRecord registerModel)
         {
+            if (!ModelState.IsValid)
+            {
+                Log.Warning("RegisterModel предоставлены некорректные данные для метода RegisterModel");
+                return BadRequest("Введены некорректные логин и (или) пароль.");
+            }
+
             try
             {
                 var user = new User
                 {
-                    FirstName = signUpModel.FirstName,
-                    LastName = signUpModel.LastName,
-                    Email = signUpModel.Email,
-                    UserName = signUpModel.Email
+                    UserName = registerModel.Email,
+                    Email = registerModel.Email,
+                    FirstName = registerModel.FirstName,
+                    LastName = registerModel.LastName,
                 };
-                
-                var response = await userManager.CreateAsync(user, signUpModel.Password);
 
-                if (response.Succeeded)
-                {
-                    await signInManager.SignInAsync(user, false);
-                    return Ok(GenerateJwtToken(user));
-                }
-                else
-                {
-                    Log.Error($"Метод SignUp в api контроллере AccountController: userManager.CreateAsync вернул response.Secceeded = false. \n{response.Errors}");
-                    return BadRequest();
-                }
+                string url = Url.Action("ConfirmEmail", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
+
+                _registerService.SendMessage += _emailService.SendEmailAsync;
+                var response = await _registerService.Register(user, registerModel.Password, url);
+
+                if (response)
+                    return Ok();
+
+                return BadRequest();
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Log.Error(ex, "");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
-        private string GenerateJwtToken(User user)
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
-            var claims = new[] {
-                new Claim("Name", $"{user.FirstName} {user.LastName}"),
-                new Claim("Id", user.Id),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
-
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var expiresTime = DateTime.Now.AddMinutes(Convert.ToDouble(configuration["Jwt:ExpireMinutes"]));
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: expiresTime,
-                signingCredentials: credentials
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            try
+            {
+                bool response = await _registerService.ConfirmEmail(userId, code);
+                if (response)
+                    return Ok();
+                else
+                    return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

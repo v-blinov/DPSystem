@@ -12,9 +12,12 @@ namespace ApiDPSystem.Records
         [Display(Name = "Email")]
         public string Email { get; init; }
 
-        [Required]
+        [Required(ErrorMessage = "Обязательное поле")]
         [Display(Name = "Пароль")]
         [DataType(DataType.Password)]
         public string Password { get; init; }
+
+        [Display(Name = "Запомнить?")]
+        public bool RememberMe { get; set; } = false;
     }
 }

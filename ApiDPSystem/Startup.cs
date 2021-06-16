@@ -1,6 +1,6 @@
 using ApiDPSystem.Data;
 using ApiDPSystem.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -37,32 +37,11 @@ namespace ApiDPSystem
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                // configure SwaggerDoc and others
-       
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiDPSystem", Version = "v1" });
-
-                // add JWT Authentication
-                var securityScheme = new OpenApiSecurityScheme
-                {
-                    Name = "JWT Authentication",
-                    Description = "Enter JWT Bearer token **_only_**",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "bearer", // must be lower case
-                    BearerFormat = "JWT",
-                    Reference = new OpenApiReference
-                    {
-                        Id = JwtBearerDefaults.AuthenticationScheme,
-                        Type = ReferenceType.SecurityScheme
-                    }
-                };
-                c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                    {
-                        {securityScheme, new string[] { }}
-                    });
-
             });
+
+            services.AddScoped<RegisterService>();
+            services.AddScoped<EmailService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

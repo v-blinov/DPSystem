@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ApiDPSystem.Records
 {
-    public class SignUpRecord
+    public class RegisterRecord
     {
         [Required]
         [Display(Name = "Имя")]
