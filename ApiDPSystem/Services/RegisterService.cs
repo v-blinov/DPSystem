@@ -8,33 +8,30 @@ namespace ApiDPSystem.Services
 {
     public class RegisterService
     {
-        private readonly IConfiguration configuration;
-        private readonly UserManager<User> userManager;
+        private readonly UserManager<User> _userManager;
 
         public delegate Task RegisterHandler(User user, string subject, string message);
         public event RegisterHandler SendMessage;
 
-        public RegisterService(UserManager<User> userManager, IConfiguration configuration)
+        public RegisterService(UserManager<User> userManager)
         {
-            this.userManager = userManager;
-            this.configuration = configuration;
+            _userManager = userManager;
         }
 
-        public async Task<bool> Register(User user, string password, string url)
+        public async Task<IdentityResult> Register(User user, string password, string url)
         {
-            var response = await userManager.CreateAsync(user, password);
+            var response = await _userManager.CreateAsync(user, password);
             if (response.Succeeded)
             {
-                var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
                 url = url.Replace("userIdValue", user.Id);
                 url = url.Replace("codeValue", HttpUtility.UrlEncode(code));
 
                 SendMessage?.Invoke(user, "Confirm your account", $"Подтвердите регистрацию, перейдя по ссылке: <a href='{url}'>Confirm your email</a>");
-
-                return true;
             }
-            return false;
+
+            return response;
         }
         
         public async Task<bool> ConfirmEmail(string userId, string code)
@@ -42,11 +39,11 @@ namespace ApiDPSystem.Services
             if (userId == null || code == null)
                 return false;
 
-            var user = await userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 return false;
 
-            var result = await userManager.ConfirmEmailAsync(user, code);
+            var result = await _userManager.ConfirmEmailAsync(user, code);
             return result.Succeeded;
         }
     }

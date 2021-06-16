@@ -1,4 +1,5 @@
-﻿using ApiDPSystem.Models;
+﻿using ApiDPSystem.Extension;
+using ApiDPSystem.Models;
 using ApiDPSystem.Records;
 using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Http;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApiDPSystem.Controllers
@@ -28,12 +30,19 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> LogIn([FromForm] LogInRecord logInModel)
+        public async Task<ApiResponse> LogIn([FromForm] LogInRecord logInModel)
         {
             if (!ModelState.IsValid)
             {
                 Log.Warning("В метод LogIn в контроллере AccountController отправлена невалидная модель.");
-                return BadRequest(logInModel);
+
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Введены некорректные логин и(или) пароль.",
+                    Errors = ModelState.GetErrorList()
+                };
             }
 
             try
@@ -41,33 +50,67 @@ namespace ApiDPSystem.Controllers
                 var user = await _userManager.FindByNameAsync(logInModel.Email);
                 if (user != null)
                     if (!await _userManager.IsEmailConfirmedAsync(user))
-                        return StatusCode(StatusCodes.Status403Forbidden, "Почта не подтвержденаю");
+                        return new ApiResponse()
+                        {
+                            IsSuccess = false,
+                            StatusCode = StatusCodes.Status403Forbidden,
+                            Message = "Почта не подтверждена."
+                        };
 
-                var result = await _signInManager.PasswordSignInAsync(logInModel.Email, logInModel.Password, logInModel.RememberMe, false);
-                
+                var result = await _signInManager.PasswordSignInAsync(logInModel.Email, logInModel.Password, false, false);
+
                 if (result.Succeeded)
-                    return Ok();
-                
-                return Unauthorized("Неправильный логин и(или) пароль");
+                    return new ApiResponse()
+                    {
+                        IsSuccess = true,
+                        StatusCode = StatusCodes.Status200OK
+                    };
+
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Message = "Неправильный логин и(или) пароль."
+                };
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Ошибка на стороне сервера"
+                };
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register([FromForm] RegisterRecord registerModel)
+        public async Task<ApiResponse> Register([FromForm] RegisterRecord registerModel)
         {
             if (!ModelState.IsValid)
             {
-                Log.Warning("RegisterModel предоставлены некорректные данные для метода RegisterModel");
-                return BadRequest("Введены некорректные логин и (или) пароль.");
+                Log.Warning("предоставлены некорректные данные для метода RegisterModel");
+
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Введены некорректные логин и(или) пароль.",
+                    Errors = ModelState.GetErrorList()
+                };
             }
 
             try
             {
+                if (await _userManager.FindByNameAsync(registerModel.Email) != null)
+                    return new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status409Conflict,
+                        Message = "Пользователь с таким email уже существует."
+                    };
+
                 var user = new User
                 {
                     UserName = registerModel.Email,
@@ -75,39 +118,67 @@ namespace ApiDPSystem.Controllers
                     FirstName = registerModel.FirstName,
                     LastName = registerModel.LastName,
                 };
-
                 string url = Url.Action("ConfirmEmail", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
 
                 _registerService.SendMessage += _emailService.SendEmailAsync;
                 var response = await _registerService.Register(user, registerModel.Password, url);
 
-                if (response)
-                    return Ok();
-
-                return BadRequest();
+                if (response.Succeeded)
+                    return new ApiResponse()
+                    {
+                        IsSuccess = true,
+                        StatusCode = StatusCodes.Status200OK
+                    };
+                    
+                return new ApiResponse()
+                    {
+                        IsSuccess = response.Succeeded,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Ошибка регистрации пользователя.",
+                        Errors = response.Errors.Select(p => p.Description).ToList()
+                    };
             }
             catch(Exception ex)
             {
                 Log.Error(ex, "");
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Ошибка на стороне сервера"
+                };
             }
         }
 
         [HttpGet]
-        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        public async Task<ApiResponse> ConfirmEmail(string userId, string code)
         {
             try
             {
                 bool response = await _registerService.ConfirmEmail(userId, code);
                 if (response)
-                    return Ok();
-                else
-                    return BadRequest();
+                    return new ApiResponse()
+                    {
+                        IsSuccess = true,
+                        StatusCode = StatusCodes.Status200OK
+                    };
+                    
+                return new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Ошибка при подтверждении email.",
+                    };
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Ошибка на стороне сервера"
+                };
             }
         }
     }

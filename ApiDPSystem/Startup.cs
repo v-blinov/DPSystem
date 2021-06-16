@@ -35,6 +35,11 @@ namespace ApiDPSystem
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddControllers();
+                //.ConfigureApiBehaviorOptions(options =>
+                //{
+                //    options.SuppressModelStateInvalidFilter = true;
+                //});
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiDPSystem", Version = "v1" });

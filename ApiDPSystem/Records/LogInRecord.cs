@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ApiDPSystem.Records
 {
     public class LogInRecord
     {
-        [Required(ErrorMessage = "Обязательное поле")]
         [Display(Name = "Email")]
+        [Required(ErrorMessage = "Обязательное поле.")]
         public string Email { get; init; }
 
-        [Required(ErrorMessage = "Обязательное поле")]
+
+
         [Display(Name = "Пароль")]
         [DataType(DataType.Password)]
+        [Required(ErrorMessage = "Обязательное поле.")]
+        [StringLength(50, MinimumLength = 6, ErrorMessage = "Пароль должен иметь длину от 6 до 50 символов.")]
         public string Password { get; init; }
-
-        [Display(Name = "Запомнить?")]
-        public bool RememberMe { get; set; } = false;
     }
 }

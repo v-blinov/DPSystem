@@ -20,7 +20,7 @@ namespace ApiDPSystem.Records
 
         [Required]
         [Display(Name = "Email")]
-        [RegularExpression(@"^([0-9A-Za-z]{1}[\-0-9A-z\.]*[0-9A-Za-z]{1})@([A-Za-z]{1,}\.){1,2}[A-Za-z]{2,}$", ErrorMessage = "Неверный формат логина")]
+        [RegularExpression(@"([0-9A-Za-z]{1}[\-0-9A-z\.]*[0-9A-Za-z]{1})@([A-Za-z\-]*\.){1,2}([A-Za-z]{1,3})", ErrorMessage = "Неверный формат логина.")]
         public string Email { get; init; }
 
         [Required]
