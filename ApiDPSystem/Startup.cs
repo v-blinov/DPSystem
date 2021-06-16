@@ -45,7 +45,7 @@ namespace ApiDPSystem
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiDPSystem", Version = "v1" });
             });
 
-            services.AddScoped<RegisterService>();
+            services.AddScoped<AccountService>();
             services.AddScoped<EmailService>();
         }
 

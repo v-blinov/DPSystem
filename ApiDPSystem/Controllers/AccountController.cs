@@ -18,14 +18,14 @@ namespace ApiDPSystem.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly RegisterService _registerService;
+        private readonly AccountService _accountService;
         private readonly EmailService _emailService;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RegisterService registerService, EmailService emailService)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, AccountService registerService, EmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _registerService = registerService;
+            _accountService = registerService;
             _emailService = emailService;
         }
 
@@ -47,10 +47,17 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                var user = await _userManager.FindByNameAsync(logInModel.Email);
-                if (user != null)
-                    if (!await _userManager.IsEmailConfirmedAsync(user))
-                        return new ApiResponse()
+                var user = await _userManager.FindByEmailAsync(logInModel.Email);
+                if (user == null)
+                    return new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = $"Пользователь с email {logInModel.Email} не найден."
+                    };
+
+                 if (!await _userManager.IsEmailConfirmedAsync(user))
+                    return new ApiResponse()
                         {
                             IsSuccess = false,
                             StatusCode = StatusCodes.Status403Forbidden,
@@ -90,7 +97,7 @@ namespace ApiDPSystem.Controllers
         {
             if (!ModelState.IsValid)
             {
-                Log.Warning("предоставлены некорректные данные для метода RegisterModel");
+                Log.Warning("Предоставлены некорректные данные для метода RegisterModel");
 
                 return new ApiResponse()
                 {
@@ -120,25 +127,25 @@ namespace ApiDPSystem.Controllers
                 };
                 string url = Url.Action("ConfirmEmail", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
 
-                _registerService.SendMessage += _emailService.SendEmailAsync;
-                var response = await _registerService.Register(user, registerModel.Password, url);
+                _accountService.SendMessage += _emailService.SendEmailAsync;
+                var result = await _accountService.Register(user, registerModel.Password, url);
 
-                if (response.Succeeded)
+                if (result.Succeeded)
                     return new ApiResponse()
                     {
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status200OK
                     };
-                    
+
                 return new ApiResponse()
-                    {
-                        IsSuccess = response.Succeeded,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Ошибка регистрации пользователя.",
-                        Errors = response.Errors.Select(p => p.Description).ToList()
-                    };
+                {
+                    IsSuccess = result.Succeeded,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Ошибка регистрации пользователя.",
+                    Errors = result.Errors.Select(p => p.Description).ToList()
+                };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Error(ex, "");
                 return new ApiResponse()
@@ -151,24 +158,24 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<ApiResponse> ConfirmEmail(string userId, string code)
+        public async Task<ApiResponse> ConfirmEmail([FromQuery] string userId, [FromQuery] string code)
         {
             try
             {
-                bool response = await _registerService.ConfirmEmail(userId, code);
-                if (response)
+                bool result = await _accountService.ConfirmEmail(userId, code);
+                if (result)
                     return new ApiResponse()
                     {
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status200OK
                     };
-                    
+
                 return new ApiResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Ошибка при подтверждении email.",
-                    };
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Ошибка при подтверждении email.",
+                };
             }
             catch (Exception ex)
             {
@@ -180,6 +187,83 @@ namespace ApiDPSystem.Controllers
                     Message = "Ошибка на стороне сервера"
                 };
             }
+        }
+
+        [HttpPost]
+        public async Task<ApiResponse> ForgotPassword([FromForm] ForgotPasswordRecord forgotPassword)
+        {
+            if (!ModelState.IsValid)
+            {
+                Log.Warning("предоставлены некорректные данные для метода ForgotPassword");
+
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Введены некорректные логин и(или) пароль.",
+                    Errors = ModelState.GetErrorList()
+                };
+            }
+
+            var user = await _userManager.FindByNameAsync(forgotPassword.Email);
+
+            if (user != null && await _userManager.IsEmailConfirmedAsync(user))
+            {
+                string url = Url.Action("ResetPassword", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
+
+                _accountService.SendMessage += _emailService.SendEmailAsync;
+                await _accountService.ForgotPassword(user, url);
+            }
+
+            return new ApiResponse()
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK
+            };
+        }
+
+        [HttpPost]
+        public async Task<ApiResponse> ResetPassword([FromForm] ResetPasswordRecord resetPassword)
+        {
+            if (!ModelState.IsValid)
+            {
+                Log.Warning("Предоставлены некорректные данные для метода RegisterModel");
+
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Введены некорректные логин и(или) пароль.",
+                    Errors = ModelState.GetErrorList()
+                };
+            }
+
+            var user = await _userManager.FindByEmailAsync(resetPassword.Email);
+            
+            if (user == null)
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = $"Пользователь с email {resetPassword.Email} не найден."
+                };
+
+            var result = await _userManager.ResetPasswordAsync(user, resetPassword.Code, resetPassword.Password);
+
+            if (result.Succeeded)
+                return new ApiResponse()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK
+                };
+
+            return new ApiResponse()
+            {
+                IsSuccess = result.Succeeded,
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = "Ошибка при изменении пароля.",
+                Errors = result.Errors.Select(p => p.Description).ToList()
+            };
         }
     }
 }
