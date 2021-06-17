@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System;
 
 namespace ApiDPSystem
 {
@@ -34,11 +35,19 @@ namespace ApiDPSystem
             services.AddDbContext<Context>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddControllers();
-                //.ConfigureApiBehaviorOptions(options =>
-                //{
-                //    options.SuppressModelStateInvalidFilter = true;
-                //});
+            services.AddControllers()
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.SuppressModelStateInvalidFilter = true;
+                });
+
+            //services.ConfigureApplicationCookie(p =>
+            //{
+            //    p.ExpireTimeSpan = TimeSpan.FromHours(2);
+            //    p.SlidingExpiration = true;
+            //});
+
+            services.Configure<DataProtectionTokenProviderOptions>(p => p.TokenLifespan = TimeSpan.FromHours(30));
 
             services.AddSwaggerGen(c =>
             {
