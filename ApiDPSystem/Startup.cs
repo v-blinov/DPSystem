@@ -41,6 +41,19 @@ namespace ApiDPSystem
                     options.SuppressModelStateInvalidFilter = true;
                 });
 
+
+
+
+            services.AddAuthentication()
+                .AddGoogle(googleOptions =>
+                {
+                    IConfigurationSection googleAuthNSection =
+                        Configuration.GetSection("Authentication:Google");
+
+                    googleOptions.ClientId = googleAuthNSection["ClientId"];
+                    googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
+                });
+ 
             //services.ConfigureApplicationCookie(p =>
             //{
             //    p.ExpireTimeSpan = TimeSpan.FromHours(2);
@@ -69,6 +82,7 @@ namespace ApiDPSystem
             {
                 app.UseDeveloperExceptionPage();
             }
+
 
             app.UseSwagger();
             app.UseSwaggerUI(

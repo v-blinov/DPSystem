@@ -16,15 +16,11 @@ namespace ApiDPSystem.Controllers
     [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
         private readonly AccountService _accountService;
         private readonly EmailService _emailService;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, AccountService registerService, EmailService emailService)
+        public AccountController(AccountService registerService, EmailService emailService)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
             _accountService = registerService;
             _emailService = emailService;
         }
@@ -47,24 +43,7 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                var user = await _userManager.FindByEmailAsync(logInModel.Email);
-                if (user == null)
-                    return new ApiResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = $"Пользователь с email {logInModel.Email} не найден."
-                    };
-
-                 if (!await _userManager.IsEmailConfirmedAsync(user))
-                    return new ApiResponse()
-                        {
-                            IsSuccess = false,
-                            StatusCode = StatusCodes.Status403Forbidden,
-                            Message = "Почта не подтверждена."
-                        };
-
-                var result = await _signInManager.PasswordSignInAsync(logInModel.Email, logInModel.Password, false, false);
+                var result = await _accountService.LogIn(logInModel);
 
                 if (result.Succeeded)
                     return new ApiResponse()
@@ -76,9 +55,11 @@ namespace ApiDPSystem.Controllers
                 return new ApiResponse()
                 {
                     IsSuccess = false,
-                    StatusCode = StatusCodes.Status401Unauthorized,
-                    Message = "Неправильный логин и(или) пароль."
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Ошибка при входе в аккаунт",
+                    Errors = result.Errors.Select(p => p.Description).ToList()
                 };
+
             }
             catch (Exception ex)
             {
@@ -110,14 +91,6 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                if (await _userManager.FindByNameAsync(registerModel.Email) != null)
-                    return new ApiResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status409Conflict,
-                        Message = "Пользователь с таким email уже существует."
-                    };
-
                 var user = new User
                 {
                     UserName = registerModel.Email,
@@ -205,21 +178,34 @@ namespace ApiDPSystem.Controllers
                 };
             }
 
-            var user = await _userManager.FindByNameAsync(forgotPassword.Email);
-
-            if (user != null && await _userManager.IsEmailConfirmedAsync(user))
+            try
             {
-                string url = Url.Action("ResetPassword", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
+                var result = await _accountService.CheckIfEmailConfirmedAsync(forgotPassword.Email);
 
-                _accountService.SendMessage += _emailService.SendEmailAsync;
-                await _accountService.ForgotPassword(user, url);
+                if (result.Succeeded)
+                {
+                    string url = Url.Action("ResetPassword", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
+
+                    _accountService.SendMessage += _emailService.SendEmailAsync;
+                    await _accountService.ForgotPassword(forgotPassword.Email, url);
+                }
+
+                return new ApiResponse()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK
+                };
             }
-
-            return new ApiResponse()
+            catch (Exception ex)
             {
-                IsSuccess = true,
-                StatusCode = StatusCodes.Status200OK
-            };
+                Log.Error(ex, "");
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Ошибка в методе ForgotPassword."
+                };
+            }
         }
 
         [HttpPost]
@@ -238,32 +224,35 @@ namespace ApiDPSystem.Controllers
                 };
             }
 
-            var user = await _userManager.FindByEmailAsync(resetPassword.Email);
-            
-            if (user == null)
+            try
+            {
+                var result = await _accountService.ResetPassword(resetPassword);
+
+                if (result.Succeeded)
+                    return new ApiResponse()
+                    {
+                        IsSuccess = result.Succeeded,
+                        StatusCode = StatusCodes.Status200OK
+                    };
+
+                return new ApiResponse()
+                {
+                    IsSuccess = result.Succeeded,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Ошибка при изменении пароля.",
+                    Errors = result.Errors.Select(p => p.Description).ToList()
+                };
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "");
                 return new ApiResponse()
                 {
                     IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = $"Пользователь с email {resetPassword.Email} не найден."
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Ошибка при изменении пароля."
                 };
-
-            var result = await _userManager.ResetPasswordAsync(user, resetPassword.Code, resetPassword.Password);
-
-            if (result.Succeeded)
-                return new ApiResponse()
-                {
-                    IsSuccess = true,
-                    StatusCode = StatusCodes.Status200OK
-                };
-
-            return new ApiResponse()
-            {
-                IsSuccess = result.Succeeded,
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = "Ошибка при изменении пароля.",
-                Errors = result.Errors.Select(p => p.Description).ToList()
-            };
+            }
         }
     }
 }
