@@ -3,26 +3,36 @@ using ApiDPSystem.Models;
 using ApiDPSystem.Records;
 using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace ApiDPSystem.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class AccountController : Controller
     {
         private readonly AccountService _accountService;
         private readonly EmailService _emailService;
+        private readonly string _clientId;
+        private readonly string _clientSecret;
 
-        public AccountController(AccountService registerService, EmailService emailService)
+        public AccountController(AccountService registerService,
+                                 EmailService emailService,
+                                 IConfiguration configuration)
         {
             _accountService = registerService;
             _emailService = emailService;
+            _clientId = configuration.GetValue<string>("Authentication:Google:ClientId");
+            _clientSecret = configuration.GetValue<string>("Authentication:Google:ClientSecret");
         }
 
         [HttpPost]
@@ -70,6 +80,125 @@ namespace ApiDPSystem.Controllers
                     StatusCode = StatusCodes.Status500InternalServerError,
                     Message = "Ошибка на стороне сервера"
                 };
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GoogleLogin()
+        {
+            //string redirectUrl = Url.Action("GoogleResponse", "Account");
+            //var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+            //return new ChallengeResult("Google", properties);
+
+            try
+            {
+                string redirectUrl = HttpUtility.UrlEncode("https://localhost:44388/Account/GetAccessToken");
+
+                //string url = "https://accounts.google.com/o/oauth2/auth?" +
+                string url = "https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?" +
+                    $"client_id={_clientId}" +
+                    $"&redirect_uri={redirectUrl}" +
+                     "&response_type=code" +
+                     "&access_type=offline" +
+                     "&prompt=consent" +
+                     "&scope=openid%20profile%20email";
+
+                return Ok(url);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        private async Task<IActionResult> GetAccessTokenAsync(string code)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var data = new Dictionary<string, string>()
+                    {
+                        { "code", code },
+                        { "client_id", _clientId },
+                        { "client_secret", _clientSecret },
+                        { "redirect_uri", "https://localhost:44388/Account/GetAccessToken" },
+                        { "access_type", "offline" },
+                        { "prompt", "consent" },
+                        { "grant_type", "authorization_code" }
+                    };
+
+                    var requestUrl = "https://accounts.google.com/o/oauth2/token";
+                    var formContent = new FormUrlEncodedContent(data);
+                    var apiResponse = await client.PostAsync(requestUrl, formContent);
+                    var result = await apiResponse.Content.ReadAsStringAsync();
+
+                    return Ok(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RefreshTokenAsync(string refreshToken)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var data = new Dictionary<string, string>()
+                    {
+                        { "client_id", _clientId },
+                        { "client_secret", _clientSecret },
+                        { "refresh_token", refreshToken },
+                        { "grant_type", "refresh_token" },
+                    };
+
+                    var requestUrl = "https://accounts.google.com/o/oauth2/token";
+                    var formContent = new FormUrlEncodedContent(data);
+                    var apiResponse = await client.PostAsync(requestUrl, formContent);
+                    var result = await apiResponse.Content.ReadAsStringAsync();
+
+                    return Ok(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RevokeTokenAsync(string accessToken)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var data = new Dictionary<string, string>()
+                    {
+                        { "client_id", _clientId },
+                        { "client_secret", _clientSecret },
+                        { "token", accessToken }
+                    };
+
+                    var requestUrl = "https://oauth2.googleapis.com/revoke";
+                    var formContent = new FormUrlEncodedContent(data);
+                    await client.PostAsync(requestUrl, formContent);
+                    
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -254,5 +383,52 @@ namespace ApiDPSystem.Controllers
                 };
             }
         }
+
+
+        #region AdditionalFunctionality
+        //[HttpGet]
+        //public async Task<IActionResult> GoogleResponse()
+        //{
+        //    try
+        //    {
+        //        ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync();
+        //        if (info == null)
+        //            return RedirectToAction("Login");
+
+        //        var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
+        //        string[] userInfo = { info.Principal.FindFirst(ClaimTypes.Name).Value, info.Principal.FindFirst(ClaimTypes.Email).Value };
+        //        if (result.Succeeded)
+        //            return Ok(userInfo);
+        //        else
+        //        {
+        //            User user = new User
+        //            {
+        //                Email = info.Principal.FindFirst(ClaimTypes.Email).Value,
+        //                UserName = info.Principal.FindFirst(ClaimTypes.Email).Value,
+        //                FirstName = "TEST",
+        //                LastName = "test"
+        //                //LastName = info.Principal.FindFirstValue(ClaimTypes.Name).Split(" ")[1] 
+        //            };
+
+        //            IdentityResult identResult = await _userManager.CreateAsync(user);
+        //            if (identResult.Succeeded)
+        //            {
+        //                identResult = await _userManager.AddLoginAsync(user, info);
+        //                if (identResult.Succeeded)
+        //                {
+        //                    await _signInManager.SignInAsync(user, false);
+        //                    return Ok(userInfo.ToList());
+        //                }
+        //            }
+        //            return StatusCode(StatusCodes.Status403Forbidden);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error("", ex);
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+        //    }
+        //}
+        #endregion
     }
 }
