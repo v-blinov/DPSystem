@@ -369,7 +369,7 @@ obj/
 mssql-data/
 
 *.sln
-.env
-appsettings.*.json
-appsettings.json
-/ApiDPSystem/appsettings.json
+# .env
+# appsettings.*.json
+# appsettings.json
+# /ApiDPSystem/appsettings.json
