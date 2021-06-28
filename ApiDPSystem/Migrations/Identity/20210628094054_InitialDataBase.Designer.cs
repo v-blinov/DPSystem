@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiDPSystem.Migrations.Identity
 {
     [DbContext(typeof(IdentityContext))]
-    [Migration("20210609101115_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20210628094054_InitialDataBase")]
+    partial class InitialDataBase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,6 +39,16 @@ namespace ApiDPSystem.Migrations.Identity
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");

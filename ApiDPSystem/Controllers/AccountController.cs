@@ -36,16 +36,17 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResponse> LogIn([FromForm] LogInRecord logInModel)
+        public async Task<ApiResponse<AuthenticationResult>> LogIn([FromForm] LogInRecord logInModel)
         {
             if (!ModelState.IsValid)
             {
                 Log.Warning("В метод LogIn в контроллере AccountController отправлена невалидная модель.");
 
-                return new ApiResponse()
+                return new ApiResponse<AuthenticationResult>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
+                    Content = null,
                     Message = "Введены некорректные логин и(или) пароль.",
                     Errors = ModelState.GetErrorList()
                 };
@@ -54,18 +55,34 @@ namespace ApiDPSystem.Controllers
             try
             {
                 var result = await _accountService.LogIn(logInModel);
-
                 if (result.Succeeded)
-                    return new ApiResponse()
-                    {
-                        IsSuccess = true,
-                        StatusCode = StatusCodes.Status200OK
-                    };
+                {
+                    var user = await _accountService.FindUserByEmail(logInModel.Email);
+                    var AuthenticationResult = _accountService.GenerateJWTToken(user);
 
-                return new ApiResponse()
+                    if (AuthenticationResult.Success)
+                        return new ApiResponse<AuthenticationResult>()
+                        {
+                            IsSuccess = true,
+                            StatusCode = StatusCodes.Status200OK,
+                            Content = AuthenticationResult
+                        };
+                    else
+                        return new ApiResponse<AuthenticationResult>()
+                        {
+                            IsSuccess = false,
+                            StatusCode = StatusCodes.Status400BadRequest,
+                            Content = null,
+                            Message = "Ошибка при попытке аутентификации пользователя.",
+                            Errors = AuthenticationResult.Errors
+                        };
+                }
+
+                return new ApiResponse<AuthenticationResult>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
+                    Content = null,
                     Message = "Ошибка при входе в аккаунт",
                     Errors = result.Errors.Select(p => p.Description).ToList()
                 };
@@ -74,9 +91,10 @@ namespace ApiDPSystem.Controllers
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse()
+                return new ApiResponse<AuthenticationResult>()
                 {
                     IsSuccess = false,
+                    Content = null,
                     StatusCode = StatusCodes.Status500InternalServerError,
                     Message = "Ошибка на стороне сервера"
                 };
@@ -204,13 +222,13 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResponse> Register([FromForm] RegisterRecord registerModel)
+        public async Task<ApiResponse<string>> Register([FromForm] RegisterRecord registerModel)
         {
             if (!ModelState.IsValid)
             {
                 Log.Warning("Предоставлены некорректные данные для метода RegisterModel");
 
-                return new ApiResponse()
+                return new ApiResponse<string>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -234,13 +252,13 @@ namespace ApiDPSystem.Controllers
                 var result = await _accountService.Register(user, registerModel.Password, url);
 
                 if (result.Succeeded)
-                    return new ApiResponse()
+                    return new ApiResponse<string>()
                     {
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status200OK
                     };
 
-                return new ApiResponse()
+                return new ApiResponse<string>()
                 {
                     IsSuccess = result.Succeeded,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -251,7 +269,7 @@ namespace ApiDPSystem.Controllers
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse()
+                return new ApiResponse<string>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -261,19 +279,19 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<ApiResponse> ConfirmEmail([FromQuery] string userId, [FromQuery] string code)
+        public async Task<ApiResponse<string>> ConfirmEmail([FromQuery] string userId, [FromQuery] string code)
         {
             try
             {
                 bool result = await _accountService.ConfirmEmail(userId, code);
                 if (result)
-                    return new ApiResponse()
+                    return new ApiResponse<string>()
                     {
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status200OK
                     };
 
-                return new ApiResponse()
+                return new ApiResponse<string>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -283,7 +301,7 @@ namespace ApiDPSystem.Controllers
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse()
+                return new ApiResponse<string>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -293,13 +311,13 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResponse> ForgotPassword([FromForm] ForgotPasswordRecord forgotPassword)
+        public async Task<ApiResponse<string>> ForgotPassword([FromForm] ForgotPasswordRecord forgotPassword)
         {
             if (!ModelState.IsValid)
             {
                 Log.Warning("предоставлены некорректные данные для метода ForgotPassword");
 
-                return new ApiResponse()
+                return new ApiResponse<string>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -320,7 +338,7 @@ namespace ApiDPSystem.Controllers
                     await _accountService.ForgotPassword(forgotPassword.Email, url);
                 }
 
-                return new ApiResponse()
+                return new ApiResponse<string>()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK
@@ -329,7 +347,7 @@ namespace ApiDPSystem.Controllers
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse()
+                return new ApiResponse<string>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -339,13 +357,13 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResponse> ResetPassword([FromForm] ResetPasswordRecord resetPassword)
+        public async Task<ApiResponse<string>> ResetPassword([FromForm] ResetPasswordRecord resetPassword)
         {
             if (!ModelState.IsValid)
             {
                 Log.Warning("Предоставлены некорректные данные для метода RegisterModel");
 
-                return new ApiResponse()
+                return new ApiResponse<string>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -359,13 +377,13 @@ namespace ApiDPSystem.Controllers
                 var result = await _accountService.ResetPassword(resetPassword);
 
                 if (result.Succeeded)
-                    return new ApiResponse()
+                    return new ApiResponse<string>()
                     {
                         IsSuccess = result.Succeeded,
                         StatusCode = StatusCodes.Status200OK
                     };
 
-                return new ApiResponse()
+                return new ApiResponse<string>()
                 {
                     IsSuccess = result.Succeeded,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -376,7 +394,7 @@ namespace ApiDPSystem.Controllers
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse()
+                return new ApiResponse<string>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,

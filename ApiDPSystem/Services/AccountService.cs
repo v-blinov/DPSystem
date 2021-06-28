@@ -1,7 +1,14 @@
-﻿using ApiDPSystem.Models;
+﻿using ApiDPSystem.Data;
+using ApiDPSystem.Models;
 using ApiDPSystem.Records;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -11,14 +18,18 @@ namespace ApiDPSystem.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly IConfiguration _configuration;
+        private Context _context;
 
         public delegate Task RegisterHandler(User user, string subject, string message);
         public event RegisterHandler SendMessage;
 
-        public AccountService(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountService(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, Context context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _configuration = configuration;
+            _context = context;
         }
 
         public async Task<IdentityResult> LogIn(LogInRecord logInModel)
@@ -106,6 +117,60 @@ namespace ApiDPSystem.Services
                 });
 
             return IdentityResult.Success;
+        }
+
+        public async Task<User> FindUserByEmail(string email) => await _userManager.FindByEmailAsync(email);
+
+        public AuthenticationResult GenerateJWTToken(User user)
+        {
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim("Id", user.Id),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim("Name", user.FirstName + " " + user.LastName),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                }),
+                Expires = DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpireMinutes"])),
+                SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+            var jwtToken = jwtTokenHandler.WriteToken(token);
+
+            var refreshToken = new RefreshToken()
+            {
+                JwtId = token.Id,
+                IsUsed = false,
+                UserId = user.Id,
+                AddedDate = DateTime.UtcNow,
+                ExpiryDate = DateTime.UtcNow.AddMonths(1),
+                IsRevoked = false,
+                Token = RandomString(25)
+            };
+
+            _context.RefreshTokens.Add(refreshToken);
+            _context.SaveChanges();
+
+            return new AuthenticationResult()
+            {
+                Token = jwtToken,
+                RefreshToken = refreshToken.Token,
+                Success = true
+            };
+        }
+
+        private string RandomString(int length)
+        {
+            var random = new Random();
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }

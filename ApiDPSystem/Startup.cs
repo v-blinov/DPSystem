@@ -11,8 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
+using System.Text;
 
 namespace ApiDPSystem
 {
@@ -52,7 +54,21 @@ namespace ApiDPSystem
                 googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
 
                 googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
-            });
+            })
+                .AddJwtBearer(jwtOptions =>
+                {
+                    jwtOptions.SaveToken = true;
+                    jwtOptions.TokenValidationParameters = new TokenValidationParameters
+                     {
+                         ValidateIssuer = false,
+                         ValidateAudience = false,
+                         ValidateLifetime = true,
+                         ValidateIssuerSigningKey = true,
+
+                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+                         ClockSkew = TimeSpan.Zero // remove delay of token when expire
+                     };
+                });
 
             services.AddControllers()
                 .ConfigureApiBehaviorOptions(options =>
