@@ -112,7 +112,8 @@ namespace ApiDPSystem.Controllers
             }
         }
 
-        private async Task<IActionResult> GetAccessTokenAsync(string code)
+        [HttpGet]
+        public async Task<IActionResult> GetAccessToken(string code)
         {
             try
             {
