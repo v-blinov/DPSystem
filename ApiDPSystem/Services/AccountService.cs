@@ -151,7 +151,7 @@ namespace ApiDPSystem.Services
                 AddedDate = DateTime.UtcNow,
                 ExpiryDate = DateTime.UtcNow.AddMonths(1),
                 IsRevoked = false,
-                Token = RandomString(25)
+                Token = GetRandomString(25)
             };
 
             _context.RefreshTokens.Add(refreshToken);
@@ -165,7 +165,8 @@ namespace ApiDPSystem.Services
             };
         }
 
-        private string RandomString(int length)
+
+        private string GetRandomString(int length)
         {
             var random = new Random();
             var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

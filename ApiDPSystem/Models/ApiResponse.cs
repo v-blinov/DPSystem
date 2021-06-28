@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ApiDPSystem.Models
 {
-    public class ApiResponse<T>
+    public class ApiResponse
     {
         public ApiResponse()
         {
@@ -15,6 +15,10 @@ namespace ApiDPSystem.Models
         public string Message { get; set; }
         public bool IsSuccess { get; set; }
         public List<string> Errors { get; set; }
+    }
+
+    public class ApiResponse<T> : ApiResponse
+    { 
         public T Content { get; set; }
     }
 }
