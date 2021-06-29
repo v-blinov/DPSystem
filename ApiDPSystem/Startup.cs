@@ -1,8 +1,6 @@
 using ApiDPSystem.Data;
 using ApiDPSystem.Models;
 using ApiDPSystem.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace ApiDPSystem
@@ -43,21 +42,21 @@ namespace ApiDPSystem
 
             services.AddAuthentication(options =>
             {
-                //options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                //options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                //options.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
             })
                 .AddGoogle(googleOptions =>
-            {
-                IConfigurationSection googleAuthNSection =
-                    Configuration.GetSection("Authentication:Google");
+                {
+                    IConfigurationSection googleAuthNSection =
+                        Configuration.GetSection("Authentication:Google");
 
-                googleOptions.ClientId = googleAuthNSection["ClientId"];
-                googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
+                    googleOptions.ClientId = googleAuthNSection["ClientId"];
+                    googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
 
-                googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
-            })
+                    googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
+                })
                 .AddJwtBearer(jwtOptions =>
                 {
                     jwtOptions.SaveToken = true;
@@ -69,7 +68,7 @@ namespace ApiDPSystem
                          ValidateIssuerSigningKey = true,
 
                          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
-                         ClockSkew = TimeSpan.Zero // remove delay of token when expire
+                         ClockSkew = TimeSpan.Zero
                      };
                 });
 
@@ -83,43 +82,41 @@ namespace ApiDPSystem
 
             services.AddSwaggerGen(c =>
             {
-                //    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                //    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                //    c.IncludeXmlComments(xmlPath);
+                //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                //c.IncludeXmlComments(xmlPath);
 
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "TheCodeBuzzService", Version = "v1" });
-                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "DPSystemAPI", Version = "v1" });
+
+                // addOAuthAuthentication
+                var OauthSecurityScheme = new OpenApiSecurityScheme
                 {
-                    Name = "Autorization",
-                    In = ParameterLocation.Header,
+                    Description = "EnterClientID",
                     Type = SecuritySchemeType.OAuth2,
+                    Scheme = "oauth2",
+                    Name = "oauth2",
+                    In = ParameterLocation.Header,
                     Flows = new OpenApiOAuthFlows
                     {
-                        AuthorizationCode = new OpenApiOAuthFlow
+                        Implicit = new OpenApiOAuthFlow
                         {
                             AuthorizationUrl = new Uri("https://accounts.google.com/o/oauth2/auth?" +
-                                                        "access_type=offline&prompt=consent&scope=openid%20profile%20email" +
-                                                        "&flowName=GeneralOAuthFlow")
-                            //Scopes = new Dictionary<string, string>
-                            //{
-                            //    { "accessApi", "Access read operations" },
-                            //},
+                                                        "scope=openid%20profile%20email" +
+                                                        "&flowName=GeneralOAuthFlow"),
+                            TokenUrl = new Uri(Configuration["OAuth:TokenUrlEndpoint"])
                         }
+                    },
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "oauth2"
                     }
-                });
-                //c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                //{
-                //    {
-                //        new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "oauth2" }},
-                //        new string[] { "readAccess", "writeAccess" }
-                //    }
-                //});
-
-
-
+                };
+                c.AddSecurityDefinition(OauthSecurityScheme.Reference.Id, OauthSecurityScheme);
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement {{ OauthSecurityScheme, new List<string>() }});
 
                 // add JWT Authentication
-                var securityScheme = new OpenApiSecurityScheme
+                var JwtSecurityScheme = new OpenApiSecurityScheme
                 {
                     Name = "JWT Authentication",
                     Description = "Enter JWT Bearer token **_only_**",
@@ -133,12 +130,8 @@ namespace ApiDPSystem
                         Type = ReferenceType.SecurityScheme
                     }
                 };
-
-                c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                    {
-                        {securityScheme, new string[] { }}
-                    });
+                c.AddSecurityDefinition(JwtSecurityScheme.Reference.Id, JwtSecurityScheme);
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement{{JwtSecurityScheme, new List<string>() }});
             });
 
             services.AddSingleton<TokenValidationParameters>();
@@ -158,18 +151,14 @@ namespace ApiDPSystem
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors("AllowAllOrigins");
-
             app.UseSwagger();
             app.UseSwaggerUI(c => 
             { 
-                c.SwaggerEndpoint("swagger/v1/swagger.json", "ApiDPSystem v1"); c.RoutePrefix = string.Empty;
-
-                c.OAuthClientId("1015102078067-mo5ds31rjrtocd7dfk4vt663946ijftq.apps.googleusercontent.com");
-                c.OAuthClientSecret("19-tLf4MHfV13WoYlUN_HXNF");
+                c.SwaggerEndpoint("swagger/v1/swagger.json", "ApiDPSystem v1"); 
+                c.RoutePrefix = string.Empty;
+                c.OAuthClientId(Configuration.GetValue<string>("Authentication:Google:ClientId"));
+                c.OAuthClientSecret(Configuration.GetValue<string>("Authentication:Google:ClientSecret"));
                 c.OAuthAppName("OAuth-dpsystem");
-                c.OAuth2RedirectUrl("https://localhost:44388/Account/OAuthGetAccessToken");
-
                 c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
             });
 

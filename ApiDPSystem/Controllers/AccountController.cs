@@ -26,10 +26,10 @@ namespace ApiDPSystem.Controllers
         private readonly string _clientId;
         private readonly string _clientSecret;
 
-        private string _accountUrlEndpoint;
-        private string _redirectUrlEndpoint;
-        private string _revokeUrlEndpoint;
-        private string _tokenUrlEndpoint;
+        private readonly string _accountUrlEndpoint;
+        private readonly string _redirectUrlEndpoint;
+        private readonly string _revokeUrlEndpoint;
+        private readonly string _tokenUrlEndpoint;
 
         public AccountController(AccountService registerService,
                                  EmailService emailService,
@@ -40,10 +40,10 @@ namespace ApiDPSystem.Controllers
             _clientId = configuration.GetValue<string>("Authentication:Google:ClientId");
             _clientSecret = configuration.GetValue<string>("Authentication:Google:ClientSecret");
 
-            _accountUrlEndpoint = configuration["OAuth:AccountUrlEndpoint"];
-            _tokenUrlEndpoint = configuration["OAuth:TokenUrlEndpoint"];
-            _revokeUrlEndpoint = configuration["OAuth:RevokeUrlEndpoint"];
-            _redirectUrlEndpoint = HttpUtility.UrlEncode(configuration["OAuth:RedirectUrlEndpoint"]);
+            _accountUrlEndpoint = configuration.GetValue<string>("OAuth:AccountUrlEndpoint");
+            _tokenUrlEndpoint = configuration.GetValue<string>("OAuth:TokenUrlEndpoint");
+            _revokeUrlEndpoint = configuration.GetValue<string>("OAuth:RevokeUrlEndpoint");
+            _redirectUrlEndpoint = configuration.GetValue<string>("OAuth:RedirectUrlEndpoint");
         }
 
         [HttpGet]
