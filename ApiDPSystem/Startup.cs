@@ -3,6 +3,7 @@ using ApiDPSystem.Models;
 using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -42,6 +43,8 @@ namespace ApiDPSystem
 
             services.AddAuthentication(options =>
             {
+                //options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
             })
@@ -95,7 +98,7 @@ namespace ApiDPSystem
                         AuthorizationCode = new OpenApiOAuthFlow
                         {
                             AuthorizationUrl = new Uri("https://accounts.google.com/o/oauth2/auth?" +
-                                                        "&access_type=offline&prompt=consent&scope=openid%20profile%20email" +
+                                                        "access_type=offline&prompt=consent&scope=openid%20profile%20email" +
                                                         "&flowName=GeneralOAuthFlow")
                             //Scopes = new Dictionary<string, string>
                             //{
@@ -111,8 +114,34 @@ namespace ApiDPSystem
                 //        new string[] { "readAccess", "writeAccess" }
                 //    }
                 //});
+
+
+
+
+                // add JWT Authentication
+                var securityScheme = new OpenApiSecurityScheme
+                {
+                    Name = "JWT Authentication",
+                    Description = "Enter JWT Bearer token **_only_**",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+
+                c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                        {securityScheme, new string[] { }}
+                    });
             });
 
+            services.AddSingleton<TokenValidationParameters>();
             services.AddScoped<AccountService>();
             services.AddScoped<EmailService>();
         }
@@ -139,7 +168,7 @@ namespace ApiDPSystem
                 c.OAuthClientId("1015102078067-mo5ds31rjrtocd7dfk4vt663946ijftq.apps.googleusercontent.com");
                 c.OAuthClientSecret("19-tLf4MHfV13WoYlUN_HXNF");
                 c.OAuthAppName("OAuth-dpsystem");
-                c.OAuth2RedirectUrl("https://localhost:44388/Account/GetAccessToken");
+                c.OAuth2RedirectUrl("https://localhost:44388/Account/OAuthGetAccessToken");
 
                 c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
             });

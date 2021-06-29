@@ -2,6 +2,7 @@
 using ApiDPSystem.Models;
 using ApiDPSystem.Records;
 using ApiDPSystem.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -68,7 +69,7 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> OauthGetAccessToken(string code)
+        public async Task<IActionResult> OAuthGetAccessToken(string code)
         {
             try
             {
@@ -79,7 +80,7 @@ namespace ApiDPSystem.Controllers
                         { "code", code },
                         { "client_id", _clientId },
                         { "client_secret", _clientSecret },
-                        { "redirect_uri", _redirectUrlEndpoint },
+                        { "redirect_uri", HttpUtility.UrlDecode(_redirectUrlEndpoint) },
                         { "access_type", "offline" },
                         { "prompt", "consent" },
                         { "grant_type", "authorization_code" }
@@ -179,14 +180,14 @@ namespace ApiDPSystem.Controllers
                 if (result.Succeeded)
                 {
                     var user = await _accountService.FindUserByEmail(logInModel.Email);
-                    var AuthenticationResult = _accountService.GenerateJWTToken(user);
+                    var authenticationResult = _accountService.GenerateJWTToken(user);
 
-                    if (AuthenticationResult.Success)
+                    if (authenticationResult.Success)
                         return new ApiResponse<AuthenticationResult>()
                         {
                             IsSuccess = true,
                             StatusCode = StatusCodes.Status200OK,
-                            Content = AuthenticationResult
+                            Content = authenticationResult
                         };
                     else
                         return new ApiResponse<AuthenticationResult>()
@@ -194,7 +195,7 @@ namespace ApiDPSystem.Controllers
                             IsSuccess = false,
                             StatusCode = StatusCodes.Status400BadRequest,
                             Message = "Ошибка при попытке аутентификации пользователя.",
-                            Errors = AuthenticationResult.Errors
+                            Errors = authenticationResult.Errors
                         };
                 }
 
@@ -307,6 +308,7 @@ namespace ApiDPSystem.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ApiResponse> ForgotPassword([FromForm] ForgotPasswordRecord forgotPassword)
         {
@@ -352,6 +354,7 @@ namespace ApiDPSystem.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ApiResponse> ResetPassword([FromForm] ResetPasswordRecord resetPassword)
         {
@@ -399,6 +402,52 @@ namespace ApiDPSystem.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<ApiResponse<AuthenticationResult>> RefreshToken([FromForm] TokenRequest tokenRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                Log.Warning("Предоставлены некорректные данные для метода RefreshToken");
+
+                return new ApiResponse<AuthenticationResult>()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Поля AccessToken и RefreshToken обязательны.",
+                    Errors = ModelState.GetErrorList()
+                };
+            }
+
+            try
+            {
+                var verifyTokenResult = await _accountService.VerifyToken(tokenRequest);
+
+                if (verifyTokenResult == null)
+                    return new ApiResponse<AuthenticationResult>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Invalid tokens.",
+                    };
+
+                return new ApiResponse<AuthenticationResult>()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Content = verifyTokenResult
+                };
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "");
+                return new ApiResponse<AuthenticationResult>()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Ошибка при обновлении AccessToken."
+                };
+            }
+        }
 
         #region AdditionalFunctionality
         //[HttpGet]

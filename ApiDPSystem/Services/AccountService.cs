@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -18,26 +19,32 @@ namespace ApiDPSystem.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly TokenValidationParameters _tokenValidationParameters;
         private readonly IConfiguration _configuration;
         private Context _context;
-
         public delegate Task RegisterHandler(User user, string subject, string message);
         public event RegisterHandler SendMessage;
 
-        public AccountService(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, Context context)
+        public AccountService(UserManager<User> userManager,
+                              SignInManager<User> signInManager,
+                              IConfiguration configuration,
+                              Context context,
+                              TokenValidationParameters tokenValidationParameters)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _context = context;
+            _tokenValidationParameters = tokenValidationParameters;
         }
+
 
         public async Task<IdentityResult> LogIn(LogInRecord logInModel)
         {
             var checkResult = await CheckIfEmailConfirmedAsync(logInModel.Email);
             if (!checkResult.Succeeded)
                 return checkResult;
-            
+
             var signInResult = await _signInManager.PasswordSignInAsync(logInModel.Email, logInModel.Password, false, false);
             if (!signInResult.Succeeded)
                 return IdentityResult.Failed(new IdentityError()
@@ -164,14 +171,101 @@ namespace ApiDPSystem.Services
                 Success = true
             };
         }
-
-
         private string GetRandomString(int length)
         {
             var random = new Random();
             var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
             .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+
+        public async Task<AuthenticationResult> VerifyToken(TokenRequest tokenRequest)
+        {
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+
+            // Now we need to check if the token has a valid security algorithm
+            var principal = jwtTokenHandler.ValidateToken(tokenRequest.Token, _tokenValidationParameters, out var validatedToken);
+            if (validatedToken is JwtSecurityToken jwtSecurityToken)
+            {
+                var result = jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
+                if (result == false)
+                    return new AuthenticationResult()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { "Invalid security algorithm" }
+                    };
+            }
+
+            // Will get the time stamp in unix time
+            var utcExpiryDate = long.Parse(principal.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+
+            // we convert the expiry date from seconds to the date
+            var expDate = UnixTimeStampToDateTime(utcExpiryDate);
+            if (expDate > DateTime.UtcNow)
+                return new AuthenticationResult()
+                {
+                    Success = false,
+                    Errors = new List<string>() { "We cannot refresh this since the token has not expired" }
+                };
+
+            // Check the token we got if its saved in the db
+            var storedRefreshToken = _context.RefreshTokens.FirstOrDefault(x => x.Token == tokenRequest.RefreshToken);
+            if (storedRefreshToken == null)
+                return new AuthenticationResult()
+                {
+                    Success = false,
+                    Errors = new List<string>() { "Refresh token doesnt exist." }
+                };
+
+            // Check the date of the saved token if it has expired
+            if (DateTime.UtcNow > storedRefreshToken.ExpiryDate)
+                return new AuthenticationResult()
+                {
+                    Success = false,
+                    Errors = new List<string>() { "Token has expired, user needs to relogin" }
+                };
+
+            // check if the refresh token has been used
+            if (storedRefreshToken.IsUsed)
+                return new AuthenticationResult()
+                {
+                    Success = false,
+                    Errors = new List<string>() { "Token has been used" }
+                };
+
+            // Check if the token is revoked
+            if (storedRefreshToken.IsRevoked)
+                return new AuthenticationResult()
+                {
+                    Success = false,
+                    Errors = new List<string>() { "Token has been revoked" }
+                };
+
+            // we are getting here the jwt token id
+            var jti = principal.Claims.SingleOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
+
+            // check the id that the recieved token has against the id saved in the db
+            if (storedRefreshToken.JwtId != jti)
+                return new AuthenticationResult()
+                {
+                    Success = false,
+                    Errors = new List<string>() { "The token doenst mateched the saved token" }
+                };
+
+            storedRefreshToken.IsUsed = true;
+            _context.RefreshTokens.Update(storedRefreshToken);
+            await _context.SaveChangesAsync();
+
+            var user = await _userManager.FindByIdAsync(storedRefreshToken.UserId);
+            return GenerateJWTToken(user);
+        }
+
+        private DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        {
+            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToUniversalTime();
+            return dtDateTime;
         }
     }
 }
