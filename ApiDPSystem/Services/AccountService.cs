@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -150,37 +151,35 @@ namespace ApiDPSystem.Services
             var token = jwtTokenHandler.CreateToken(tokenDescriptor);
             var jwtToken = jwtTokenHandler.WriteToken(token);
 
-            var refreshToken = new RefreshToken()
+            var refreshTokenInfo = new RefreshTokenInfo()
             {
                 JwtId = token.Id,
-                IsUsed = false,
                 UserId = user.Id,
-                AddedDate = DateTime.UtcNow,
                 ExpiryDate = DateTime.UtcNow.AddMonths(1),
-                IsRevoked = false,
-                Token = GetRandomString(25)
+                RefreshToken = GetRandomString()
             };
 
-            _context.RefreshTokens.Add(refreshToken);
+            _context.RefreshTokenInfoTable.Add(refreshTokenInfo);
             _context.SaveChanges();
 
             return new AuthenticationResult()
             {
                 Token = jwtToken,
-                RefreshToken = refreshToken.Token,
+                RefreshToken = refreshTokenInfo.RefreshToken,
                 Success = true
             };
         }
-        private string GetRandomString(int length)
+
+        private string GetRandomString()
         {
-            var random = new Random();
-            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Repeat(chars, length)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
+            var randomNumber = new byte[32];
+            using var randomNumberGenerator = RandomNumberGenerator.Create();
+            randomNumberGenerator.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
         }
 
 
-        public async Task<AuthenticationResult> VerifyToken(TokenRequest tokenRequest)
+        public async Task<AuthenticationResult> Refresh(TokenRequest tokenRequest)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
 
@@ -209,8 +208,7 @@ namespace ApiDPSystem.Services
                     Errors = new List<string>() { "We cannot refresh this since the token has not expired" }
                 };
 
-            // Check the token we got if its saved in the db
-            var storedRefreshToken = _context.RefreshTokens.FirstOrDefault(x => x.Token == tokenRequest.RefreshToken);
+            var storedRefreshToken = _context.RefreshTokenInfoTable.FirstOrDefault(x => x.RefreshToken == tokenRequest.RefreshToken);
             if (storedRefreshToken == null)
                 return new AuthenticationResult()
                 {
@@ -226,22 +224,6 @@ namespace ApiDPSystem.Services
                     Errors = new List<string>() { "Token has expired, user needs to relogin" }
                 };
 
-            // check if the refresh token has been used
-            if (storedRefreshToken.IsUsed)
-                return new AuthenticationResult()
-                {
-                    Success = false,
-                    Errors = new List<string>() { "Token has been used" }
-                };
-
-            // Check if the token is revoked
-            if (storedRefreshToken.IsRevoked)
-                return new AuthenticationResult()
-                {
-                    Success = false,
-                    Errors = new List<string>() { "Token has been revoked" }
-                };
-
             // we are getting here the jwt token id
             var jti = principal.Claims.SingleOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
 
@@ -253,8 +235,7 @@ namespace ApiDPSystem.Services
                     Errors = new List<string>() { "The token doenst mateched the saved token" }
                 };
 
-            storedRefreshToken.IsUsed = true;
-            _context.RefreshTokens.Update(storedRefreshToken);
+            _context.RefreshTokenInfoTable.Update(storedRefreshToken);
             await _context.SaveChangesAsync();
 
             var user = await _userManager.FindByIdAsync(storedRefreshToken.UserId);

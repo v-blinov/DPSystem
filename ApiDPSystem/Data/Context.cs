@@ -5,7 +5,7 @@ namespace ApiDPSystem.Data
 {
     public class Context : DbContext
     {
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<RefreshTokenInfo> RefreshTokenInfoTable { get; set; }
 
         public Context() : this(DefaultOptions())
         {
