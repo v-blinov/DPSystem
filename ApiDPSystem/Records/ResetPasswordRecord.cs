@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.Records
 {
-    public class ResetPasswordRecord
+    public record ResetPasswordRecord
     {
         public string Code { get; set; }
 

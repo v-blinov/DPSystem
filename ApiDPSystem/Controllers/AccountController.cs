@@ -19,14 +19,18 @@ namespace ApiDPSystem.Controllers
     {
         private readonly AccountService _accountService;
         private readonly EmailService _emailService;
+        private readonly UserService _userService;
 
-        public AccountController(AccountService registerService, EmailService emailService)
+        private const string userRole = "User";
+
+        public AccountController(AccountService registerService, EmailService emailService, UserService userService)
         {
             _accountService = registerService;
             _emailService = emailService;
+            _userService = userService;
         }
 
-        
+
         [HttpPost]
         public async Task<ApiResponse<AuthenticationResult>> LogIn([FromForm] LogInRecord logInModel)
         {
@@ -45,35 +49,35 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                var result = await _accountService.LogIn(logInModel);
-                if (result.Succeeded)
-                {
-                    var user = await _accountService.FindUserByEmail(logInModel.Email);
-                    var authenticationResult = _accountService.GenerateJWTToken(user);
+                var logInResult = await _accountService.LogIn(logInModel);
+                if (!logInResult.Succeeded)
+                    return new ApiResponse<AuthenticationResult>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Ошибка при входе в аккаунт",
+                        Errors = logInResult.Errors.Select(p => p.Description).ToList()
+                    };
 
-                    if (authenticationResult.Success)
-                        return new ApiResponse<AuthenticationResult>()
-                        {
-                            IsSuccess = true,
-                            StatusCode = StatusCodes.Status200OK,
-                            Content = authenticationResult
-                        };
-                    else
-                        return new ApiResponse<AuthenticationResult>()
-                        {
-                            IsSuccess = false,
-                            StatusCode = StatusCodes.Status400BadRequest,
-                            Message = "Ошибка при попытке аутентификации пользователя.",
-                            Errors = authenticationResult.Errors
-                        };
-                }
+                var user = await _accountService.FindUserByEmail(logInModel.Email);
+
+                var role = await _userService.GetRole(user);
+
+                var authenticationResult = _accountService.GenerateJWTToken(user, role);
+                if (!authenticationResult.Success)
+                    return new ApiResponse<AuthenticationResult>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Ошибка при попытке аутентификации пользователя.",
+                        Errors = authenticationResult.Errors
+                    };
 
                 return new ApiResponse<AuthenticationResult>()
                 {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Ошибка при входе в аккаунт",
-                    Errors = result.Errors.Select(p => p.Description).ToList()
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Content = authenticationResult,
                 };
             }
             catch (Exception ex)
@@ -89,12 +93,11 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResponse> Register([FromForm] RegisterRecord registerModel)
+        public async Task<ApiResponse> RegisterUser([FromForm] RegisterRecord registerModel)
         {
             if (!ModelState.IsValid)
             {
                 Log.Warning("Предоставлены некорректные данные для метода RegisterModel");
-
                 return new ApiResponse()
                 {
                     IsSuccess = false,
@@ -117,20 +120,31 @@ namespace ApiDPSystem.Controllers
 
                 _accountService.SendMessage += _emailService.SendEmailAsync;
                 var result = await _accountService.Register(user, registerModel.Password, url);
+                var resultRoleAdding = await _userService.AddRoleToUser(user, userRole);
 
                 if (result.Succeeded)
-                    return new ApiResponse()
+                    if (resultRoleAdding.Succeeded)
+                        return new ApiResponse()
+                        {
+                            IsSuccess = true,
+                            StatusCode = StatusCodes.Status200OK
+                        };
+                    else
                     {
-                        IsSuccess = true,
-                        StatusCode = StatusCodes.Status200OK
-                    };
+                        Log.Error($"Ошибка при добавлении роли {userRole} для пользователя {user.Email}.");
+                        await _userService.RemoveUser(user.Email);
+                    }
+
+                var errors = result.Errors.Select(p => p.Description).ToList();
+                errors.AddRange(resultRoleAdding.Errors.Select(p => p.Description).ToList());
+                errors = errors.Distinct().ToList();
 
                 return new ApiResponse()
                 {
-                    IsSuccess = result.Succeeded,
+                    IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = "Ошибка регистрации пользователя.",
-                    Errors = result.Errors.Select(p => p.Description).ToList()
+                    Errors = errors
                 };
             }
             catch (Exception ex)
@@ -183,7 +197,6 @@ namespace ApiDPSystem.Controllers
             if (!ModelState.IsValid)
             {
                 Log.Warning("предоставлены некорректные данные для метода ForgotPassword");
-
                 return new ApiResponse()
                 {
                     IsSuccess = false,
@@ -228,7 +241,6 @@ namespace ApiDPSystem.Controllers
             if (!ModelState.IsValid)
             {
                 Log.Warning("Предоставлены некорректные данные для метода RegisterModel");
-
                 return new ApiResponse()
                 {
                     IsSuccess = false,
@@ -275,7 +287,6 @@ namespace ApiDPSystem.Controllers
             if (!ModelState.IsValid)
             {
                 Log.Warning("Предоставлены некорректные данные для метода RefreshToken");
-
                 return new ApiResponse<AuthenticationResult>()
                 {
                     IsSuccess = false,
@@ -324,8 +335,8 @@ namespace ApiDPSystem.Controllers
             var jsonToken = handler.ReadToken(token);
             var tokenS = handler.ReadToken(token) as JwtSecurityToken;
 
-            return Ok(jsonToken);
             //var jti = tokenS.Claims.First(claim => claim.Type == "jti").Value;
+            return Ok(jsonToken);
         }
     }
 }

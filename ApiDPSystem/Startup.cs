@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Text;
 
 namespace ApiDPSystem
@@ -26,7 +27,6 @@ namespace ApiDPSystem
         {
             Configuration = configuration;
         }
-
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
@@ -47,34 +47,30 @@ namespace ApiDPSystem
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                
-                //options.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
-                //options.DefaultScheme = GoogleDefaults.AuthenticationScheme;
-                //options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
             })
-                .AddGoogle(googleOptions =>
-                {
-                    IConfigurationSection googleAuthNSection =
-                        Configuration.GetSection("Authentication:Google");
+                //.AddGoogle(googleOptions =>
+                //{
+                //    IConfigurationSection googleAuthNSection =
+                //        Configuration.GetSection("Authentication:Google");
 
-                    googleOptions.ClientId = googleAuthNSection["ClientId"];
-                    googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
+                //    googleOptions.ClientId = googleAuthNSection["ClientId"];
+                //    googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
 
-                    //googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
-                })
+                //    //googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
+                //})
                 .AddJwtBearer(jwtOptions =>
                 {
                     jwtOptions.SaveToken = true;
                     jwtOptions.TokenValidationParameters = new TokenValidationParameters
-                     {
-                         ValidateIssuer = false,
-                         ValidateAudience = false,
-                         ValidateLifetime = true,
-                         ValidateIssuerSigningKey = true,
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
 
-                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
-                         ClockSkew = TimeSpan.Zero
-                     };
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+                        ClockSkew = TimeSpan.Zero
+                    };
                 });
 
             services.AddControllers()
@@ -87,13 +83,15 @@ namespace ApiDPSystem
 
             services.AddSwaggerGen(c =>
             {
+                //SwaggerXmlComments
                 //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 //c.IncludeXmlComments(xmlPath);
 
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "DPSystemAPI", Version = "v1" });
 
-                //// addOAuthAuthentication
+                #region OAuthAuthentication
+                // addOAuthAuthentication
                 //var OauthSecurityScheme = new OpenApiSecurityScheme
                 //{
                 //    Description = "EnterClientID",
@@ -118,7 +116,8 @@ namespace ApiDPSystem
                 //    }
                 //};
                 //c.AddSecurityDefinition(OauthSecurityScheme.Reference.Id, OauthSecurityScheme);
-                //c.AddSecurityRequirement(new OpenApiSecurityRequirement {{ OauthSecurityScheme, new List<string>() }});
+                //c.AddSecurityRequirement(new OpenApiSecurityRequirement { { OauthSecurityScheme, new List<string>() } });
+                #endregion
 
                 // add JWT Authentication
                 var JwtSecurityScheme = new OpenApiSecurityScheme
@@ -136,12 +135,28 @@ namespace ApiDPSystem
                     }
                 };
                 c.AddSecurityDefinition(JwtSecurityScheme.Reference.Id, JwtSecurityScheme);
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement{{JwtSecurityScheme, new List<string>() }});
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement { { JwtSecurityScheme, new List<string>() } });
             });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", builder =>
+                {
+                    builder.RequireRole("Admin");
+                });
+
+                options.AddPolicy("User", builder =>
+                {
+                    builder.RequireRole("User");
+                });
+            });
+
 
             services.AddSingleton<TokenValidationParameters>();
             services.AddScoped<AccountService>();
             services.AddScoped<EmailService>();
+            services.AddScoped<RoleService>();
+            services.AddScoped<UserService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -157,14 +172,14 @@ namespace ApiDPSystem
             }
 
             app.UseSwagger();
-            app.UseSwaggerUI(c => 
-            { 
-                c.SwaggerEndpoint("swagger/v1/swagger.json", "ApiDPSystem v1"); 
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("swagger/v1/swagger.json", "ApiDPSystem v1");
                 c.RoutePrefix = string.Empty;
-                //c.OAuthClientId(Configuration.GetValue<string>("Authentication:Google:ClientId"));
-                //c.OAuthClientSecret(Configuration.GetValue<string>("Authentication:Google:ClientSecret"));
+                c.OAuthClientId(Configuration.GetValue<string>("Authentication:Google:ClientId"));
+                c.OAuthClientSecret(Configuration.GetValue<string>("Authentication:Google:ClientSecret"));
                 c.OAuthAppName("OAuth-dpsystem");
-                //c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+                c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
             });
 
             app.UseHttpsRedirection();

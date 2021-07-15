@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.Records
 {
-    public class ForgotPasswordRecord
+    public record ForgotPasswordRecord
     {
         [Display(Name = "Email")]
         [Required(ErrorMessage = "Обязательное поле.")]

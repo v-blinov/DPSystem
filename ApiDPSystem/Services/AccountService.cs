@@ -18,8 +18,11 @@ namespace ApiDPSystem.Services
 {
     public class AccountService
     {
+        // вынести работу с _context в repository
+
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly UserService _userService;
         private readonly TokenValidationParameters _tokenValidationParameters;
         private readonly IConfiguration _configuration;
         private Context _context;
@@ -28,12 +31,14 @@ namespace ApiDPSystem.Services
 
         public AccountService(UserManager<User> userManager,
                               SignInManager<User> signInManager,
+                              UserService userService,
                               IConfiguration configuration,
                               Context context,
                               TokenValidationParameters tokenValidationParameters)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _userService = userService;
             _configuration = configuration;
             _context = context;
             _tokenValidationParameters = tokenValidationParameters;
@@ -129,7 +134,7 @@ namespace ApiDPSystem.Services
 
         public async Task<User> FindUserByEmail(string email) => await _userManager.FindByEmailAsync(email);
 
-        public AuthenticationResult GenerateJWTToken(User user)
+        public AuthenticationResult GenerateJWTToken(User user, string role)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -139,10 +144,9 @@ namespace ApiDPSystem.Services
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim("Id", user.Id),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                    new Claim("Name", user.FirstName + " " + user.LastName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim("roles", role)
                 }),
                 Expires = DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpireMinutes"])),
                 SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
@@ -179,6 +183,8 @@ namespace ApiDPSystem.Services
         }
 
 
+
+        //Поменять логику refresh
         public async Task<AuthenticationResult> Refresh(TokenRequest tokenRequest)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -232,14 +238,15 @@ namespace ApiDPSystem.Services
                 return new AuthenticationResult()
                 {
                     Success = false,
-                    Errors = new List<string>() { "The token doenst mateched the saved token" }
+                    Errors = new List<string>() { "The token didn't matech the saved token" }
                 };
 
             _context.RefreshTokenInfoTable.Update(storedRefreshToken);
             await _context.SaveChangesAsync();
 
             var user = await _userManager.FindByIdAsync(storedRefreshToken.UserId);
-            return GenerateJWTToken(user);
+            var role = await _userService.GetRole(user);
+            return GenerateJWTToken(user, role);
         }
 
         private DateTime UnixTimeStampToDateTime(double unixTimeStamp)

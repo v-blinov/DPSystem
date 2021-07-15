@@ -8,12 +8,11 @@ namespace ApiDPSystem.Controllers
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class TestController : Controller
     {
-        [Authorize]
         [HttpGet]
+        [Authorize(Policy = "User")]
         public IActionResult CheckAuthentication()
         {
             return Ok("Success access");
         }
-
     }
 }

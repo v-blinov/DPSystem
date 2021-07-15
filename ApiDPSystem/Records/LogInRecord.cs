@@ -2,12 +2,11 @@
 
 namespace ApiDPSystem.Records
 {
-    public class LogInRecord
+    public record LogInRecord
     {
         [Display(Name = "Email")]
         [Required(ErrorMessage = "Обязательное поле.")]
         public string Email { get; init; }
-
 
 
         [Display(Name = "Пароль")]

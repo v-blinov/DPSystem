@@ -19,7 +19,7 @@ namespace Tests
         private Mock<FakeUserManager> mockUsrMng;
         private Mock<FakeSignInManager> mockSignInMng;
         private AccountService _accountSrv;
-        
+
         //[SetUp]
         //public void Setup()
         //{
@@ -78,7 +78,7 @@ namespace Tests
         //    Assert.AreEqual(false, result.Succeeded);
         //}
 
-        
+
         //[Test]
         //public void AccountService_ConfirmEmail_IfEmailAndTokenCorrect_Test()
         //{

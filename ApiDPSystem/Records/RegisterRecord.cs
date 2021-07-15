@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.Records
 {
-    public class RegisterRecord
+    public record RegisterRecord
     {
         [Required]
         [Display(Name = "Имя")]
