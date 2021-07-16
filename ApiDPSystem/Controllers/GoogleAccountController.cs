@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ApiDPSystem.Models;
+using ApiDPSystem.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace ApiDPSystem.Controllers
 {
@@ -15,172 +17,234 @@ namespace ApiDPSystem.Controllers
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class GoogleAccountController : Controller
     {
-        private readonly string _clientId;
-        private readonly string _clientSecret;
+        private readonly AccountService _accountService;
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserService _userService;
 
-        private readonly string _accountUrlEndpoint;
-        private readonly string _redirectUrlEndpoint;
-        private readonly string _revokeUrlEndpoint;
-        private readonly string _tokenUrlEndpoint;
+        private const string UserRole = "User";
+        private readonly string _googleRedirectUrlEndpoint;
 
-        public GoogleAccountController(IConfiguration configuration)
+        public GoogleAccountController(IConfiguration configuration, AccountService accountService, SignInManager<User> signInManager, UserService userService)
         {
-            _clientId = configuration.GetValue<string>("Authentication:Google:ClientId");
-            _clientSecret = configuration.GetValue<string>("Authentication:Google:ClientSecret");
-
-            _accountUrlEndpoint = configuration.GetValue<string>("OAuth:AccountUrlEndpoint");
-            _tokenUrlEndpoint = configuration.GetValue<string>("OAuth:TokenUrlEndpoint");
-            _revokeUrlEndpoint = configuration.GetValue<string>("OAuth:RevokeUrlEndpoint");
-            _redirectUrlEndpoint = configuration.GetValue<string>("OAuth:RedirectUrlEndpoint");
-        }
-
-
-        [HttpGet]
-        public IActionResult OAuthGoogleLoginGetUrl()
-        {
-            try
-            {
-                string url = $"{_accountUrlEndpoint}?" +
-                             $"client_id={_clientId}&" +
-                             $"redirect_uri={_redirectUrlEndpoint}&" +
-                              "response_type=code&" +
-                              "access_type=offline&" +
-                              "prompt=consent&" +
-                              "scope=openid%20profile%20email";
-
-                return Ok(url);
-            }
-            catch (Exception ex)
-            {
-                Log.Error("", ex);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            _accountService = accountService;
+            _signInManager = signInManager;
+            _userService = userService;
+            _googleRedirectUrlEndpoint = configuration.GetValue<string>("OAuth:GoogleRedirectUrl");
         }
 
         [HttpGet]
-        public async Task<IActionResult> OAuthGetAccessToken(string code)
+        public IActionResult GoogleLogin()
+        {
+            var provider = "Google";
+
+            var redirectUrl = _googleRedirectUrlEndpoint;
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+
+            return new ChallengeResult(provider, properties);
+        }
+
+        [HttpGet]
+        public async Task<ApiResponse<AuthenticationResult>> GoogleResponse()
         {
             try
             {
-                using (var client = new HttpClient())
+                ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync();
+                if (info == null)
                 {
-                    var data = new Dictionary<string, string>()
+                    return new ApiResponse<AuthenticationResult>()
                     {
-                        { "code", code },
-                        { "client_id", _clientId },
-                        { "client_secret", _clientSecret },
-                        { "redirect_uri", HttpUtility.UrlDecode(_redirectUrlEndpoint) },
-                        { "access_type", "offline" },
-                        { "prompt", "consent" },
-                        { "grant_type", "authorization_code" }
+                        IsSuccess = true,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Данные пользователя не обнаружены."
                     };
-
-                    var formContent = new FormUrlEncodedContent(data);
-                    var apiResponse = await client.PostAsync(_tokenUrlEndpoint, formContent);
-                    var result = await apiResponse.Content.ReadAsStringAsync();
-
-                    return Ok(result);
+                    //возможно стоит редиректнуть на страницу входа
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error("", ex);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
 
-        [HttpGet]
-        public async Task<IActionResult> OAuthRefreshTokenAsync(string refreshToken)
-        {
-            try
-            {
-                using (var client = new HttpClient())
+                //Если внешний пользователь уже сохранен в нашей базе, то генерируем токены
+                var user = await _userService.GetUserByEmail(info.Principal.FindFirst(ClaimTypes.Email).Value);
+                if (user != null)
                 {
-                    var data = new Dictionary<string, string>()
+                    var authenticationResult = _accountService.GenerateJWTToken(user, UserRole);
+                    return new ApiResponse<AuthenticationResult>()
                     {
-                        { "client_id", _clientId },
-                        { "client_secret", _clientSecret },
-                        { "refresh_token", refreshToken },
-                        { "grant_type", "refresh_token" },
+                        IsSuccess = true,
+                        StatusCode = StatusCodes.Status200OK,
+                        Content = authenticationResult,
                     };
-
-                    var formContent = new FormUrlEncodedContent(data);
-                    var apiResponse = await client.PostAsync(_tokenUrlEndpoint, formContent);
-                    var result = await apiResponse.Content.ReadAsStringAsync();
-
-                    return Ok(result);
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error("", ex);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
 
-        [HttpGet]
-        public async Task<IActionResult> OAuthRevokeTokenAsync(string accessToken)
-        {
-            try
-            {
-                using (var client = new HttpClient())
+                //Если внешний пользователь не сохранен в нашей базе,
+                //то сначала сохраняем его, затем генерируем токены
+
+                user = new User
                 {
-                    var data = new Dictionary<string, string>()
+                    UserName = info.Principal.FindFirst(ClaimTypes.Email).Value,
+                    Email = info.Principal.FindFirst(ClaimTypes.Email).Value,
+                    FirstName = info.Principal.FindFirstValue(ClaimTypes.Name).Split(" ")[0],
+                    LastName = info.Principal.FindFirstValue(ClaimTypes.Name).Split(" ")[1],
+                    EmailConfirmed = true
+                };
+
+                var externalRegisterResult = await _accountService.RegisterExternalUser(user);
+
+                if (externalRegisterResult.Succeeded)
+                {
+                    var roleAddingResult = await _userService.AddRoleToUser(user, UserRole);
+                    if (roleAddingResult.Succeeded)
                     {
-                        { "client_id", _clientId },
-                        { "client_secret", _clientSecret },
-                        { "token", accessToken }
-                    };
+                        var authenticationResult = _accountService.GenerateJWTToken(user, UserRole);
 
-                    var formContent = new FormUrlEncodedContent(data);
-                    await client.PostAsync(_revokeUrlEndpoint, formContent);
+                        return new ApiResponse<AuthenticationResult>()
+                        {
+                            IsSuccess = true,
+                            StatusCode = StatusCodes.Status200OK,
+                            Content = authenticationResult,
+                        };
+                    }
+                    else
+                    {
+                        Log.Error($"Ошибка при добавлении роли {UserRole} для пользователя {user.Email}.");
+                        await _userService.RemoveUser(user.Email);
 
-                    return Ok();
+                        return new ApiResponse<AuthenticationResult>()
+                        {
+                            IsSuccess = false,
+                            StatusCode = StatusCodes.Status400BadRequest,
+                            Message = "Ошибка регистрации пользователя.",
+                            Errors = roleAddingResult.Errors.Select(p => p.Description).ToList()
+                        };
+                    }
                 }
+
+                Log.Error($"Ошибка при регистрации пользователя {user.Email}. {externalRegisterResult.Errors.Select(p => p.Description).ToList()}");
+                return new ApiResponse<AuthenticationResult>()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Ошибка регистрации пользователя.",
+                    Errors = externalRegisterResult.Errors.Select(p => p.Description).ToList()
+                };
             }
             catch (Exception ex)
             {
-                Log.Error("", ex);
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                Log.Error(ex, "");
+                return new ApiResponse<AuthenticationResult>()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Ошибка на стороне сервера"
+                };
             }
         }
+
 
         #region AdditionalFunctionality
         //[HttpGet]
-        //public async Task<IActionResult> GoogleResponse()
+        //public IActionResult OAuthGoogleLoginGetUrl()
         //{
         //    try
         //    {
-        //        ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync();
-        //        if (info == null)
-        //            return RedirectToAction("Login");
+        //        string url = $"{_accountUrlEndpoint}?" +
+        //                     $"client_id={_clientId}&" +
+        //                     $"redirect_uri={_redirectUrlEndpoint}&" +
+        //                      "response_type=code&" +
+        //                      "access_type=offline&" +
+        //                      "prompt=consent&" +
+        //                      "scope=openid%20profile%20email";
 
-        //        var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
-        //        string[] userInfo = { info.Principal.FindFirst(ClaimTypes.Name).Value, info.Principal.FindFirst(ClaimTypes.Email).Value };
-        //        if (result.Succeeded)
-        //            return Ok(userInfo);
-        //        else
+        //        return Ok(url);
+        //        return Redirect(url);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error("", ex);
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+        //    }
+        //}
+
+        //[HttpGet]
+        //public async Task<IActionResult> OAuthGetAccessToken(string code)
+        //{
+        //    try
+        //    {
+        //        using (var client = new HttpClient())
         //        {
-        //            User user = new User
+        //            var data = new Dictionary<string, string>()
         //            {
-        //                Email = info.Principal.FindFirst(ClaimTypes.Email).Value,
-        //                UserName = info.Principal.FindFirst(ClaimTypes.Email).Value,
-        //                FirstName = "TEST",
-        //                LastName = "test"
-        //                //LastName = info.Principal.FindFirstValue(ClaimTypes.Name).Split(" ")[1] 
+        //                { "code", code },
+        //                { "client_id", _clientId },
+        //                { "client_secret", _clientSecret },
+        //                { "redirect_uri", HttpUtility.UrlDecode(_redirectUrlEndpoint) },
+        //                { "access_type", "offline" },
+        //                { "prompt", "consent" },
+        //                { "grant_type", "authorization_code" }
         //            };
 
-        //            IdentityResult identResult = await _userManager.CreateAsync(user);
-        //            if (identResult.Succeeded)
+        //            var formContent = new FormUrlEncodedContent(data);
+        //            var apiResponse = await client.PostAsync(_tokenUrlEndpoint, formContent);
+        //            var result = await apiResponse.Content.ReadAsStringAsync();
+
+        //            if (result != null)
         //            {
-        //                identResult = await _userManager.AddLoginAsync(user, info);
-        //                if (identResult.Succeeded)
-        //                {
-        //                    await _signInManager.SignInAsync(user, false);
-        //                    return Ok(userInfo.ToList());
-        //                }
+        //                await _accountService.SaveExternalUserAsync(result);
         //            }
-        //            return StatusCode(StatusCodes.Status403Forbidden);
+        //            return Ok(result);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error("", ex);
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+        //    }
+        //}
+
+        //[HttpGet]
+        //public async Task<IActionResult> OAuthRefreshTokenAsync(string refreshToken)
+        //{
+        //    try
+        //    {
+        //        using (var client = new HttpClient())
+        //        {
+        //            var data = new Dictionary<string, string>()
+        //            {
+        //                { "client_id", _clientId },
+        //                { "client_secret", _clientSecret },
+        //                { "refresh_token", refreshToken },
+        //                { "grant_type", "refresh_token" },
+        //            };
+
+        //            var formContent = new FormUrlEncodedContent(data);
+        //            var apiResponse = await client.PostAsync(_tokenUrlEndpoint, formContent);
+        //            var result = await apiResponse.Content.ReadAsStringAsync();
+
+        //            return Ok(result);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error("", ex);
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+        //    }
+        //}
+
+        //[HttpGet]
+        //public async Task<IActionResult> OAuthRevokeTokenAsync(string accessToken)
+        //{
+        //    try
+        //    {
+        //        using (var client = new HttpClient())
+        //        {
+        //            var data = new Dictionary<string, string>()
+        //            {
+        //                { "client_id", _clientId },
+        //                { "client_secret", _clientSecret },
+        //                { "token", accessToken }
+        //            };
+
+        //            var formContent = new FormUrlEncodedContent(data);
+        //            await client.PostAsync(_revokeUrlEndpoint, formContent);
+
+        //            return Ok();
         //        }
         //    }
         //    catch (Exception ex)

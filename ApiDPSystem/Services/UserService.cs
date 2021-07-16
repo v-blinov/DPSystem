@@ -16,8 +16,12 @@ namespace ApiDPSystem.Services
             _roleService = roleService;
         }
 
-        public async Task<User> GetUser(string userId) =>
+
+        public async Task<User> GetUserById(string userId) =>
             await _userManager.FindByIdAsync(userId);
+
+        public async Task<User> GetUserByEmail(string userEmail) =>
+            await _userManager.FindByEmailAsync(userEmail);
 
         public async Task<IdentityResult> AddRoleToUser(User user, string roleName)
         {

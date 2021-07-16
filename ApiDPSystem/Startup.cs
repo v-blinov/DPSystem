@@ -48,16 +48,16 @@ namespace ApiDPSystem
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-                //.AddGoogle(googleOptions =>
-                //{
-                //    IConfigurationSection googleAuthNSection =
-                //        Configuration.GetSection("Authentication:Google");
+                .AddGoogle(googleOptions =>
+                {
+                    IConfigurationSection googleAuthNSection =
+                        Configuration.GetSection("Authentication:Google");
 
-                //    googleOptions.ClientId = googleAuthNSection["ClientId"];
-                //    googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
+                    googleOptions.ClientId = googleAuthNSection["ClientId"];
+                    googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
 
-                //    //googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
-                //})
+                    googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
+                })
                 .AddJwtBearer(jwtOptions =>
                 {
                     jwtOptions.SaveToken = true;

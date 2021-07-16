@@ -172,7 +172,7 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                var user = await _userService.GetUser(userId);
+                var user = await _userService.GetUserById(userId);
                 if (user == null)
                 {
                     Log.Error($"Пользователь с id = {userId} не найден.");

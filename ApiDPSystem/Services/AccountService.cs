@@ -61,7 +61,7 @@ namespace ApiDPSystem.Services
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> Register(User user, string password, string url)
+        public async Task<IdentityResult> RegisterWithEmail(User user, string password, string url)
         {
             var response = await _userManager.CreateAsync(user, password);
             if (response.Succeeded)
@@ -255,5 +255,10 @@ namespace ApiDPSystem.Services
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToUniversalTime();
             return dtDateTime;
         }
+
+
+
+        public async Task<IdentityResult> RegisterExternalUser(User user) =>
+            await _userManager.CreateAsync(user);
     }
 }
