@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>dotnet-MessageService-EFE58385-947D-4F2A-9587-D68E6A64DD01</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="ConsumeRabbitMQService.cs~RFc7cb1d2.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.2.2" />
+  </ItemGroup>
+</Project>

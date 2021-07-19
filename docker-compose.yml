@@ -1,6 +1,30 @@
 version: "3.8"
 
 services: 
+    rabbit:
+        image: rabbitmq:3-management
+        hostname: rabbit
+        container_name: rabbit
+        ports:
+            - 5672:5672
+            - 15672:15672
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:15672"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+    
+    messageSender:
+        image: ${DOCKER_REGISTRY-}messagesender
+        build:
+            context: .
+            dockerfile: MessageService/Dockerfile
+        environment:
+            - RABBIT_HOSTNAME=rabbit
+        restart: on-failure
+        depends_on:
+            - rabbit
+
     api:
         # restart: always
         image: blinovvitaly/apidpsystem
@@ -10,17 +34,24 @@ services:
         volumes:
            - ./:/etc    #нужно уточнить. Пытаюсь сохранять все данные,
                         #чтобы каждый раз при обновлении приложения не перезапускать контейнер.
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - RABBIT_HOSTNAME=rabbit
+        restart: on-failure
         ports:
             - 8081:80
         depends_on:
             - mssql
-
+            - rabbit
+      
     nginx:
         image: nginx:latest
         volumes:
             - ./ApiDPSystem/nginx.conf:/etc/nginx/nginx.conf
         ports:
             - 90:80
+        depends_on:
+            - api
 
     mssql:
         image: mcr.microsoft.com/mssql/server

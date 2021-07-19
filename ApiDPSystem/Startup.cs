@@ -1,8 +1,6 @@
 using ApiDPSystem.Data;
 using ApiDPSystem.Models;
 using ApiDPSystem.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,9 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Text;
 
 namespace ApiDPSystem
@@ -31,6 +29,7 @@ namespace ApiDPSystem
 
         public void ConfigureServices(IServiceCollection services)
         {
+            #region DbContexts and Identity
             services.AddDbContext<IdentityContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
 
@@ -40,8 +39,9 @@ namespace ApiDPSystem
 
             services.AddDbContext<Context>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            #endregion
 
-
+            #region AuthenticationShemes
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,11 +50,14 @@ namespace ApiDPSystem
             })
                 .AddGoogle(googleOptions =>
                 {
-                    IConfigurationSection googleAuthNSection =
-                        Configuration.GetSection("Authentication:Google");
+                    //IConfigurationSection googleAuthNSection =
+                    //    Configuration.GetSection("Authentication:Google");
 
-                    googleOptions.ClientId = googleAuthNSection["ClientId"];
-                    googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
+                    //googleOptions.ClientId = googleAuthNSection["ClientId"];
+                    //googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
+
+                    googleOptions.ClientId = "1015102078067-mo5ds31rjrtocd7dfk4vt663946ijftq.apps.googleusercontent.com";
+                    googleOptions.ClientSecret = "19-tLf4MHfV13WoYlUN_HXNF";
 
                     googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
                 })
@@ -72,6 +75,22 @@ namespace ApiDPSystem
                         ClockSkew = TimeSpan.Zero
                     };
                 });
+            #endregion
+
+            #region RabbitMQ
+            var rabbitHostName = Environment.GetEnvironmentVariable("RABBIT_HOSTNAME");
+            var connectionFactory = new ConnectionFactory
+            {
+                HostName = rabbitHostName ?? "localhost",
+                Port = 5672,
+                UserName = "guest",
+                Password = "guest"
+            };
+            var rabbitMqConnection = connectionFactory.CreateConnection();
+
+            services.AddSingleton(rabbitMqConnection);
+            services.AddSingleton<RabbitMqService>();
+            #endregion
 
             services.AddControllers()
                 .ConfigureApiBehaviorOptions(options =>
@@ -81,6 +100,7 @@ namespace ApiDPSystem
 
             services.Configure<DataProtectionTokenProviderOptions>(p => p.TokenLifespan = TimeSpan.FromMinutes(30));
 
+            #region Swagger
             services.AddSwaggerGen(c =>
             {
                 //SwaggerXmlComments
@@ -137,7 +157,9 @@ namespace ApiDPSystem
                 c.AddSecurityDefinition(JwtSecurityScheme.Reference.Id, JwtSecurityScheme);
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement { { JwtSecurityScheme, new List<string>() } });
             });
+            #endregion
 
+            #region AuthorizationByRoles
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("Admin", builder =>
@@ -150,13 +172,15 @@ namespace ApiDPSystem
                     builder.RequireRole("User");
                 });
             });
+            #endregion
 
-
+            #region DI_Services
             services.AddSingleton<TokenValidationParameters>();
             services.AddScoped<AccountService>();
             services.AddScoped<EmailService>();
             services.AddScoped<RoleService>();
             services.AddScoped<UserService>();
+            #endregion
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -176,10 +200,10 @@ namespace ApiDPSystem
             {
                 c.SwaggerEndpoint("swagger/v1/swagger.json", "ApiDPSystem v1");
                 c.RoutePrefix = string.Empty;
-                c.OAuthClientId(Configuration.GetValue<string>("Authentication:Google:ClientId"));
-                c.OAuthClientSecret(Configuration.GetValue<string>("Authentication:Google:ClientSecret"));
-                c.OAuthAppName("OAuth-dpsystem");
-                c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+                //c.OAuthClientId(Configuration.GetValue<string>("Authentication:Google:ClientId"));
+                //c.OAuthClientSecret(Configuration.GetValue<string>("Authentication:Google:ClientSecret"));
+                //c.OAuthAppName("OAuth-dpsystem");
+                //c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
             });
 
             app.UseHttpsRedirection();
