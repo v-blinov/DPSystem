@@ -52,10 +52,10 @@ namespace ApiDPSystem
                 {
                     //IConfigurationSection googleAuthNSection =
                     //    Configuration.GetSection("Authentication:Google");
-
                     //googleOptions.ClientId = googleAuthNSection["ClientId"];
                     //googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
 
+                    // Ќадо придумать, как вынести эти данные в docker secret
                     googleOptions.ClientId = "1015102078067-mo5ds31rjrtocd7dfk4vt663946ijftq.apps.googleusercontent.com";
                     googleOptions.ClientSecret = "19-tLf4MHfV13WoYlUN_HXNF";
 

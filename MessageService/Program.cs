@@ -1,3 +1,4 @@
+using MessageService.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -15,6 +16,7 @@ namespace MessageService
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<ConsumeRabbitMQService>();
+                    services.AddSingleton<EmailService>();
                 });
     }
 }

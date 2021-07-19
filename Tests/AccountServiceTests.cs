@@ -16,9 +16,9 @@ namespace Tests
     [TestFixture]
     public class AccountServiceTests
     {
-        private Mock<FakeUserManager> mockUsrMng;
-        private Mock<FakeSignInManager> mockSignInMng;
-        private AccountService _accountSrv;
+        //private Mock<FakeUserManager> mockUsrMng;
+        //private Mock<FakeSignInManager> mockSignInMng;
+        //private AccountService _accountSrv;
 
         //[SetUp]
         //public void Setup()
