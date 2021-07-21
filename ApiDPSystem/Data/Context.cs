@@ -5,23 +5,15 @@ namespace ApiDPSystem.Data
 {
     public class Context : DbContext
     {
-        public DbSet<RefreshTokenInfo> RefreshTokenInfoTable { get; set; }
-
-        public Context() : this(DefaultOptions())
+        public Context(DbContextOptions<Context> options) : base(options)
         {
-        }
-        public Context(string connectionString) : this(DefaultOptions(connectionString))
-        {
-        }
-        public Context(DbContextOptions options) : base(options)
-        {
-            //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
-        public static DbContextOptions DefaultOptions(string connectionString = null)
+
+        public DbSet<RefreshTokenInfo> RefreshTokenInfoTable { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var cs = connectionString ?? DefaultConnection.DefaultConnectionString;
-            return SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), cs).Options;
         }
     }
 }

@@ -27,11 +27,9 @@ namespace ApiDPSystem.Controllers
         {
             try 
             {
-                var addresses = await _emailService.GetUserEmailsAsync();
-
                 RabbitMessage rabbitMessage = new RabbitMessage()
                 {
-                    Addresses = addresses,
+                    Addresses = await _emailService.GetUserEmailsAsync(),
                     Message = message,
                     Subject = subject
                 };

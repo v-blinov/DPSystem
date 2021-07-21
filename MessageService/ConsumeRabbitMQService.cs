@@ -41,7 +41,7 @@ namespace MessageService
         {
             var consumer = new EventingBasicConsumer(_channel);
 
-            consumer.Received += (sender, e) =>
+            consumer.Received += async (sender, e) =>
             {
                 var body = e.Body;
                 var messageJson = Encoding.UTF8.GetString(body.ToArray());
@@ -49,7 +49,7 @@ namespace MessageService
 
                 Console.WriteLine($"============================================ Received message: {rabbitMessage.Message}");
 
-                //await _emailService.SendEmailAsync(rabbitMessage);
+                await _emailService.SendEmailAsync(rabbitMessage);
             };
 
             _channel.BasicQos(0, 1, false);

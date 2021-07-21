@@ -26,7 +26,6 @@ services:
             - rabbit
 
     api:
-        # restart: always
         image: blinovvitaly/apidpsystem
         build: 
             context: .
@@ -55,10 +54,14 @@ services:
 
     mssql:
         image: mcr.microsoft.com/mssql/server
+        container_name: mssql
         environment: 
             - ACCEPT_EULA=Y
             - SA_PASSWORD=${PASSWORD}
         # volumes:
         #     - ./mssql-data:/var/opt/mssql
         ports:
-            - 8082:1433
+            - 8083:1433
+
+networks:
+    default:
