@@ -1,4 +1,5 @@
 ﻿using ApiDPSystem.Data;
+using ApiDPSystem.DbEntities;
 using ApiDPSystem.Models;
 using ApiDPSystem.Records;
 using Microsoft.AspNetCore.Identity;

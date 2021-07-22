@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ApiDPSystem.Models
+namespace ApiDPSystem.DbEntities
 {
     public class RefreshTokenInfo
     {
