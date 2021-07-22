@@ -1,5 +1,4 @@
 ﻿using ApiDPSystem.DbEntities;
-using ApiDPSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,7 +8,7 @@ namespace ApiDPSystem.Data
     {
         public Context(DbContextOptions<Context> options) : base(options)
         {
-            //Database.EnsureCreated();
+            Database.EnsureCreated();
         }
 
         public DbSet<RefreshTokenInfo> RefreshTokenInfoTable { get; set; }
@@ -80,6 +79,10 @@ namespace ApiDPSystem.Data
                 builder.Property(p => p.ModelTrim)
                     .IsRequired()
                     .HasMaxLength(20);
+
+                builder.Property(p => p.CarId)
+                    .IsRequired()
+                    .HasMaxLength(30);
             }
         }
 

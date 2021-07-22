@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiDPSystem.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20210722084202_InitialDB")]
+    [Migration("20210722142622_InitialDB")]
     partial class InitialDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,10 +23,9 @@ namespace ApiDPSystem.Migrations
 
             modelBuilder.Entity("ApiDPSystem.DbEntities.Car", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("CarColorId")
                         .HasColumnType("int");
@@ -37,16 +36,25 @@ namespace ApiDPSystem.Migrations
                     b.Property<int?>("CarFeatureFeatureId")
                         .HasColumnType("int");
 
+                    b.Property<string>("CarId")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<int>("EngineId")
                         .HasColumnType("int");
 
                     b.Property<string>("Model")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ModelTrim")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ProducerId")
@@ -56,7 +64,9 @@ namespace ApiDPSystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("VinCode")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<DateTime>("Year")
                         .HasColumnType("datetime2");
@@ -123,7 +133,9 @@ namespace ApiDPSystem.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("HexCode")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("varchar(6)");
 
                     b.HasKey("Id");
 
@@ -137,13 +149,14 @@ namespace ApiDPSystem.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<double>("Capacity")
+                    b.Property<double?>("Capacity")
                         .HasColumnType("float");
 
                     b.Property<string>("Fuel")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("Power")
+                    b.Property<int?>("Power")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -188,7 +201,9 @@ namespace ApiDPSystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -208,6 +223,7 @@ namespace ApiDPSystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Url")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -225,29 +241,16 @@ namespace ApiDPSystem.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Producers");
                 });
 
-            modelBuilder.Entity("ApiDPSystem.DbEntities.Transmission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Transmissions");
-                });
-
-            modelBuilder.Entity("ApiDPSystem.Models.RefreshTokenInfo", b =>
+            modelBuilder.Entity("ApiDPSystem.DbEntities.RefreshTokenInfo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -258,17 +261,38 @@ namespace ApiDPSystem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("JwtId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RefreshToken")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.ToTable("RefreshTokenInfoTable");
+                });
+
+            modelBuilder.Entity("ApiDPSystem.DbEntities.Transmission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Transmissions");
                 });
 
             modelBuilder.Entity("ApiDPSystem.DbEntities.Car", b =>

@@ -25,7 +25,7 @@ namespace ApiDPSystem.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    HexCode = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    HexCode = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -38,9 +38,9 @@ namespace ApiDPSystem.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Fuel = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Power = table.Column<int>(type: "int", nullable: false),
-                    Capacity = table.Column<double>(type: "float", nullable: false)
+                    Fuel = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Power = table.Column<int>(type: "int", nullable: true),
+                    Capacity = table.Column<double>(type: "float", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -53,11 +53,27 @@ namespace ApiDPSystem.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Producers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefreshTokenInfoTable",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    JwtId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokenInfoTable", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -66,7 +82,7 @@ namespace ApiDPSystem.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Value = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -123,7 +139,7 @@ namespace ApiDPSystem.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     FeatureId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -141,13 +157,13 @@ namespace ApiDPSystem.Migrations
                 name: "Cars",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    VinCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CarId = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    VinCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     Year = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Model = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ModelTrim = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Model = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ModelTrim = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     ProducerId = table.Column<int>(type: "int", nullable: false),
                     EngineId = table.Column<int>(type: "int", nullable: false),
                     TransmissionId = table.Column<int>(type: "int", nullable: false),
@@ -196,7 +212,7 @@ namespace ApiDPSystem.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CarColorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -266,6 +282,9 @@ namespace ApiDPSystem.Migrations
 
             migrationBuilder.DropTable(
                 name: "Images");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokenInfoTable");
 
             migrationBuilder.DropTable(
                 name: "Engines");

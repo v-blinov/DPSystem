@@ -21,10 +21,9 @@ namespace ApiDPSystem.Migrations
 
             modelBuilder.Entity("ApiDPSystem.DbEntities.Car", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("CarColorId")
                         .HasColumnType("int");
@@ -34,6 +33,11 @@ namespace ApiDPSystem.Migrations
 
                     b.Property<int?>("CarFeatureFeatureId")
                         .HasColumnType("int");
+
+                    b.Property<string>("CarId")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<int>("EngineId")
                         .HasColumnType("int");

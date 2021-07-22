@@ -6,7 +6,9 @@ namespace ApiDPSystem.DbEntities
 {
     public class Car
     { 
-        public int Id { get; set; }
+        [Key]
+        public Guid Id { get; set; }
+        public string CarId { get; set; }
         public string VinCode { get; set; }
 
         [DataType(DataType.Date)]
