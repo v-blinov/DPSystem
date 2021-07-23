@@ -1,0 +1,17 @@
+﻿using System.Xml.Serialization;
+
+namespace ApiDPSystem.Xml.Version1
+{
+    [XmlRoot(ElementName = "techincal_options")]
+    public class TechincalOptions
+    {
+        [XmlElement(ElementName = "engine")]
+        public Engine Engine { get; set; }
+
+        [XmlElement(ElementName = "transmission")]
+        public string Transmission { get; set; }
+
+        [XmlElement(ElementName = "drive")]
+        public string Drive { get; set; }
+    }
+}

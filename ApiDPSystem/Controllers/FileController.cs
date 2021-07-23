@@ -1,5 +1,4 @@
-﻿using ApiDPSystem.Models;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System;
@@ -31,7 +30,7 @@ namespace ApiDPSystem.Controllers
                 using (var reader = new StreamReader(file.OpenReadStream()))
                     jsonContent = await reader.ReadToEndAsync();
 
-                var model = JsonSerializer.Deserialize<Root>(jsonContent);
+                var model = JsonSerializer.Deserialize<Json.Version1.Root>(jsonContent);
 
                 return Ok(model);
 
@@ -54,7 +53,7 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(Root));
+                XmlSerializer serializer = new XmlSerializer(typeof(Xml.Version1.Root));
 
                 using (var reader = new StreamReader(file.OpenReadStream()))
                 {
