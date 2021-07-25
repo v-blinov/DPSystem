@@ -19,15 +19,11 @@ namespace ApiDPSystem.Controllers
     {
         private readonly AccountService _accountService;
         private readonly EmailService _emailService;
-        private readonly UserService _userService;
 
-        private const string UserRole = "User";
-
-        public AccountController(AccountService registerService, EmailService emailService, UserService userService)
+        public AccountController(AccountService registerService, EmailService emailService)
         {
             _accountService = registerService;
             _emailService = emailService;
-            _userService = userService;
         }
 
 
@@ -58,24 +54,12 @@ namespace ApiDPSystem.Controllers
                         Errors = logInResult.Errors.Select(p => p.Description).ToList()
                     };
 
-                var user = await _accountService.FindUserByEmail(logInModel.Email);
-                var role = await _userService.GetRole(user);
-
-                var authenticationResult = _accountService.GenerateJWTToken(user, role);
-                //if (!authenticationResult.Success)
-                //    return new ApiResponse<AuthenticationResult>()
-                //    {
-                //        IsSuccess = false,
-                //        StatusCode = StatusCodes.Status400BadRequest,
-                //        Message = "Ошибка при попытке аутентификации пользователя.",
-                //        Errors = authenticationResult.Errors
-                //    };
-
+                var tokenResult = await _accountService.GenerateJWTTokenAsync(logInModel.Email);
                 return new ApiResponse<AuthenticationResult>()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Content = authenticationResult,
+                    Content = tokenResult,
                 };
             }
             catch (Exception ex)
@@ -100,56 +84,30 @@ namespace ApiDPSystem.Controllers
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Введены некорректные логин и(или) пароль.",
+                    Message = "Введены некорректные данные.",
                     Errors = ModelState.GetErrorList()
                 };
             }
 
             try
             {
-                var user = new User
-                {
-                    UserName = registerModel.Email,
-                    Email = registerModel.Email,
-                    FirstName = registerModel.FirstName,
-                    LastName = registerModel.LastName,
-                };
-                string url = Url.Action("ConfirmEmail", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
-                    
-                _accountService.SendMessage += _emailService.SendEmailAsync;
+                string confirmEmailUrl = Url.Action("ConfirmEmail", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
 
-                var result = await _accountService.RegisterWithEmail(user, registerModel.Password, url);
-                if (result.Succeeded)
-                {
-                    var resultRoleAdding = await _userService.AddRoleToUser(user, UserRole);
-                    if (resultRoleAdding.Succeeded)
-                        return new ApiResponse()
-                        {
-                            IsSuccess = true,
-                            StatusCode = StatusCodes.Status200OK
-                        };
-                    else
+                var registerResult = await _accountService.Register(registerModel, confirmEmailUrl);
+                if (registerResult.Succeeded)
+                    return new ApiResponse()
                     {
-                        Log.Error($"Ошибка при добавлении роли {UserRole} для пользователя {user.Email}.");
-                        await _userService.RemoveUser(user.Email);
-
-                        return new ApiResponse()
-                        {
-                            IsSuccess = false,
-                            StatusCode = StatusCodes.Status400BadRequest,
-                            Message = "Ошибка регистрации пользователя.",
-                            Errors = resultRoleAdding.Errors.Select(p => p.Description).ToList()
-                        };
-                    }
-                }
+                        IsSuccess = true,
+                        StatusCode = StatusCodes.Status200OK
+                    };
 
                 return new ApiResponse()
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Ошибка регистрации пользователя.",
-                    Errors = result.Errors.Select(p => p.Description).ToList()
-                };
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Ошибка регистрации пользователя.",
+                        Errors = registerResult.Errors.Select(p => p.Description).ToList()
+                    };
             }
             catch (Exception ex)
             {

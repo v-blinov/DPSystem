@@ -2,6 +2,7 @@
 using ApiDPSystem.DbEntities;
 using ApiDPSystem.Models;
 using ApiDPSystem.Records;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -24,15 +25,20 @@ namespace ApiDPSystem.Services
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly UserService _userService;
+        private readonly EmailService _emailService;
         private readonly TokenValidationParameters _tokenValidationParameters;
         private readonly IConfiguration _configuration;
         private Context _context;
         public delegate Task RegisterHandler(User user, string subject, string message);
         public event RegisterHandler SendMessage;
 
+        private const string UserRole = "User";
+
+
         public AccountService(UserManager<User> userManager,
                               SignInManager<User> signInManager,
                               UserService userService,
+                              EmailService emailService,
                               IConfiguration configuration,
                               Context context,
                               TokenValidationParameters tokenValidationParameters)
@@ -40,6 +46,7 @@ namespace ApiDPSystem.Services
             _userManager = userManager;
             _signInManager = signInManager;
             _userService = userService;
+            _emailService = emailService;
             _configuration = configuration;
             _context = context;
             _tokenValidationParameters = tokenValidationParameters;
@@ -62,19 +69,41 @@ namespace ApiDPSystem.Services
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> RegisterWithEmail(User user, string password, string url)
+        public async Task<IdentityResult> Register(RegisterRecord registerModel, string url)
         {
-            var response = await _userManager.CreateAsync(user, password);
-            if (response.Succeeded)
+            var user = new User
             {
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                UserName = registerModel.Email,
+                Email = registerModel.Email,
+                FirstName = registerModel.FirstName,
+                LastName = registerModel.LastName,
+            };
 
-                url = url.Replace("userIdValue", user.Id);
-                url = url.Replace("codeValue", HttpUtility.UrlEncode(code));
-
-                await SendMessage?.Invoke(user, "Confirm your account", $"Подтвердите регистрацию, перейдя по ссылке: <a href='{url}'>Confirm your email</a>");
+            var createUserResponse = await _userManager.CreateAsync(user, registerModel.Password);
+            if (!createUserResponse.Succeeded)
+                return createUserResponse;
+            
+            var roleAddingResult = await _userService.AddRoleToUser(user, UserRole);
+            if (!roleAddingResult.Succeeded)
+            {
+                await _userService.RemoveUser(user.Email);
+                return roleAddingResult;
             }
-            return response;
+
+            SendMessage += _emailService.SendEmailAsync;
+            await CreateMessageAndSendEmail(user, url);
+
+            return IdentityResult.Success;
+        }
+
+        private async Task CreateMessageAndSendEmail(User user, string url)
+        {
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            url = url.Replace("userIdValue", user.Id);
+            url = url.Replace("codeValue", HttpUtility.UrlEncode(code));
+
+            await SendMessage?.Invoke(user, "Confirm your account", $"Подтвердите регистрацию, перейдя по ссылке: <a href='{url}'>Confirm your email</a>");
         }
 
         public async Task<bool> ConfirmEmail(string userId, string code)
@@ -134,6 +163,49 @@ namespace ApiDPSystem.Services
         }
 
         public async Task<User> FindUserByEmail(string email) => await _userManager.FindByEmailAsync(email);
+
+        public async Task<AuthenticationResult> GenerateJWTTokenAsync(string userEmail)
+        {
+            var user = await FindUserByEmail(userEmail);
+            var role = await _userService.GetRole(user);
+
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim("Id", user.Id),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim("roles", role)
+                }),
+                Expires = DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpireMinutes"])),
+                SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+            var jwtToken = jwtTokenHandler.WriteToken(token);
+
+            var refreshTokenInfo = new RefreshTokenInfo()
+            {
+                JwtId = token.Id,
+                UserId = user.Id,
+                ExpiryDate = DateTime.UtcNow.AddMonths(1),
+                RefreshToken = GetRandomString()
+            };
+
+            _context.RefreshTokenInfoTable.Add(refreshTokenInfo);
+            _context.SaveChanges();
+
+            return new AuthenticationResult()
+            {
+                Token = jwtToken,
+                RefreshToken = refreshTokenInfo.RefreshToken,
+                Success = true
+            };
+        }
 
         public AuthenticationResult GenerateJWTToken(User user, string role)
         {
