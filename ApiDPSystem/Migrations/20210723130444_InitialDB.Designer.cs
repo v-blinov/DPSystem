@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiDPSystem.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20210722142622_InitialDB")]
+    [Migration("20210723130444_InitialDB")]
     partial class InitialDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,11 +35,6 @@ namespace ApiDPSystem.Migrations
 
                     b.Property<int?>("CarFeatureFeatureId")
                         .HasColumnType("int");
-
-                    b.Property<string>("CarId")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
 
                     b.Property<int>("EngineId")
                         .HasColumnType("int");
@@ -68,8 +63,8 @@ namespace ApiDPSystem.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
-                    b.Property<DateTime>("Year")
-                        .HasColumnType("datetime2");
+                    b.Property<short>("Year")
+                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 

@@ -180,6 +180,7 @@ namespace ApiDPSystem
             services.AddScoped<EmailService>();
             services.AddScoped<RoleService>();
             services.AddScoped<UserService>();
+            services.AddScoped<FileService>();
             #endregion
         }
 

@@ -72,7 +72,7 @@ namespace ApiDPSystem.Services
                 url = url.Replace("userIdValue", user.Id);
                 url = url.Replace("codeValue", HttpUtility.UrlEncode(code));
 
-                SendMessage?.Invoke(user, "Confirm your account", $"Подтвердите регистрацию, перейдя по ссылке: <a href='{url}'>Confirm your email</a>");
+                await SendMessage?.Invoke(user, "Confirm your account", $"Подтвердите регистрацию, перейдя по ссылке: <a href='{url}'>Confirm your email</a>");
             }
             return response;
         }

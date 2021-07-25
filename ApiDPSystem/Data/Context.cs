@@ -80,9 +80,11 @@ namespace ApiDPSystem.Data
                     .IsRequired()
                     .HasMaxLength(20);
 
-                builder.Property(p => p.CarId)
-                    .IsRequired()
-                    .HasMaxLength(30);
+                builder.Property(p => p.Year)
+                    .HasColumnType("smallint");
+
+                builder.Property(p => p.Drive)
+                    .HasMaxLength(10);
             }
         }
 

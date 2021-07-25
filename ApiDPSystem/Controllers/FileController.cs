@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ApiDPSystem.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System;
-using System.IO;
-using System.Text.Json;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 namespace ApiDPSystem.Controllers
 {
@@ -14,36 +11,15 @@ namespace ApiDPSystem.Controllers
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class FileController : Controller
     {
-        [HttpPost]
-        public async Task<IActionResult> ProcessJsonFileAsync(IFormFile file)
+        private readonly FileService _fileService;
+        public FileController(FileService fileService)
         {
-            if (file == null || file.Length == 0)
-            {
-                Log.Error("Файл не отправлен, или он пустой");
-                return BadRequest();
-            }
-
-            try
-            {
-                string jsonContent = string.Empty;
-
-                using (var reader = new StreamReader(file.OpenReadStream()))
-                    jsonContent = await reader.ReadToEndAsync();
-
-                var model = JsonSerializer.Deserialize<Json.Version1.Root>(jsonContent);
-
-                return Ok(model);
-
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            _fileService = fileService;
         }
 
+
         [HttpPost]
-        public IActionResult ProcessXmlFile(IFormFile file)
+        public IActionResult SendFile(IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
@@ -53,14 +29,8 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(Xml.Version1.Root));
-
-                using (var reader = new StreamReader(file.OpenReadStream()))
-                {
-                    var model = serializer.Deserialize(reader);
-                    return Ok(model);
-                }
-
+                _fileService.ProcessFile(file);
+                return Ok();
             }
             catch (Exception ex)
             {

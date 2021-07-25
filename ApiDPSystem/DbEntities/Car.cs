@@ -8,17 +8,16 @@ namespace ApiDPSystem.DbEntities
     { 
         [Key]
         public Guid Id { get; set; }
-        public string CarId { get; set; }
         public string VinCode { get; set; }
 
-        [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime Year { get; set; }
+        [Range(1900, 9999)]
+        public int Year { get; set; }
         public string Model { get; set; }
         public string ModelTrim { get; set; }
 
         [Min(0, ErrorMessage = "Значение Price должно быть больше 0.")]
         public decimal? Price { get; set; }
+        public string Drive { get; set; }
 
 
         public int ProducerId { get; set; }

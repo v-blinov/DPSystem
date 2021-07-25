@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace ApiDPSystem.Xml.Version1
+namespace ApiDPSystem.FileFormat.Xml.Version1
 {
     [XmlRoot(ElementName = "colors")]
     public class Colors

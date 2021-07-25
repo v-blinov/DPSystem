@@ -158,9 +158,8 @@ namespace ApiDPSystem.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CarId = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     VinCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
-                    Year = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Year = table.Column<short>(type: "smallint", nullable: false),
                     Model = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     ModelTrim = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),

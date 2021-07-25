@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ApiDPSystem.Json.Version1
+namespace ApiDPSystem.FileFormat.Json.Version1
 {
     public class Engine
     {
