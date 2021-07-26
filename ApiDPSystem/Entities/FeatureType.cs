@@ -1,4 +1,4 @@
-﻿namespace ApiDPSystem.DbEntities
+﻿namespace ApiDPSystem.Entities
 {
     public class FeatureType
     {

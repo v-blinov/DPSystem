@@ -1,4 +1,4 @@
-﻿using ApiDPSystem.DbEntities;
+﻿using ApiDPSystem.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

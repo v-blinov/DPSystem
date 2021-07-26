@@ -1,5 +1,5 @@
 ﻿using ApiDPSystem.Data;
-using ApiDPSystem.DbEntities;
+using ApiDPSystem.Entities;
 using ApiDPSystem.Models;
 using ApiDPSystem.Records;
 using Microsoft.AspNetCore.Http;
@@ -53,7 +53,7 @@ namespace ApiDPSystem.Services
         }
 
 
-        public async Task<IdentityResult> LogIn(LogInRecord logInModel)
+        public async Task<IdentityResult> LogInAsync(LogInRecord logInModel)
         {
             var checkResult = await CheckIfEmailConfirmedAsync(logInModel.Email);
             if (!checkResult.Succeeded)
@@ -69,7 +69,7 @@ namespace ApiDPSystem.Services
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> Register(RegisterRecord registerModel, string url)
+        public async Task<IdentityResult> RegisterAsync(RegisterRecord registerModel, string url)
         {
             var user = new User
             {
@@ -91,12 +91,12 @@ namespace ApiDPSystem.Services
             }
 
             SendMessage += _emailService.SendEmailAsync;
-            await CreateMessageAndSendEmail(user, url);
+            await SendRegistrationEmailAsync(user, url);
 
             return IdentityResult.Success;
         }
-
-        private async Task CreateMessageAndSendEmail(User user, string url)
+        
+        private async Task SendRegistrationEmailAsync(User user, string url)
         {
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
@@ -106,7 +106,7 @@ namespace ApiDPSystem.Services
             await SendMessage?.Invoke(user, "Confirm your account", $"Подтвердите регистрацию, перейдя по ссылке: <a href='{url}'>Confirm your email</a>");
         }
 
-        public async Task<bool> ConfirmEmail(string userId, string code)
+        public async Task<bool> ConfirmEmailAsync(string userId, string code)
         {
             if (userId == null || code == null)
                 return false;
@@ -119,16 +119,30 @@ namespace ApiDPSystem.Services
             return result.Succeeded;
         }
 
-        public async Task ForgotPassword(string email, string url)
+        public async Task ForgotPasswordAsync(EmailRecord emailRecord, string url)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var result = await CheckIfEmailConfirmedAsync(emailRecord.Email);
+
+            if (result.Succeeded)
+            {
+                SendMessage += _emailService.SendEmailAsync;
+
+                var user = await _userManager.FindByEmailAsync(emailRecord.Email);
+                await SendForgotPasswordEmailAsync(user, url);
+            }
+        }
+        
+        private async Task SendForgotPasswordEmailAsync(User user, string url)
+        {
             var code = await _userManager.GeneratePasswordResetTokenAsync(user);
 
             url = url.Replace("userIdValue", user.Id);
             url = url.Replace("codeValue", code);
 
-            SendMessage?.Invoke(user, "Reset password", $"Для сброса пароля пройдите по ссылке: <a href='{url}'>link</a>");
+            await SendMessage?.Invoke(user, "Reset password", $"Для сброса пароля пройдите по ссылке: <a href='{url}'>link</a>");
         }
+
+
 
         public async Task<IdentityResult> ResetPassword(ResetPasswordRecord resetPassword)
         {
@@ -143,7 +157,7 @@ namespace ApiDPSystem.Services
             return await _userManager.ResetPasswordAsync(user, resetPassword.Code, resetPassword.Password);
         }
 
-        public async Task<IdentityResult> CheckIfEmailConfirmedAsync(string email)
+        private async Task<IdentityResult> CheckIfEmailConfirmedAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
 

@@ -1,7 +1,7 @@
 ﻿using DataAnnotationsExtensions;
 using System.Collections.Generic;
 
-namespace ApiDPSystem.DbEntities
+namespace ApiDPSystem.Entities
 {
     public class Engine
     {

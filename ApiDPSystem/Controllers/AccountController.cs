@@ -18,12 +18,10 @@ namespace ApiDPSystem.Controllers
     public class AccountController : Controller
     {
         private readonly AccountService _accountService;
-        private readonly EmailService _emailService;
 
-        public AccountController(AccountService registerService, EmailService emailService)
+        public AccountController(AccountService registerService)
         {
             _accountService = registerService;
-            _emailService = emailService;
         }
 
 
@@ -44,7 +42,7 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                var logInResult = await _accountService.LogIn(logInModel);
+                var logInResult = await _accountService.LogInAsync(logInModel);
                 if (!logInResult.Succeeded)
                     return new ApiResponse<AuthenticationResult>()
                     {
@@ -54,6 +52,7 @@ namespace ApiDPSystem.Controllers
                         Errors = logInResult.Errors.Select(p => p.Description).ToList()
                     };
 
+                //Проверить метод GenerateJWTTokenAsync
                 var tokenResult = await _accountService.GenerateJWTTokenAsync(logInModel.Email);
                 return new ApiResponse<AuthenticationResult>()
                 {
@@ -93,7 +92,7 @@ namespace ApiDPSystem.Controllers
             {
                 string confirmEmailUrl = Url.Action("ConfirmEmail", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
 
-                var registerResult = await _accountService.Register(registerModel, confirmEmailUrl);
+                var registerResult = await _accountService.RegisterAsync(registerModel, confirmEmailUrl);
                 if (registerResult.Succeeded)
                     return new ApiResponse()
                     {
@@ -126,7 +125,7 @@ namespace ApiDPSystem.Controllers
         {
             try
             {
-                bool result = await _accountService.ConfirmEmail(userId, code);
+                bool result = await _accountService.ConfirmEmailAsync(userId, code);
                 if (result)
                     return new ApiResponse()
                     {
@@ -154,7 +153,7 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResponse> ForgotPassword([FromForm] ForgotPasswordRecord forgotPassword)
+        public async Task<ApiResponse> ForgotPassword([FromForm] EmailRecord emailRecord)
         {
             if (!ModelState.IsValid)
             {
@@ -170,15 +169,9 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                var result = await _accountService.CheckIfEmailConfirmedAsync(forgotPassword.Email);
-                if (result.Succeeded)
-                {
-                    string url = Url.Action("ResetPassword", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
-
-                    _accountService.SendMessage += _emailService.SendEmailAsync;
-                    await _accountService.ForgotPassword(forgotPassword.Email, url);
-                }
-
+                string url = Url.Action("ResetPassword", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
+                await _accountService.ForgotPasswordAsync(emailRecord, url);
+                
                 return new ApiResponse()
                 {
                     IsSuccess = true,
