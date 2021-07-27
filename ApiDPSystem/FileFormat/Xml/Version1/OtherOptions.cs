@@ -7,7 +7,7 @@ namespace ApiDPSystem.FileFormat.Xml.Version1
     public class OtherOptions
     {
         [XmlElement(ElementName = "exterior")]
-        public object Exterior { get; set; }
+        public List<string> Exterior { get; set; }
 
         [XmlElement(ElementName = "interior")]
         public List<string> Interior { get; set; }

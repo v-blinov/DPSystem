@@ -5,7 +5,7 @@ namespace ApiDPSystem.FileFormat.Json.Version1
     public class Colors
     {
         [JsonPropertyName("interior")]
-        public object Interior { get; set; }
+        public string Interior { get; set; }
 
         [JsonPropertyName("exterior")]
         public string Exterior { get; set; }

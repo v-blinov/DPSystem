@@ -93,7 +93,6 @@ namespace ApiDPSystem.Data
                     .HasMaxLength(30);
             }
         }
-
         public class RefreshTokenInfoConfiguration : IEntityTypeConfiguration<RefreshTokenInfo>
         {
             public void Configure(EntityTypeBuilder<RefreshTokenInfo> builder)

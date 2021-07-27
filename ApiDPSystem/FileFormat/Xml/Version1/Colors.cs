@@ -6,7 +6,7 @@ namespace ApiDPSystem.FileFormat.Xml.Version1
     public class Colors
     {
         [XmlElement(ElementName = "interior")]
-        public object Interior { get; set; }
+        public string Interior { get; set; }
 
         [XmlElement(ElementName = "exterior")]
         public string Exterior { get; set; }

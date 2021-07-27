@@ -21,9 +21,9 @@ namespace ApiDPSystem.Services
                 case ".yaml":
                     new YamlParser().ProcessFile(file);
                     break;
-                //case ".csv":
-                //    new JsonParser().ProcessFile(file);
-                //    break;
+                case ".csv":
+                    new CsvParser().ProcessFile(file);
+                    break;
                 default:
                     throw new Exception("Неверный формат файла");
             }

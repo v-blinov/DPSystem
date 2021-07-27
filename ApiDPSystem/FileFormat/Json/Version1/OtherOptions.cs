@@ -6,7 +6,7 @@ namespace ApiDPSystem.FileFormat.Json.Version1
     public class OtherOptions
     {
         [JsonPropertyName("exterior")]
-        public object Exterior { get; set; }
+        public List<string> Exterior { get; set; }
 
         [JsonPropertyName("interior")]
         public List<string> Interior { get; set; }

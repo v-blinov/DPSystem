@@ -1,5 +1,4 @@
-﻿using DataAnnotationsExtensions;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ApiDPSystem.Entities
@@ -14,8 +13,6 @@ namespace ApiDPSystem.Entities
         public int Year { get; set; }
         public string Model { get; set; }
         public string ModelTrim { get; set; }
-
-        [Min(0, ErrorMessage = "Значение Price должно быть больше 0.")]
         public decimal? Price { get; set; }
         public string Drive { get; set; }
 
