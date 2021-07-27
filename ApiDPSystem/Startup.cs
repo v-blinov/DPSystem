@@ -1,5 +1,6 @@
 using ApiDPSystem.Data;
 using ApiDPSystem.Models;
+using ApiDPSystem.Repository;
 using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -174,13 +175,15 @@ namespace ApiDPSystem
             });
             #endregion
 
-            #region DI_Services
+            #region DI
             services.AddSingleton<TokenValidationParameters>();
             services.AddScoped<AccountService>();
             services.AddScoped<EmailService>();
             services.AddScoped<RoleService>();
             services.AddScoped<UserService>();
             services.AddScoped<FileService>();
+
+            services.AddScoped<AccountRepository>();
             #endregion
         }
 

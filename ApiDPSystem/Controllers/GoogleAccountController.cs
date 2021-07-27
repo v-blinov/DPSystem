@@ -64,7 +64,7 @@ namespace ApiDPSystem.Controllers
                 var user = await _userService.GetUserByEmail(info.Principal.FindFirst(ClaimTypes.Email).Value);
                 if (user != null)
                 {
-                    var authenticationResult = _accountService.GenerateJWTToken(user, UserRole);
+                    var authenticationResult = _accountService.GenerateJWTTokenAsync(user, UserRole);
                     return new ApiResponse<AuthenticationResult>()
                     {
                         IsSuccess = true,
@@ -92,7 +92,7 @@ namespace ApiDPSystem.Controllers
                     var roleAddingResult = await _userService.AddRoleToUser(user, UserRole);
                     if (roleAddingResult.Succeeded)
                     {
-                        var authenticationResult = _accountService.GenerateJWTToken(user, UserRole);
+                        var authenticationResult = _accountService.GenerateJWTTokenAsync(user, UserRole);
 
                         return new ApiResponse<AuthenticationResult>()
                         {

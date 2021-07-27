@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,7 +25,8 @@ namespace ApiDPSystem.Controllers
 
 
         [HttpPost]
-        public async Task<ApiResponse<AuthenticationResult>> LogIn([FromForm] LogInRecord logInModel)
+        [ActionName("LogIn")]
+        public async Task<ApiResponse<AuthenticationResult>> LogInAsync([FromForm] LogInRecord logInModel)
         {
             if (!ModelState.IsValid)
             {
@@ -52,7 +52,6 @@ namespace ApiDPSystem.Controllers
                         Errors = logInResult.Errors.Select(p => p.Description).ToList()
                     };
 
-                //Проверить метод GenerateJWTTokenAsync
                 var tokenResult = await _accountService.GenerateJWTTokenAsync(logInModel.Email);
                 return new ApiResponse<AuthenticationResult>()
                 {
@@ -74,7 +73,8 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResponse> RegisterUser([FromForm] RegisterRecord registerModel)
+        [ActionName("RegisterUser")]
+        public async Task<ApiResponse> RegisterUserAsync([FromForm] RegisterRecord registerModel)
         {
             if (!ModelState.IsValid)
             {
@@ -121,7 +121,8 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<ApiResponse> ConfirmEmail([FromQuery] string userId, [FromQuery] string code)
+        [ActionName("ConfirmEmail")]
+        public async Task<ApiResponse> ConfirmEmailAsync([FromQuery] string userId, [FromQuery] string code)
         {
             try
             {
@@ -153,7 +154,8 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResponse> ForgotPassword([FromForm] EmailRecord emailRecord)
+        [ActionName("ForgotPasswor")]
+        public async Task<ApiResponse> ForgotPasswordAsync([FromForm] EmailRecord emailRecord)
         {
             if (!ModelState.IsValid)
             {
@@ -191,7 +193,8 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResponse> ResetPassword([FromForm] ResetPasswordRecord resetPassword)
+        [ActionName("ResetPassword")]
+        public async Task<ApiResponse> ResetPasswordAsync([FromForm] ResetPasswordRecord resetPassword)
         {
             if (!ModelState.IsValid)
             {
@@ -207,7 +210,7 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                var result = await _accountService.ResetPassword(resetPassword);
+                var result = await _accountService.ResetPasswordAsync(resetPassword);
 
                 if (result.Succeeded)
                     return new ApiResponse()
@@ -237,7 +240,8 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResponse<AuthenticationResult>> RefreshToken([FromForm] TokenRequest tokenRequest)
+        [ActionName("RefreshToken")]
+        public async Task<ApiResponse<AuthenticationResult>> RefreshTokenAsync([FromForm] TokenRequest tokenRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -253,7 +257,7 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                var refreshTokenResult = await _accountService.Refresh(tokenRequest);
+                var refreshTokenResult = await _accountService.RefreshAsync(tokenRequest);
 
                 if (refreshTokenResult.Success)
                     return new ApiResponse<AuthenticationResult>()
@@ -281,17 +285,6 @@ namespace ApiDPSystem.Controllers
                     Message = "Ошибка при обновлении AccessToken."
                 };
             }
-        }
-
-        [HttpPost]
-        public IActionResult DecodeJwtToken([FromForm] string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(token);
-            var tokenS = handler.ReadToken(token) as JwtSecurityToken;
-
-            //var jti = tokenS.Claims.First(claim => claim.Type == "jti").Value;
-            return Ok(jsonToken);
         }
     }
 }

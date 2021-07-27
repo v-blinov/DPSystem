@@ -1,4 +1,5 @@
-﻿using ApiDPSystem.Services;
+﻿using ApiDPSystem.Models;
+using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -19,23 +20,37 @@ namespace ApiDPSystem.Controllers
 
 
         [HttpPost]
-        public IActionResult SendFile(IFormFile file)
+        public ApiResponse SendFile(IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
                 Log.Error("Файл не отправлен, или он пустой");
-                return BadRequest();
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Файл не отправлен, или он пустой.",
+                };
             }
 
             try
             {
                 _fileService.ProcessFile(file);
-                return Ok();
+                return new ApiResponse()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                };
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return new ApiResponse<AuthenticationResult>()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Ошибка на стороне сервера"
+                };
             }
         }
     }
