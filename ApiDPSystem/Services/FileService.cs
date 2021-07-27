@@ -18,9 +18,9 @@ namespace ApiDPSystem.Services
                 case ".xml":
                     new XmlParser().ProcessFile(file);
                     break;
-                //case ".yaml":
-                //    new JsonParser().ProcessFile(file);
-                //    break;
+                case ".yaml":
+                    new YamlParser().ProcessFile(file);
+                    break;
                 //case ".csv":
                 //    new JsonParser().ProcessFile(file);
                 //    break;

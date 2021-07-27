@@ -17,7 +17,7 @@ namespace ApiDPSystem.Models.Parser
 
             using (var reader = new StringReader(xmlContent))
             {
-                var test = (Root)serializer.Deserialize(reader);
+                var xmlModel = (Root)serializer.Deserialize(reader);
             }
         }
     }
