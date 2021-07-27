@@ -33,12 +33,6 @@ namespace ApiDPSystem.Data
             modelBuilder.Entity<CarFeature>()
                 .HasKey(p => new { p.CarId, p.FeatureId });
 
-            modelBuilder.Entity<Color>()
-                .Property(p => p.HexCode)
-                .IsRequired()
-                .HasMaxLength(6)
-                .HasColumnType("varchar");
-
             modelBuilder.Entity<Engine>()
                 .Property(p => p.Fuel)
                 .HasMaxLength(20);
@@ -85,6 +79,18 @@ namespace ApiDPSystem.Data
 
                 builder.Property(p => p.Drive)
                     .HasMaxLength(10);
+            }
+        }
+        public class ColorConfiguration : IEntityTypeConfiguration<Color>
+        {
+            public void Configure(EntityTypeBuilder<Color> builder)
+            {
+                builder.Property(p => p.HexCode)
+                    .HasMaxLength(6)
+                    .HasColumnType("varchar");
+
+                builder.Property(p => p.Name)
+                    .HasMaxLength(30);
             }
         }
 
