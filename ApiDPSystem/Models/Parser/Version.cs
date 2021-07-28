@@ -12,6 +12,6 @@ namespace ApiDPSystem.Models.Parser
         [XmlElement(ElementName = "version")]
         [YamlMember(Alias = "version")]
         [Name("version")]
-        public int Value { get; set; }
+        public int? Value { get; set; }
     }
 }

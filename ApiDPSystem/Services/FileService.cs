@@ -2,16 +2,17 @@
 using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ApiDPSystem.Services
 {
     public class FileService
     {
-        public void ProcessFile(IFormFile file)
+        public async Task ProcessFileAsync(IFormFile file)
         {
             var fileExtension = Path.GetExtension(file.FileName);
 
-            var fileContent = ReadFile(file);
+            var fileContent = await ReadFileAsync(file);
 
             switch (fileExtension)
             {
@@ -32,11 +33,10 @@ namespace ApiDPSystem.Services
             }
         }
 
-        // сделать асинхронным
-        private string ReadFile(IFormFile file)
+        private async Task<string> ReadFileAsync(IFormFile file)
         {
-            using (var reader = new StreamReader(file.OpenReadStream()))
-                return reader.ReadToEnd();
+            using var reader = new StreamReader(file.OpenReadStream());
+            return await reader.ReadToEndAsync();
         }
 
         public void ProcessJsonWithVersion(string fileContent)

@@ -1,5 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
 namespace ApiDPSystem.Models.Parser
@@ -30,11 +33,16 @@ namespace ApiDPSystem.Models.Parser
 
         public Version CsvGetVersion(string fileName)
         {
-            //string xmlContent = ReadFile(file);
-            //var serializer = new XmlSerializer(typeof(Version));
-            //using (var reader = new StringReader(xmlContent))
-            //    return (Version)serializer.Deserialize(reader);
-            return new Version() { Value = 1 };
+            Regex regex = new Regex(@"_v(\d)+\.");
+            MatchCollection matches = regex.Matches(fileName);
+
+            if (matches.Count > 0)
+            {
+                var versionString = matches.Last().Value.Replace("_v", "").Replace(".", "");
+                return new Version { Value = Convert.ToInt32(versionString) };
+            }
+            else
+                return new Version();
         }
     }
 }

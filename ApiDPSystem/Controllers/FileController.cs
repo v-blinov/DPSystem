@@ -35,7 +35,7 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                _fileService.ProcessFile(file);
+                _fileService.ProcessFileAsync(file);
                 return new ApiResponse()
                 {
                     IsSuccess = true,
