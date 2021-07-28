@@ -8,6 +8,12 @@ namespace ApiDPSystem.Models.Parser
     [XmlRoot(ElementName = "root")]
     public class Root<T>
     {
+        public Root()
+        {
+            Cars = new List<T>();
+        }
+
+
         [JsonPropertyName("cars")]
         [XmlElement(ElementName = "cars")]
         [YamlMember(Alias = "cars")]

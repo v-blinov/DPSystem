@@ -91,8 +91,10 @@ namespace ApiDPSystem.Services
             switch (version.Value)
             {
                 case 1:
-                    var deserializeCsvModel = new CsvParser<FileFormat.Csv.Version1.Car>().DeserializeFile(fileContent);
-                    
+                    var deserializeCsvModel_v1 = new CsvParser<FileFormat.Csv.Version1.Car>().DeserializeFile_Version_1(fileContent);
+                    break;
+                case 2:
+                    var deserializeCsvModel_v2 = new CsvParser<FileFormat.Csv.Version2.Car>().DeserializeFile_Version_2(fileContent);
                     break;
                 default:
                     throw new Exception($"Unknown Yaml file version {version.Value}");

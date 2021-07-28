@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System;
+using System.Threading.Tasks;
 
 namespace ApiDPSystem.Controllers
 {
@@ -20,7 +21,7 @@ namespace ApiDPSystem.Controllers
 
 
         [HttpPost]
-        public ApiResponse SendFile(IFormFile file)
+        public async Task<ApiResponse> SendFileAsync(IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
@@ -35,6 +36,8 @@ namespace ApiDPSystem.Controllers
 
             try
             {
+                // Написать реализацию обратного вызова,
+                // возвращающего результат обработки файла для пользователя
                 _fileService.ProcessFileAsync(file);
                 return new ApiResponse()
                 {

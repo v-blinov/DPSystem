@@ -1,60 +1,86 @@
 ﻿using ApiDPSystem.Interfaces;
 using CsvHelper;
-using System.Collections.Generic;
+using CsvHelper.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 
 namespace ApiDPSystem.Models.Parser
 {
-    public class CsvParser<T> : IParser<T> where T : FileFormat.Csv.Version1.Car
+    public class CsvParser<T> : IParser<T>
     {
+        private readonly CsvConfiguration config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            //MissingFieldFound = null,
+            //HeaderValidated = null
+        };
+
         public Root<T> DeserializeFile(string fileContent)
         {
-            var root = new Root<T>()
-            {
-                Cars = new List<T>()
-            };
+            var root = new Root<T>();
 
-            // вынести десериализацию общих полей в отдельный метод
             using (var reader = new StringReader(fileContent))
+            using (var csv = new CsvReader(reader, config))
+            
+                root.Cars.AddRange(csv.GetRecords<T>());
+
+            return root;
+        }
+
+        public Root<FileFormat.Csv.Version1.Car> DeserializeFile_Version_1(string fileContent)
+        {
+            var root = new Root<FileFormat.Csv.Version1.Car>();
+
+            using (var reader = new StringReader(fileContent))
+            using (var csv = new CsvReader(reader, config))
             {
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                while (csv.Read())
                 {
+                    var car = csv.GetRecord<FileFormat.Csv.Version1.Car>();
 
-                    while (csv.Read())
-                    {
-                        var car = csv.GetRecord<T>();
+                    var headers = csv.HeaderRecord.ToList();
 
-                        // Вынести инициализацию листов и объектов в конструкторы классов
-                        car.Images = new List<string>();
-                        car.OtherOptions = new FileFormat.Csv.Version1.OtherOptions();
+                    var images_FieldNames = headers.Where(p => p.StartsWith("images/")).ToList();
+                    car.Images = images_FieldNames.Select(name => csv.GetField(name)).ToList();
 
-                        car.OtherOptions.Multimedia = new List<string>();
-                        car.OtherOptions.Exterior = new List<string>();
-                        car.OtherOptions.Interior = new List<string>();
+                    var otherOptions_Multimedia_FieldNames = headers.Where(p => p.StartsWith("other options/multimedia/")).ToList();
+                    car.OtherOptions.Multimedia = otherOptions_Multimedia_FieldNames.Select(name => csv.GetField(name)).ToList();
 
-                        var headers = csv.HeaderRecord.ToList();
+                    var otherOptions_Interior_FieldNames = headers.Where(p => p.StartsWith("other options/interior/")).ToList();
+                    car.OtherOptions.Interior = otherOptions_Interior_FieldNames.Select(name => csv.GetField(name)).ToList();
 
-                        var image_FieldNames = headers.Where(p => p.StartsWith("images/")).ToList();
-                        var otherOptions_Multimedia_FieldNames = headers.Where(p => p.StartsWith("other options/multimedia/")).ToList();
-                        var otherOptions_Interior_FieldNames = headers.Where(p => p.StartsWith("other options/interior/")).ToList();
-                        var otherOptions_Exterior_FieldNames = headers.Where(p => p.StartsWith("other options/exterior/")).ToList();
+                    var otherOptions_Exterior_FieldNames = headers.Where(p => p.StartsWith("other options/exterior/")).ToList();
+                    car.OtherOptions.Exterior = otherOptions_Exterior_FieldNames.Select(name => csv.GetField(name)).ToList();
 
-                        foreach (var name in image_FieldNames)
-                            car.Images.Add(csv.GetField(name));
+                    root.Cars.Add(car);
+                }
+            }
+            return root;
+        }
 
-                        foreach (var name in otherOptions_Multimedia_FieldNames)
-                            car.OtherOptions.Multimedia.Add(csv.GetField(name));
+        public Root<FileFormat.Csv.Version2.Car> DeserializeFile_Version_2(string fileContent)
+        {
+            var root = new Root<FileFormat.Csv.Version2.Car>();
 
-                        foreach (var name in otherOptions_Interior_FieldNames)
-                            car.OtherOptions.Interior.Add(csv.GetField(name));
+            using (var reader = new StringReader(fileContent))
+            using (var csv = new CsvReader(reader, config))
+            {
+                while (csv.Read())
+                {
+                    var car = csv.GetRecord<FileFormat.Csv.Version2.Car>();
 
-                        foreach (var name in otherOptions_Exterior_FieldNames)
-                            car.OtherOptions.Exterior.Add(csv.GetField(name));
+                    var headers = csv.HeaderRecord.ToList();
 
-                        root.Cars.Add(car);
-                    }
+                    var images_FieldNames = headers.Where(p => p.StartsWith("images/")).ToList();
+                    car.Images = images_FieldNames.Select(name => csv.GetField(name)).ToList();
+
+                    var otherOptions_Safety_FieldNames = headers.Where(p => p.StartsWith("other options/safety/")).ToList();
+                    car.OtherOptions.Safety = otherOptions_Safety_FieldNames.Select(name => csv.GetField(name)).ToList();
+
+                    var otherOptions_Exterior_FieldNames = headers.Where(p => p.StartsWith("other options/exterior/")).ToList();
+                    car.OtherOptions.Exterior = otherOptions_Exterior_FieldNames.Select(name => csv.GetField(name)).ToList();
+
+                    root.Cars.Add(car);
                 }
             }
             return root;

@@ -1,7 +1,7 @@
 ﻿using CsvHelper.Configuration.Attributes;
 using System.Collections.Generic;
 
-namespace ApiDPSystem.FileFormat.Csv.Version1
+namespace ApiDPSystem.FileFormat.Csv.Version2
 {
     public class Car
     {
