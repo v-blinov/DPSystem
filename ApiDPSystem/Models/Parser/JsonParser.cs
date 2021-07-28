@@ -1,6 +1,4 @@
 ﻿using ApiDPSystem.Interfaces;
-using Microsoft.AspNetCore.Http;
-using System.IO;
 using System.Text.Json;
 
 namespace ApiDPSystem.Models.Parser
@@ -37,15 +35,9 @@ namespace ApiDPSystem.Models.Parser
         ////    }
         //    #endregion  
 
-        public Root<T> DeserializeFile(IFormFile file)
+        public Root<T> DeserializeFile(string fileContent)
         {
-            string jsonContent;
-
-            using (var reader = new StreamReader(file.OpenReadStream()))
-                jsonContent = reader.ReadToEnd();
-
-            var deserializeModel = JsonSerializer.Deserialize<Root<T>>(jsonContent);
-            return deserializeModel;
+            return JsonSerializer.Deserialize<Root<T>>(fileContent);
         }
         public void SetDataToDatabase(Root<T> data)
         {

@@ -10,37 +10,92 @@ namespace ApiDPSystem.Services
         public void ProcessFile(IFormFile file)
         {
             var fileExtension = Path.GetExtension(file.FileName);
+
+            var fileContent = ReadFile(file);
+
             switch (fileExtension)
             {
                 case ".json":
-                    ProcessJsonWithVersion(file);
+                    ProcessJsonWithVersion(fileContent);
                     break;
                 case ".xml":
-                    new XmlParser().ProcessFile(file);
+                    ProcessXmlWithVersion(fileContent);
                     break;
                 case ".yaml":
-                    new YamlParser().ProcessFile(file);
+                    ProcessYamlWithVersion(fileContent);
                     break;
                 case ".csv":
-                    new CsvParser().ProcessFile(file);
+                    ProcessCsvWithVersion(fileContent, file.FileName);
                     break;
                 default:
-                    throw new Exception("Неверный формат файла");
+                    throw new Exception("Unknown file format");
             }
         }
 
-        public void ProcessJsonWithVersion(IFormFile file)
+        // сделать асинхронным
+        private string ReadFile(IFormFile file)
         {
-            var version = new Distributer().GetJsonVersion(file);
+            using (var reader = new StreamReader(file.OpenReadStream()))
+                return reader.ReadToEnd();
+        }
 
-            switch (version.VersionValue)
+        public void ProcessJsonWithVersion(string fileContent)
+        {
+            var version = new Distributer().JsonGetVersion(fileContent);
+
+            switch (version.Value)
             {
                 case 1:
-                    var deserializeJsonModel = new JsonParser<FileFormat.Json.Version1.Car>().DeserializeFile(file);
+                    var deserializeJsonModel = new JsonParser<FileFormat.Json.Version1.Car>().DeserializeFile(fileContent);
 
                     break;
                 default:
-                    throw new Exception($"Unknown file version {version.VersionValue}");
+                    throw new Exception($"Unknown Json file version {version.Value}");
+            }
+        }
+
+        public void ProcessXmlWithVersion(string fileContent)
+        {
+            var version = new Distributer().XmlGetVersion(fileContent);
+
+            switch (version.Value)
+            {
+                case 1:
+                    var deserializeXmlModel = new XmlParser<FileFormat.Xml.Version1.Car>().DeserializeFile(fileContent);
+
+                    break;
+                default:
+                    throw new Exception($"Unknown Xml file version {version.Value}");
+            }
+        }
+
+        public void ProcessYamlWithVersion(string fileContent)
+        {
+            var version = new Distributer().YamlGetVersion(fileContent);
+
+            switch (version.Value)
+            {
+                case 1:
+                    var deserializeYamlModel = new YamlParser<FileFormat.Yaml.Version1.Car>().DeserializeFile(fileContent);
+                    
+                    break;
+                default:
+                    throw new Exception($"Unknown Yaml file version {version.Value}");
+            }
+        }
+
+        public void ProcessCsvWithVersion(string fileContent, string fileName) 
+        {
+            var version = new Distributer().CsvGetVersion(fileName);
+
+            switch (version.Value)
+            {
+                case 1:
+                    var deserializeCsvModel = new CsvParser<FileFormat.Csv.Version1.Car>().DeserializeFile(fileContent);
+                    
+                    break;
+                default:
+                    throw new Exception($"Unknown Yaml file version {version.Value}");
             }
         }
     }

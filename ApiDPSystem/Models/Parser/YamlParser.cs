@@ -1,21 +1,19 @@
-﻿using ApiDPSystem.FileFormat.Yaml.Version1;
-using Microsoft.AspNetCore.Http;
-using System.IO;
+﻿using ApiDPSystem.Interfaces;
 using YamlDotNet.Serialization;
 
 namespace ApiDPSystem.Models.Parser
 {
-    public class YamlParser : Parser
+    public class YamlParser<T> : IParser<T>
     {
-        public override void ProcessFile(IFormFile file)
+        public Root<T> DeserializeFile(string fileContent)
         {
-            string yamlContent;
-            var deserializer = new DeserializerBuilder().Build();
+            var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
+            return deserializer.Deserialize<Root<T>>(fileContent);
+        }
 
-            using (var reader = new StreamReader(file.OpenReadStream()))
-                yamlContent = reader.ReadToEnd();
-
-            var yamlModel = deserializer.Deserialize<Root>(yamlContent);
+        public void SetDataToDatabase(Root<T> data)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

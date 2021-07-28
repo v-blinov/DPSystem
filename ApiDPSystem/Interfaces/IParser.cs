@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ApiDPSystem.Models.Parser;
 
 namespace ApiDPSystem.Interfaces
 {
     public interface IParser<T>
     {
-        public Root<T> DeserializeFile(IFormFile file);
+        public Root<T> DeserializeFile(string fileContent);
 
         public void SetDataToDatabase(Root<T> data);
     }

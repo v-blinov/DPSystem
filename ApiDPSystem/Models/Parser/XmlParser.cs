@@ -1,24 +1,22 @@
-﻿using ApiDPSystem.FileFormat.Xml.Version1;
-using Microsoft.AspNetCore.Http;
+﻿using ApiDPSystem.Interfaces;
 using System.IO;
 using System.Xml.Serialization;
 
 namespace ApiDPSystem.Models.Parser
 {
-    public class XmlParser : Parser
+    public class XmlParser<T> : IParser<T>
     {
-        public override void ProcessFile(IFormFile file)
+        public Root<T> DeserializeFile(string fileContent)
         {
-            string xmlContent;
-            var serializer = new XmlSerializer(typeof(Root));
+            var serializer = new XmlSerializer(typeof(Root<T>));
 
-            using (var reader = new StreamReader(file.OpenReadStream()))
-                xmlContent = reader.ReadToEnd();
+            using var reader = new StringReader(fileContent);
+            return (Root<T>)serializer.Deserialize(reader);
+        }
 
-            using (var reader = new StringReader(xmlContent))
-            {
-                var xmlModel = (Root)serializer.Deserialize(reader);
-            }
+        public void SetDataToDatabase(Root<T> data)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

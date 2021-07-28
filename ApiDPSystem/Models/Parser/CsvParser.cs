@@ -1,6 +1,5 @@
-﻿using ApiDPSystem.FileFormat.Csv.Version1;
+﻿using ApiDPSystem.Interfaces;
 using CsvHelper;
-using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -8,34 +7,35 @@ using System.Linq;
 
 namespace ApiDPSystem.Models.Parser
 {
-    public class CsvParser : Parser
+    public class CsvParser<T> : IParser<T> where T : FileFormat.Csv.Version1.Car
     {
-        public override void ProcessFile(IFormFile file)
+        public Root<T> DeserializeFile(string fileContent)
         {
-            var root = new Root()
+            var root = new Root<T>()
             {
-                Version = 1,
-                Cars = new List<Car>()
+                Cars = new List<T>()
             };
 
-            using (var reader = new StreamReader(file.OpenReadStream()))
+            // вынести десериализацию общих полей в отдельный метод
+            using (var reader = new StringReader(fileContent))
             {
                 using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                 {
-                    
+
                     while (csv.Read())
                     {
-                        var car = csv.GetRecord<Car>();
+                        var car = csv.GetRecord<T>();
 
+                        // Вынести инициализацию листов и объектов в конструкторы классов
                         car.Images = new List<string>();
-                        car.OtherOptions = new OtherOptions();
+                        car.OtherOptions = new FileFormat.Csv.Version1.OtherOptions();
 
                         car.OtherOptions.Multimedia = new List<string>();
                         car.OtherOptions.Exterior = new List<string>();
                         car.OtherOptions.Interior = new List<string>();
 
                         var headers = csv.HeaderRecord.ToList();
-                        
+
                         var image_FieldNames = headers.Where(p => p.StartsWith("images/")).ToList();
                         var otherOptions_Multimedia_FieldNames = headers.Where(p => p.StartsWith("other options/multimedia/")).ToList();
                         var otherOptions_Interior_FieldNames = headers.Where(p => p.StartsWith("other options/interior/")).ToList();
@@ -57,6 +57,12 @@ namespace ApiDPSystem.Models.Parser
                     }
                 }
             }
+            return root;
+        }
+
+        public void SetDataToDatabase(Root<T> data)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

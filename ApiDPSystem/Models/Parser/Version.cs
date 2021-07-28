@@ -1,10 +1,17 @@
-﻿using System.Text.Json.Serialization;
+﻿using CsvHelper.Configuration.Attributes;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
+using YamlDotNet.Serialization;
 
 namespace ApiDPSystem.Models.Parser
 {
+    [XmlRoot(ElementName = "root")]
     public class Version
     {
         [JsonPropertyName("version")]
-        public int VersionValue { get; set; }
+        [XmlElement(ElementName = "version")]
+        [YamlMember(Alias = "version")]
+        [Name("version")]
+        public int Value { get; set; }
     }
 }
