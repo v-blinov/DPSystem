@@ -2,20 +2,22 @@
 using ApiDPSystem.Entities;
 using ApiDPSystem.Models;
 using System;
+using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace ApiDPSystem.Repository
 {
     public class AccountRepository
     {
-        private Context _context;
+        private readonly Context _context;
 
         public AccountRepository(Context context)
         {
             _context = context;
         }
 
-        public string GetRefrashToken(string tokenId, User user)
+        public async Task<string> GetRefreshTokenAsync(string tokenId, User user)
         {
             var refreshTokenInfo = new RefreshTokenInfo()
             {
@@ -26,7 +28,7 @@ namespace ApiDPSystem.Repository
             };
 
             _context.RefreshTokenInfoTable.Add(refreshTokenInfo);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return refreshTokenInfo.RefreshToken;
         }
@@ -37,6 +39,15 @@ namespace ApiDPSystem.Repository
             using var randomNumberGenerator = RandomNumberGenerator.Create();
             randomNumberGenerator.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
+        }
+
+        public RefreshTokenInfo GetStoredRefreshToken(string requestRefreshToken) => 
+            _context.RefreshTokenInfoTable.FirstOrDefault(x => x.RefreshToken == requestRefreshToken);
+
+        public async Task UpdateStoredRefreshTokenAsync(RefreshTokenInfo storedRefreshToken)
+        {
+            _context.RefreshTokenInfoTable.Update(storedRefreshToken);
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using ApiDPSystem.Data;
-using ApiDPSystem.Models;
+﻿using ApiDPSystem.Models;
 using ApiDPSystem.Records;
 using ApiDPSystem.Repository;
 using Microsoft.AspNetCore.Identity;
@@ -18,8 +17,6 @@ namespace ApiDPSystem.Services
 {
     public class AccountService
     {
-        // вынести работу с _context в repository
-
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly UserService _userService;
@@ -29,7 +26,6 @@ namespace ApiDPSystem.Services
 
         private readonly AccountRepository _accountRepository;
         
-        private Context _context;
         public delegate Task RegisterHandler(User user, string subject, string message);
         public event RegisterHandler SendMessage;
 
@@ -42,7 +38,6 @@ namespace ApiDPSystem.Services
                               UserService userService,
                               EmailService emailService,
                               IConfiguration configuration,
-                              Context context,
                               TokenValidationParameters tokenValidationParameters,
                               AccountRepository accountRepository)
         {
@@ -51,7 +46,6 @@ namespace ApiDPSystem.Services
             _userService = userService;
             _emailService = emailService;
             _configuration = configuration;
-            _context = context;
             _tokenValidationParameters = tokenValidationParameters;
 
             _accountRepository = accountRepository;
@@ -147,8 +141,6 @@ namespace ApiDPSystem.Services
             await SendMessage?.Invoke(user, "Reset password", $"Для сброса пароля пройдите по ссылке: <a href='{url}'>link</a>");
         }
 
-
-
         public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordRecord resetPassword)
         {
             var user = await _userManager.FindByEmailAsync(resetPassword.Email);
@@ -181,17 +173,17 @@ namespace ApiDPSystem.Services
             return IdentityResult.Success;
         }
 
-        public async Task<User> FindUserByEmail(string email) => await _userManager.FindByEmailAsync(email);
+        public async Task<User> FindUserByEmailAsync (string email) => await _userManager.FindByEmailAsync(email);
 
         public async Task<AuthenticationResult> GenerateJWTTokenAsync(string userEmail)
         {
-            var user = await FindUserByEmail(userEmail);
+            var user = await FindUserByEmailAsync(userEmail);
             var role = await _userService.GetRole(user);
 
-            return GenerateJWTTokenAsync(user, role);
+            return await GenerateJWTTokenAsync(user, role);
         }
 
-        public AuthenticationResult GenerateJWTTokenAsync(User user, string role)
+        public async Task<AuthenticationResult> GenerateJWTTokenAsync(User user, string role)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -212,7 +204,7 @@ namespace ApiDPSystem.Services
             var token = jwtTokenHandler.CreateToken(tokenDescriptor);
             var jwtToken = jwtTokenHandler.WriteToken(token);
 
-            var refreshToken = _accountRepository.GetRefrashToken(token.Id, user);
+            var refreshToken = await _accountRepository.GetRefreshTokenAsync(token.Id, user);
 
             return new AuthenticationResult()
             {
@@ -222,8 +214,6 @@ namespace ApiDPSystem.Services
             };
         }
 
-
-        //Поменять логику refresh
         public async Task<AuthenticationResult> RefreshAsync(TokenRequest tokenRequest)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -233,27 +223,15 @@ namespace ApiDPSystem.Services
             if (validatedToken is JwtSecurityToken jwtSecurityToken)
             {
                 var result = jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
-                if (result == false)
+                if (!result)
                     return new AuthenticationResult()
                     {
                         Success = false,
-                        Errors = new List<string>() { "Invalid security algorithm" }
+                        Errors = new List<string>() { "Invalid Token" }
                     };
             }
 
-            // Will get the time stamp in unix time
-            var utcExpiryDate = long.Parse(principal.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
-
-            // we convert the expiry date from seconds to the date
-            var expDate = UnixTimeStampToDateTime(utcExpiryDate);
-            if (expDate > DateTime.UtcNow)
-                return new AuthenticationResult()
-                {
-                    Success = false,
-                    Errors = new List<string>() { "We cannot refresh this since the token has not expired" }
-                };
-
-            var storedRefreshToken = _context.RefreshTokenInfoTable.FirstOrDefault(x => x.RefreshToken == tokenRequest.RefreshToken);
+            var storedRefreshToken = _accountRepository.GetStoredRefreshToken(tokenRequest.RefreshToken);
             if (storedRefreshToken == null)
                 return new AuthenticationResult()
                 {
@@ -270,9 +248,8 @@ namespace ApiDPSystem.Services
                 };
 
             // we are getting here the jwt token id
-            var jti = principal.Claims.SingleOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
-
             // check the id that the recieved token has against the id saved in the db
+            var jti = principal.Claims.SingleOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
             if (storedRefreshToken.JwtId != jti)
                 return new AuthenticationResult()
                 {
@@ -280,19 +257,12 @@ namespace ApiDPSystem.Services
                     Errors = new List<string>() { "The token didn't matech the saved token" }
                 };
 
-            _context.RefreshTokenInfoTable.Update(storedRefreshToken);
-            await _context.SaveChangesAsync();
+            await _accountRepository.UpdateStoredRefreshTokenAsync(storedRefreshToken);
 
             var user = await _userManager.FindByIdAsync(storedRefreshToken.UserId);
             var role = await _userService.GetRole(user);
-            return GenerateJWTTokenAsync(user, role);
-        }
 
-        private DateTime UnixTimeStampToDateTime(double unixTimeStamp)
-        {
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToUniversalTime();
-            return dtDateTime;
+            return await GenerateJWTTokenAsync(user, role);
         }
 
         public async Task<IdentityResult> RegisterExternalUser(User user) =>
