@@ -13,7 +13,7 @@ namespace ApiDPSystem.Services
             switch (fileExtension)
             {
                 case ".json":
-                    new JsonParser().ProcessFile(file);
+                    ProcessJsonWithVersion(file);
                     break;
                 case ".xml":
                     new XmlParser().ProcessFile(file);
@@ -26,6 +26,21 @@ namespace ApiDPSystem.Services
                     break;
                 default:
                     throw new Exception("Неверный формат файла");
+            }
+        }
+
+        public void ProcessJsonWithVersion(IFormFile file)
+        {
+            var version = new Distributer().GetJsonVersion(file);
+
+            switch (version.VersionValue)
+            {
+                case 1:
+                    var deserializeJsonModel = new JsonParser<FileFormat.Json.Version1.Car>().DeserializeFile(file);
+
+                    break;
+                default:
+                    throw new Exception($"Unknown file version {version.VersionValue}");
             }
         }
     }
