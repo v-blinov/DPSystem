@@ -8,6 +8,8 @@ namespace ApiDPSystem.Entities
         
         [Url]
         public string Url { get; set; }
-        public int CarColorId { get; set; }
+        public int CarId { get; set; }
+
+        public Car Car { get; set; }
     }
 }

@@ -13,7 +13,6 @@ namespace ApiDPSystem.Data
 
         public DbSet<RefreshTokenInfo> RefreshTokenInfoTable { get; set; }
         public DbSet<Car> Cars { get; set; }
-        public DbSet<CarColor> CarColors { get; set; }
         public DbSet<CarFeature> CarFeatures { get; set; }
         public DbSet<Color> Colors { get; set; }
         public DbSet<Engine> Engines { get; set; }
@@ -28,6 +27,7 @@ namespace ApiDPSystem.Data
         {
             modelBuilder.ApplyConfiguration(new CarConfiguration());
             modelBuilder.ApplyConfiguration(new RefreshTokenInfoConfiguration());
+            modelBuilder.ApplyConfiguration(new ColorConfiguration());
 
 
             modelBuilder.Entity<CarFeature>()

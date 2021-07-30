@@ -8,7 +8,7 @@ namespace ApiDPSystem.Entities
         public string Description { get; set; }
         public int FeatureTypeId { get; set; }
 
-        public ICollection<FeatureType> FeatureTypes { get; set; }
-        public CarFeature CarFeature { get; set; }
+        public FeatureType FeatureType { get; set; }
+        public ICollection<CarFeature> CarFeature { get; set; }
     }
 }

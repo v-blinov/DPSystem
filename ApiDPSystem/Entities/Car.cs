@@ -20,12 +20,13 @@ namespace ApiDPSystem.Entities
         public int ProducerId { get; set; }
         public int EngineId { get; set; }
         public int TransmissionId { get; set; }
+        public int InteriorColorId { get; set; }
+        public int ExteriorColorId { get; set; }
 
 
         public Producer Producer { get; set; }
         public Engine Engine { get; set; }
         public Transmission Transmission { get; set; }
-        public CarColor CarColor { get; set; }
         public CarFeature CarFeature { get; set; }
     }
 }
