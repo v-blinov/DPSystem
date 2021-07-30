@@ -39,22 +39,23 @@ namespace ApiDPSystem.Services
             return await reader.ReadToEndAsync();
         }
 
-        public void ProcessJsonWithVersion(string fileContent)
+        private void ProcessJsonWithVersion(string fileContent)
         {
             var version = new Distributer().JsonGetVersion(fileContent);
 
             switch (version.Value)
             {
                 case 1:
-                    var deserializeJsonModel = new JsonParser<FileFormat.Json.Version1.Car>().DeserializeFile(fileContent);
-
+                    var jsonParser = new JsonParser<FileFormat.Json.Version1.Car>();
+                    //var deserializeJsonModel = jsonParser.DeserializeFile(fileContent);
+                    //jsonParser.SetData_Version_1(deserializeJsonModel);
                     break;
                 default:
                     throw new Exception($"Unknown Json file version {version.Value}");
             }
         }
 
-        public void ProcessXmlWithVersion(string fileContent)
+        private void ProcessXmlWithVersion(string fileContent)
         {
             var version = new Distributer().XmlGetVersion(fileContent);
 
@@ -69,7 +70,7 @@ namespace ApiDPSystem.Services
             }
         }
 
-        public void ProcessYamlWithVersion(string fileContent)
+        private void ProcessYamlWithVersion(string fileContent)
         {
             var version = new Distributer().YamlGetVersion(fileContent);
 
@@ -84,7 +85,7 @@ namespace ApiDPSystem.Services
             }
         }
 
-        public void ProcessCsvWithVersion(string fileContent, string fileName) 
+        private void ProcessCsvWithVersion(string fileContent, string fileName) 
         {
             var version = new Distributer().CsvGetVersion(fileName);
 
