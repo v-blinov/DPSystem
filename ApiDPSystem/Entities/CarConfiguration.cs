@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ApiDPSystem.Entities
 {
-    public class Car
+    public class CarConfiguration
     { 
         [Key]
         public Guid Id { get; set; }
@@ -28,7 +28,7 @@ namespace ApiDPSystem.Entities
         public Producer Producer { get; set; }
         public Engine Engine { get; set; }
         public Transmission Transmission { get; set; }
-        public ICollection<CarFeature> CarFeatures { get; set; }
+        public ICollection<ConfigurationFeature> ConfigurationFeatures { get; set; }
         public Color InteriorColor { get; set; }
         public Color ExteriorColor { get; set; }
         public ICollection<Image> Images { get; set; }

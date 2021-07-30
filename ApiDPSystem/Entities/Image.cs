@@ -11,6 +11,6 @@ namespace ApiDPSystem.Entities
         public string Url { get; set; }
         public Guid CarId { get; set; }
 
-        public Car Car { get; set; }
+        public CarConfiguration Configurations { get; set; }
     }
 }

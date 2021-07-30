@@ -43,7 +43,7 @@ namespace ApiDPSystem.Services
         private void ProcessJsonWithVersion(string fileContent)
         {
             var version = new Distributer().JsonGetVersion(fileContent);
-            var dbModels = new List<Entities.Car>();
+            var dbModels = new List<Entities.CarConfiguration>();
 
             switch (version.Value)
             {
@@ -60,7 +60,7 @@ namespace ApiDPSystem.Services
         private void ProcessXmlWithVersion(string fileContent)
         {
             var version = new Distributer().XmlGetVersion(fileContent);
-            var dbModels = new List<Entities.Car>();
+            var dbModels = new List<Entities.CarConfiguration>();
 
             switch (version.Value)
             {
@@ -77,7 +77,7 @@ namespace ApiDPSystem.Services
         private void ProcessYamlWithVersion(string fileContent)
         {
             var version = new Distributer().YamlGetVersion(fileContent);
-            var dbModels = new List<Entities.Car>();
+            var dbModels = new List<Entities.CarConfiguration>();
 
             switch (version.Value)
             {
@@ -94,7 +94,7 @@ namespace ApiDPSystem.Services
         private void ProcessCsvWithVersion(string fileContent, string fileName) 
         {
             var version = new Distributer().CsvGetVersion(fileName);
-            var dbModels = new List<Entities.Car>();
+            var dbModels = new List<Entities.CarConfiguration>();
 
             switch (version.Value)
             {

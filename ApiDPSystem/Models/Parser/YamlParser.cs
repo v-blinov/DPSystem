@@ -12,9 +12,9 @@ namespace ApiDPSystem.Models.Parser
             return deserializer.Deserialize<Root<T>>(fileContent);
         }
 
-        public List<Entities.Car> MapToDBModel(Root<T> deserializedModels)
+        public List<Entities.CarConfiguration> MapToDBModel(Root<T> deserializedModels)
         {
-            var dbCars = new List<Entities.Car>();
+            var dbCars = new List<Entities.CarConfiguration>();
 
             foreach (var deserializeModel in deserializedModels.Cars)
                 dbCars.Add(deserializeModel.ConvertToDbModel());

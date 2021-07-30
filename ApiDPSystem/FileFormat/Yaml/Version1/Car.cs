@@ -36,9 +36,9 @@ namespace ApiDPSystem.FileFormat.Yaml.Version1
         [YamlMember(Alias = "price")]
         public string Price { get; set; }
 
-        public Entities.Car ConvertToDbModel()
+        public Entities.CarConfiguration ConvertToDbModel()
         {
-            var carFeatures = new List<Entities.CarFeature>();
+            var carFeatures = new List<Entities.ConfigurationFeature>();
 
             carFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
             carFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
@@ -49,7 +49,7 @@ namespace ApiDPSystem.FileFormat.Yaml.Version1
                 carImages.Add(new Entities.Image { Url = image });
 
 
-            var dbCar = new Entities.Car
+            var dbCar = new Entities.CarConfiguration
             {
                 VinCode = Id,
                 Year = Convert.ToInt32(Year),
@@ -68,7 +68,7 @@ namespace ApiDPSystem.FileFormat.Yaml.Version1
                 },
                 InteriorColor = new Entities.Color { Name = Colors.Interior },
                 ExteriorColor = new Entities.Color { Name = Colors.Exterior },
-                CarFeatures = carFeatures
+                ConfigurationFeatures = carFeatures
             };
 
             return dbCar;

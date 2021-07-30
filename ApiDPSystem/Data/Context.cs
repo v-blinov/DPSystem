@@ -8,12 +8,12 @@ namespace ApiDPSystem.Data
     {
         public Context(DbContextOptions<Context> options) : base(options)
         {
-            Database.EnsureCreated();
+            //Database.EnsureCreated();
         }
 
         public DbSet<RefreshTokenInfo> RefreshTokenInfoTable { get; set; }
-        public DbSet<Car> Cars { get; set; }
-        public DbSet<CarFeature> CarFeatures { get; set; }
+        public DbSet<Entities.CarConfiguration> Cars { get; set; }
+        public DbSet<ConfigurationFeature> CarFeatures { get; set; }
         public DbSet<Color> Colors { get; set; }
         public DbSet<Engine> Engines { get; set; }
         public DbSet<Feature> Features { get; set; }
@@ -30,7 +30,7 @@ namespace ApiDPSystem.Data
             modelBuilder.ApplyConfiguration(new ColorConfiguration());
 
 
-            modelBuilder.Entity<CarFeature>()
+            modelBuilder.Entity<ConfigurationFeature>()
                 .HasKey(p => new { p.CarId, p.FeatureId });
 
             modelBuilder.Entity<Engine>()
@@ -57,16 +57,16 @@ namespace ApiDPSystem.Data
                 .IsRequired();
         }
 
-        public class CarConfiguration : IEntityTypeConfiguration<Car>
+        public class CarConfiguration : IEntityTypeConfiguration<Entities.CarConfiguration>
         {
-            public void Configure(EntityTypeBuilder<Car> builder)
+            public void Configure(EntityTypeBuilder<Entities.CarConfiguration> builder)
             {
                 builder.HasOne(s => s.ExteriorColor)
-                    .WithMany(x => x.ExteriorCars)
+                    .WithMany(x => x.ExteriorConfiguration)
                     .HasForeignKey(s => s.ExteriorColorId);
 
                 builder.HasOne(s => s.InteriorColor)
-                    .WithMany(x => x.InteriorCars)
+                    .WithMany(x => x.InteriorConfiguration)
                     .HasForeignKey(s => s.InteriorColorId)
                     .OnDelete(DeleteBehavior.Restrict);
 

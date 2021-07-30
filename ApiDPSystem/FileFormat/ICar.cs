@@ -4,16 +4,16 @@ namespace ApiDPSystem.FileFormat
 {
     public interface ICar
     {
-        public Entities.Car ConvertToDbModel();
+        public Entities.CarConfiguration ConvertToDbModel();
 
-        public static List<Entities.CarFeature> GetFeaturesCollection(List<string> collection, string featureType)
+        public static List<Entities.ConfigurationFeature> GetFeaturesCollection(List<string> collection, string featureType)
         {
-            var features = new List<Entities.CarFeature>();
+            var features = new List<Entities.ConfigurationFeature>();
 
             if (collection != null)
             {
                 foreach (var feature in collection)
-                    features.Add(new Entities.CarFeature { Feature = new Entities.Feature { FeatureType = new Entities.FeatureType { Name = featureType }, Description = feature } });
+                    features.Add(new Entities.ConfigurationFeature { Feature = new Entities.Feature { FeatureType = new Entities.FeatureType { Name = featureType }, Description = feature } });
             }
 
             return features;

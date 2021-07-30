@@ -7,6 +7,6 @@ namespace ApiDPSystem.Entities
         public int Id { get; set; }
         public string Value { get; set; }
 
-        public ICollection<Car> Cars { get; set; }
+        public ICollection<CarConfiguration> CarConfigurations { get; set; }
     }
 }

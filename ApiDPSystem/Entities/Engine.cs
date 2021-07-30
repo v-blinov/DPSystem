@@ -9,6 +9,6 @@ namespace ApiDPSystem.Entities
         public int? Power { get; set; }
         public double? Capacity { get; set; }
 
-        public ICollection<Car> Cars { get; set; }
+        public ICollection<CarConfiguration> Configurations { get; set; }
     }
 }

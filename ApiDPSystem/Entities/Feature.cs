@@ -9,6 +9,6 @@ namespace ApiDPSystem.Entities
         public int FeatureTypeId { get; set; }
 
         public FeatureType FeatureType { get; set; }
-        public ICollection<CarFeature> CarFeature { get; set; }
+        public ICollection<ConfigurationFeature> ConfigurationFeature { get; set; }
     }
 }
