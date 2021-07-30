@@ -34,7 +34,7 @@ namespace ApiDPSystem.Models.Parser
             return root;
         }
 
-        public Root<FileFormat.Csv.Version1.Car> DeserializeFile_Version_1(string fileContent)
+        public Root<FileFormat.Csv.Version1.Car> DeserializeFile_V1(string fileContent)
         {
             var root = new Root<FileFormat.Csv.Version1.Car>();
 
@@ -64,7 +64,7 @@ namespace ApiDPSystem.Models.Parser
             return root;
         }
 
-        public Root<FileFormat.Csv.Version2.Car> DeserializeFile_Version_2(string fileContent)
+        public Root<FileFormat.Csv.Version2.Car> DeserializeFile_V2(string fileContent)
         {
             var root = new Root<FileFormat.Csv.Version2.Car>();
 
@@ -92,9 +92,14 @@ namespace ApiDPSystem.Models.Parser
         }
 
 
-        List<Entities.Car> IParser<T>.MapToDBModel(Root<T> deserializedModels)
+        public List<Entities.Car> MapToDBModel(Root<T> deserializedModels)
         {
-            throw new System.NotImplementedException();
+            var dbCars = new List<Entities.Car>();
+
+            foreach (var deserializeModel in deserializedModels.Cars)
+                dbCars.Add(deserializeModel.ConvertToDbModel());
+
+            return dbCars;
         }
     }
 }
