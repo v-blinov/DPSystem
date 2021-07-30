@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ApiDPSystem.Entities
@@ -27,6 +28,9 @@ namespace ApiDPSystem.Entities
         public Producer Producer { get; set; }
         public Engine Engine { get; set; }
         public Transmission Transmission { get; set; }
-        public CarFeature CarFeature { get; set; }
+        public ICollection<CarFeature> CarFeatures { get; set; }
+        public Color InteriorColor { get; set; }
+        public Color ExteriorColor { get; set; }
+        public ICollection<Image> Images { get; set; }
     }
 }

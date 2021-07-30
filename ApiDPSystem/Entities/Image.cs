@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ApiDPSystem.Entities
 {
@@ -8,7 +9,7 @@ namespace ApiDPSystem.Entities
         
         [Url]
         public string Url { get; set; }
-        public int CarId { get; set; }
+        public Guid CarId { get; set; }
 
         public Car Car { get; set; }
     }

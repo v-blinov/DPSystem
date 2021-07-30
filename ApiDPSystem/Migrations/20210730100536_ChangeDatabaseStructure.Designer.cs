@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiDPSystem.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20210729135105_ChangeColorTablesStructure")]
-    partial class ChangeColorTablesStructure
+    [Migration("20210730100536_ChangeDatabaseStructure")]
+    partial class ChangeDatabaseStructure
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -71,6 +71,10 @@ namespace ApiDPSystem.Migrations
 
                     b.HasIndex("EngineId");
 
+                    b.HasIndex("ExteriorColorId");
+
+                    b.HasIndex("InteriorColorId");
+
                     b.HasIndex("ProducerId");
 
                     b.HasIndex("TransmissionId");
@@ -87,9 +91,6 @@ namespace ApiDPSystem.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("CarId", "FeatureId");
-
-                    b.HasIndex("CarId")
-                        .IsUnique();
 
                     b.HasIndex("FeatureId");
 
@@ -182,10 +183,7 @@ namespace ApiDPSystem.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CarId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("CarId1")
+                    b.Property<Guid>("CarId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Url")
@@ -194,7 +192,7 @@ namespace ApiDPSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CarId1");
+                    b.HasIndex("CarId");
 
                     b.ToTable("Images");
                 });
@@ -269,6 +267,18 @@ namespace ApiDPSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ApiDPSystem.Entities.Color", "ExteriorColor")
+                        .WithMany("ExteriorCars")
+                        .HasForeignKey("ExteriorColorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ApiDPSystem.Entities.Color", "InteriorColor")
+                        .WithMany("InteriorCars")
+                        .HasForeignKey("InteriorColorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("ApiDPSystem.Entities.Producer", "Producer")
                         .WithMany("Cars")
                         .HasForeignKey("ProducerId")
@@ -283,6 +293,10 @@ namespace ApiDPSystem.Migrations
 
                     b.Navigation("Engine");
 
+                    b.Navigation("ExteriorColor");
+
+                    b.Navigation("InteriorColor");
+
                     b.Navigation("Producer");
 
                     b.Navigation("Transmission");
@@ -291,12 +305,12 @@ namespace ApiDPSystem.Migrations
             modelBuilder.Entity("ApiDPSystem.Entities.CarFeature", b =>
                 {
                     b.HasOne("ApiDPSystem.Entities.Car", "Car")
-                        .WithOne("CarFeature")
-                        .HasForeignKey("ApiDPSystem.Entities.CarFeature", "CarId")
+                        .WithMany("CarFeatures")
+                        .HasForeignKey("CarId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ApiDPSystem.Entities.Feature", "Features")
+                    b.HasOne("ApiDPSystem.Entities.Feature", "Feature")
                         .WithMany("CarFeature")
                         .HasForeignKey("FeatureId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -304,7 +318,7 @@ namespace ApiDPSystem.Migrations
 
                     b.Navigation("Car");
 
-                    b.Navigation("Features");
+                    b.Navigation("Feature");
                 });
 
             modelBuilder.Entity("ApiDPSystem.Entities.Feature", b =>
@@ -321,15 +335,26 @@ namespace ApiDPSystem.Migrations
             modelBuilder.Entity("ApiDPSystem.Entities.Image", b =>
                 {
                     b.HasOne("ApiDPSystem.Entities.Car", "Car")
-                        .WithMany()
-                        .HasForeignKey("CarId1");
+                        .WithMany("Images")
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Car");
                 });
 
             modelBuilder.Entity("ApiDPSystem.Entities.Car", b =>
                 {
-                    b.Navigation("CarFeature");
+                    b.Navigation("CarFeatures");
+
+                    b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("ApiDPSystem.Entities.Color", b =>
+                {
+                    b.Navigation("ExteriorCars");
+
+                    b.Navigation("InteriorCars");
                 });
 
             modelBuilder.Entity("ApiDPSystem.Entities.Engine", b =>

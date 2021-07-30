@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ApiDPSystem.Migrations
 {
-    public partial class ChangeColorTablesStructure : Migration
+    public partial class ChangeDatabaseStructure : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -132,6 +132,18 @@ namespace ApiDPSystem.Migrations
                 {
                     table.PrimaryKey("PK_Cars", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Cars_Colors_ExteriorColorId",
+                        column: x => x.ExteriorColorId,
+                        principalTable: "Colors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Cars_Colors_InteriorColorId",
+                        column: x => x.InteriorColorId,
+                        principalTable: "Colors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Cars_Engines_EngineId",
                         column: x => x.EngineId,
                         principalTable: "Engines",
@@ -182,25 +194,18 @@ namespace ApiDPSystem.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CarId = table.Column<int>(type: "int", nullable: false),
-                    CarId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    CarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Images", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Images_Cars_CarId1",
-                        column: x => x.CarId1,
+                        name: "FK_Images_Cars_CarId",
+                        column: x => x.CarId,
                         principalTable: "Cars",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CarFeatures_CarId",
-                table: "CarFeatures",
-                column: "CarId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_CarFeatures_FeatureId",
@@ -211,6 +216,16 @@ namespace ApiDPSystem.Migrations
                 name: "IX_Cars_EngineId",
                 table: "Cars",
                 column: "EngineId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cars_ExteriorColorId",
+                table: "Cars",
+                column: "ExteriorColorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cars_InteriorColorId",
+                table: "Cars",
+                column: "InteriorColorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cars_ProducerId",
@@ -228,18 +243,15 @@ namespace ApiDPSystem.Migrations
                 column: "FeatureTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Images_CarId1",
+                name: "IX_Images_CarId",
                 table: "Images",
-                column: "CarId1");
+                column: "CarId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "CarFeatures");
-
-            migrationBuilder.DropTable(
-                name: "Colors");
 
             migrationBuilder.DropTable(
                 name: "Images");
@@ -255,6 +267,9 @@ namespace ApiDPSystem.Migrations
 
             migrationBuilder.DropTable(
                 name: "FeatureTypes");
+
+            migrationBuilder.DropTable(
+                name: "Colors");
 
             migrationBuilder.DropTable(
                 name: "Engines");

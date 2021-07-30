@@ -61,6 +61,15 @@ namespace ApiDPSystem.Data
         {
             public void Configure(EntityTypeBuilder<Car> builder)
             {
+                builder.HasOne(s => s.ExteriorColor)
+                    .WithMany(x => x.ExteriorCars)
+                    .HasForeignKey(s => s.ExteriorColorId);
+
+                builder.HasOne(s => s.InteriorColor)
+                    .WithMany(x => x.InteriorCars)
+                    .HasForeignKey(s => s.InteriorColorId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
                 builder.Property(p => p.VinCode)
                     .IsRequired()
                     .HasMaxLength(20)
