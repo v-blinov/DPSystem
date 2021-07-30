@@ -1,9 +1,11 @@
-﻿using ApiDPSystem.Interfaces;
+﻿using ApiDPSystem.Entities;
+using ApiDPSystem.Interfaces;
+using System.Collections.Generic;
 using YamlDotNet.Serialization;
 
 namespace ApiDPSystem.Models.Parser
 {
-    public class YamlParser<T> : IParser<T>
+    public class YamlParser<T> : IParser<T> where T : FileFormat.ICar
     {
         public Root<T> DeserializeFile(string fileContent)
         {
@@ -11,7 +13,7 @@ namespace ApiDPSystem.Models.Parser
             return deserializer.Deserialize<Root<T>>(fileContent);
         }
 
-        public void SetDataToDatabase(Root<T> data)
+        List<Car> IParser<T>.MapToDBModel(Root<T> deserializedModels)
         {
             throw new System.NotImplementedException();
         }

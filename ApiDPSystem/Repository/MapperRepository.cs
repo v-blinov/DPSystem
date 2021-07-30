@@ -14,37 +14,14 @@ namespace ApiDPSystem.Repository
             _context = context;
         }
 
-        public Color getColor(string name)
+
+        public FeatureType GetFeatureType(string name) =>
+            _context.FeatureTypes.FirstOrDefault(p => p.Name == name);
+
+        public List<Feature> GetFeature(List<string> features, string name)
         {
-            var color = _context.Colors.FirstOrDefault(p => p.Name == name);
-
-            if (color == null)
-            {
-                color = new Color { Name = name };
-                _context.Colors.Add(color);
-                _context.SaveChanges();
-            }
-             
-            return color;
-        }
-
-        public FeatureType getFeatureType(string name)
-        {
-            var featureType = _context.FeatureTypes.FirstOrDefault(p => p.Name == name);
-
-            if (featureType == null)
-            {
-                featureType = new FeatureType { Name = name };
-                _context.FeatureTypes.Add(featureType);
-                _context.SaveChanges();
-            }
-
-            return featureType;
-        }
-
-        public List<Feature> AddFeatures(List<string> features, string name)
-        {
-            var featureType = getFeatureType(name);
+            var featureType = GetFeatureType(name);
+            
 
             var storedFeatures = new List<Feature>();
 
@@ -60,14 +37,17 @@ namespace ApiDPSystem.Repository
             return storedFeatures;
         }
 
-        public void AddCarFeatureNotes(List<Feature> features, Car car)
-        {
-            foreach (var feature in features)
-            {
-                _context.CarFeatures.Add(new CarFeature { Feature = feature, Car = car });
-            }
+        public Transmission GetTransmission(string value) =>
+            _context.Transmissions.FirstOrDefault(p => p.Value == value);
 
-            _context.SaveChanges();
-        }
+        public Producer GetProducer(string name) =>
+            _context.Producers.FirstOrDefault(p => p.Name == name);
+
+        public Engine GetEngine(Engine currentEngine) =>
+            _context.Engines.FirstOrDefault(p => p.Equals(currentEngine));
+
+        public Color getColor(string name) =>
+            _context.Colors.FirstOrDefault(p => p.Name == name);
+
     }
 }

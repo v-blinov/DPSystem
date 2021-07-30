@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using YamlDotNet.Serialization;
 
 namespace ApiDPSystem.FileFormat.Yaml.Version1
 {
-    public class Car
+    public class Car : ICar
     {
         [YamlMember(Alias = "id")]
         public string Id { get; set; }
@@ -34,5 +35,43 @@ namespace ApiDPSystem.FileFormat.Yaml.Version1
 
         [YamlMember(Alias = "price")]
         public string Price { get; set; }
+
+        public Entities.Car ConvertToDbModel()
+        {
+            var carFeatures = new List<Entities.CarFeature>();
+
+            carFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
+            carFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
+            carFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
+
+            var carImages = new List<Entities.Image>();
+            foreach (var image in Images)
+                carImages.Add(new Entities.Image { Url = image });
+
+
+            var dbCar = new Entities.Car
+            {
+                VinCode = Id,
+                Year = Convert.ToInt32(Year),
+                Model = Model,
+                ModelTrim = ModelTrim,
+                Price = Decimal.TryParse(Price, out decimal price) ? price : null,
+                Drive = TechincalOptions.Drive,
+                Images = carImages,
+                Transmission = new Entities.Transmission { Value = TechincalOptions.Transmission },
+                Producer = new Entities.Producer { Name = Make },
+                Engine = new Entities.Engine
+                {
+                    Power = Int32.TryParse(TechincalOptions.Engine.Power, out int power) ? power : null,
+                    Fuel = TechincalOptions.Engine.Fuel,
+                    Capacity = Double.TryParse(TechincalOptions.Engine.Capacity, out double capacity) ? capacity : null
+                },
+                InteriorColor = new Entities.Color { Name = Colors.Interior },
+                ExteriorColor = new Entities.Color { Name = Colors.Exterior },
+                CarFeatures = carFeatures
+            };
+
+            return dbCar;
+        }
     }
 }

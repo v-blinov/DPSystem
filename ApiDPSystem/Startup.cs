@@ -184,6 +184,7 @@ namespace ApiDPSystem
             services.AddScoped<FileService>();
 
             services.AddScoped<AccountRepository>();
+            services.AddScoped<MapperRepository>();
             #endregion
         }
 

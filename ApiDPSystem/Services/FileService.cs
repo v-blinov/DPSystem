@@ -1,4 +1,5 @@
-﻿using ApiDPSystem.Models.Parser;
+﻿using ApiDPSystem.Interfaces;
+using ApiDPSystem.Models.Parser;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
@@ -47,8 +48,8 @@ namespace ApiDPSystem.Services
             {
                 case 1:
                     var jsonParser = new JsonParser<FileFormat.Json.Version1.Car>();
-                    //var deserializeJsonModel = jsonParser.DeserializeFile(fileContent);
-                    //jsonParser.SetData_Version_1(deserializeJsonModel);
+                    var deserializeJsonModel = jsonParser.DeserializeFile(fileContent);
+                    var dbModels = jsonParser.MapToDBModel(deserializeJsonModel);
                     break;
                 default:
                     throw new Exception($"Unknown Json file version {version.Value}");
