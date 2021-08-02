@@ -1,5 +1,4 @@
-﻿using ApiDPSystem.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -37,52 +36,48 @@ namespace ApiDPSystem.FileFormat.Json.Version1
         [JsonPropertyName("price")]
         public string Price { get; set; }
 
-        public Configuration ConvertToDbModel(string DealerName)
+        public Entities.CarEntity ConvertToCarEntityDbModel(string DealerName)
         {
-            throw new NotImplementedException();
+            var configurationFeatures = new List<Entities.ConfigurationFeature>();
+
+            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
+            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
+            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
+
+            var carImages = new List<Entities.CarImage>();
+            foreach (var image in Images)
+                carImages.Add(new Entities.CarImage { Image = new Entities.Image { Url = image }});
+
+            var dbConfiguration = new Entities.Configuration
+            {
+                Year = Int32.Parse(Year),
+                Model = Model,
+                ModelTrim = ModelTrim,
+                Transmission = TechincalOptions.Transmission,
+                Drive = TechincalOptions.Drive,
+                Producer = new Entities.Producer { Name = Make },
+                Engine = new Entities.Engine
+                {
+                    Power = Int32.TryParse(TechincalOptions.Engine.Power, out int power) ? power : null,
+                    Fuel = TechincalOptions.Engine.Fuel,
+                    Capacity = Double.TryParse(TechincalOptions.Engine.Capacity, out double capacity) ? capacity : null
+                },
+                ConfigurationFeatures = configurationFeatures
+            };
+
+            var dbCarEntity = new Entities.CarEntity
+            {
+                VinCode = Id,
+                Price = Int32.TryParse(Price, out int price) ? price : null,
+                Dealer = new Entities.Dealer { Name = DealerName },
+                CarImages = carImages,
+                InteriorColor = new Entities.Color { Name = Colors.Interior },
+                ExteriorColor = new Entities.Color { Name = Colors.Exterior },
+                Configuration = dbConfiguration
+            };
+
+            return dbCarEntity;
         }
-
-
-
-        //public Entities.CarConfiguration ConvertToDbModel()
-        //{
-        //    var carFeatures = new List<Entities.ConfigurationFeature>();
-
-        //    carFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
-        //    carFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
-        //    carFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
-
-        //    var carImages = new List<Entities.Image>();
-        //    foreach (var image in Images)
-        //        carImages.Add(new Entities.Image { Url = image });
-
-
-
-        //    var dbCar = new Entities.CarConfiguration
-        //    {
-        //        VinCode = Id,
-        //        Year = Convert.ToInt32(Year),
-        //        Model = Model,
-        //        ModelTrim = ModelTrim,
-        //        CarEntities = new CarEntity
-        //        Price = Decimal.TryParse(Price, out decimal price) ? price : null,
-        //        Drive = TechincalOptions.Drive,
-        //        Images = carImages,
-        //        Transmission = new Entities.Transmission { Value = TechincalOptions.Transmission },
-        //        Producer = new Entities.Producer { Name = Make },
-        //        Engine = new Entities.Engine
-        //        {
-        //            Power = Int32.TryParse(TechincalOptions.Engine.Power, out int power) ? power : null,
-        //            Fuel = TechincalOptions.Engine.Fuel,
-        //            Capacity = Double.TryParse(TechincalOptions.Engine.Capacity, out double capacity) ? capacity : null
-        //        },
-        //        InteriorColor = new Entities.Color { Name = Colors.Interior },
-        //        ExteriorColor = new Entities.Color { Name = Colors.Exterior },
-        //        ConfigurationFeatures = carFeatures
-        //    };
-
-        //    return dbCar;
-        //}
 
         //private List<Entities.CarFeature> GetFeaturesCollection(List<string> collection, string featureType)
         //{

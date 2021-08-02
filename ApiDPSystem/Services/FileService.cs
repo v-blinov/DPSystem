@@ -9,7 +9,7 @@ namespace ApiDPSystem.Services
 {
     public class FileService
     {
-        public async Task ProcessFileAsync(IFormFile file)
+        public async Task ProcessFileAsync(IFormFile file, string dealer)
         {
             var fileExtension = Path.GetExtension(file.FileName);
 
@@ -18,16 +18,16 @@ namespace ApiDPSystem.Services
             switch (fileExtension)
             {
                 case ".json":
-                    ProcessJsonWithVersion(fileContent);
+                    ProcessJsonWithVersion(fileContent, dealer);
                     break;
                 case ".xml":
-                    ProcessXmlWithVersion(fileContent);
+                    ProcessXmlWithVersion(fileContent, dealer);
                     break;
                 case ".yaml":
-                    ProcessYamlWithVersion(fileContent);
+                    ProcessYamlWithVersion(fileContent, dealer);
                     break;
                 case ".csv":
-                    ProcessCsvWithVersion(fileContent, file.FileName);
+                    ProcessCsvWithVersion(fileContent, file.FileName, dealer);
                     break;
                 default:
                     throw new Exception("Unknown file format");
@@ -40,73 +40,73 @@ namespace ApiDPSystem.Services
             return await reader.ReadToEndAsync();
         }
 
-        private void ProcessJsonWithVersion(string fileContent)
+        private void ProcessJsonWithVersion(string fileContent, string dealer)
         {
             var version = new Distributer().JsonGetVersion(fileContent);
-            var dbModels = new List<Entities.Configuration>();
+            var dbModels = new List<Entities.CarEntity>();
 
             switch (version.Value)
             {
                 case 1:
                     var jsonParser_v1 = new JsonParser<FileFormat.Json.Version1.Car>();
                     var deserializeJsonModel = jsonParser_v1.DeserializeFile(fileContent);
-                    //dbModels = jsonParser_v1.MapToDBModel(deserializeJsonModel);
+                    dbModels = jsonParser_v1.MapToDBModel(deserializeJsonModel, dealer);
                     break;
                 default:
                     throw new Exception($"Unknown Json file version {version.Value}");
             }
         }
 
-        private void ProcessXmlWithVersion(string fileContent)
+        private void ProcessXmlWithVersion(string fileContent, string dealer)
         {
             var version = new Distributer().XmlGetVersion(fileContent);
-            var dbModels = new List<Entities.Configuration>();
+            var dbModels = new List<Entities.CarEntity>();
 
             switch (version.Value)
             {
                 case 1:
                     var xmlParser_v1 = new XmlParser<FileFormat.Xml.Version1.Car>();
                     var deserializeXmlModel = xmlParser_v1.DeserializeFile(fileContent);
-                    //dbModels = xmlParser_v1.MapToDBModel(deserializeXmlModel);
+                    dbModels = xmlParser_v1.MapToDBModel(deserializeXmlModel, dealer);
                     break;
                 default:
                     throw new Exception($"Unknown Xml file version {version.Value}");
             }
         }
 
-        private void ProcessYamlWithVersion(string fileContent)
+        private void ProcessYamlWithVersion(string fileContent, string dealer)
         {
             var version = new Distributer().YamlGetVersion(fileContent);
-            var dbModels = new List<Entities.Configuration>();
+            var dbModels = new List<Entities.CarEntity>();
 
             switch (version.Value)
             {
                 case 1:
                     var yamlParser_v1 = new YamlParser<FileFormat.Yaml.Version1.Car>();
                     var deserializeYamlModel = yamlParser_v1.DeserializeFile(fileContent);
-                    //dbModels = yamlParser_v1.MapToDBModel(deserializeYamlModel);
+                    dbModels = yamlParser_v1.MapToDBModel(deserializeYamlModel, dealer);
                     break;
                 default:
                     throw new Exception($"Unknown Yaml file version {version.Value}");
             }
         }
 
-        private void ProcessCsvWithVersion(string fileContent, string fileName) 
+        private void ProcessCsvWithVersion(string fileContent, string fileName, string dealer) 
         {
             var version = new Distributer().CsvGetVersion(fileName);
-            var dbModels = new List<Entities.Configuration>();
+            var dbModels = new List<Entities.CarEntity>();
 
             switch (version.Value)
             {
                 case 1:
                     var csvParser_v1 = new CsvParser<FileFormat.Csv.Version1.Car>();
                     var deserializeCsvModel_v1 = csvParser_v1.DeserializeFile_V1(fileContent);
-                    //dbModels = csvParser_v1.MapToDBModel(deserializeCsvModel_v1);
+                    dbModels = csvParser_v1.MapToDBModel(deserializeCsvModel_v1, dealer);
                     break;
                 case 2:
                     var csvParser_v2 = new CsvParser<FileFormat.Csv.Version2.Car>();
                     var deserializeCsvModel_v2 = csvParser_v2.DeserializeFile_V2(fileContent);
-                    //dbModels = csvParser_v2.MapToDBModel(deserializeCsvModel_v2);
+                    dbModels = csvParser_v2.MapToDBModel(deserializeCsvModel_v2, dealer);
                     break;
                 default:
                     throw new Exception($"Unknown Yaml file version {version.Value}");

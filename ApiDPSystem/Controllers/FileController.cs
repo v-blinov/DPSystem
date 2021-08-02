@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace ApiDPSystem.Controllers
@@ -21,8 +23,19 @@ namespace ApiDPSystem.Controllers
 
 
         [HttpPost]
-        public async Task<ApiResponse> SendFileAsync(IFormFile file)
+        public async Task<ApiResponse> SendFileAsync(IFormFile file, [FromForm] string dealer)
         {
+            var availableExtensions = new List<string> { ".json", ".xml", ".yaml", ".csv" };
+            if (!availableExtensions.Contains(Path.GetExtension(file.FileName)))
+            {
+                Log.Error($"Отправлен неподдерживаемый формат файла {Path.GetExtension(file.FileName)}");
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = $"Неподдерживаемый формат файла {Path.GetExtension(file.FileName)}",
+                };
+            }
             if (file == null || file.Length == 0)
             {
                 Log.Error("Файл не отправлен, или он пустой");
@@ -33,12 +46,22 @@ namespace ApiDPSystem.Controllers
                     Message = "Файл не отправлен, или он пустой.",
                 };
             }
+            if (String.IsNullOrEmpty(dealer))
+            {
+                Log.Error("Имя диллера пустое или не отправлено.");
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = $"Имя диллера пустое или не отправлено.",
+                };
+            }
 
             try
             {
                 // Написать реализацию обратного вызова,
                 // возвращающего результат обработки файла для пользователя
-                _fileService.ProcessFileAsync(file);
+                await _fileService.ProcessFileAsync(file, dealer);
                 return new ApiResponse()
                 {
                     IsSuccess = true,

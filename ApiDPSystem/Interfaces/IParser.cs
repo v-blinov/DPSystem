@@ -8,21 +8,6 @@ namespace ApiDPSystem.Interfaces
     {
         public Root<T> DeserializeFile(string fileContent);
 
-        public List<Entities.CarEntity> MapToDBModel(Root<T> deserializedModels);
-
-        //public List<Entities.CarEntity> MapToDBModel(Root<T> deserializedModels)
-        //{
-        //    var dbCars = new List<Entities.CarEntity>();
-
-        //    foreach (var deserializeModel in deserializedModels.Cars)
-        //        dbCars.Add(new Entities.CarEntity
-        //        {
-        //            CarConfiguration = deserializeModel.ConvertToDbModel(),
-        //            Price = Decimal.TryParse(deserializeModel.Price, out decimal price) ? price : null,
-
-        //        });
-
-        //    return dbCars;
-        //}
+        public List<Entities.CarEntity> MapToDBModel(Root<T> deserializedModels, string dealer);
     }
 }

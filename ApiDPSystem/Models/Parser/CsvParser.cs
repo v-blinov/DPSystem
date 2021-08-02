@@ -1,5 +1,4 @@
-﻿using ApiDPSystem.Entities;
-using ApiDPSystem.Interfaces;
+﻿using ApiDPSystem.Interfaces;
 using CsvHelper;
 using CsvHelper.Configuration;
 using System.Collections.Generic;
@@ -92,20 +91,14 @@ namespace ApiDPSystem.Models.Parser
             return root;
         }
 
-
-        List<CarEntity> IParser<T>.MapToDBModel(Root<T> deserializedModels)
+        public List<Entities.CarEntity> MapToDBModel(Root<T> deserializedModels, string dealer)
         {
-            throw new System.NotImplementedException();
+            var dbCars = new List<Entities.CarEntity>();
+
+            foreach (var deserializeModel in deserializedModels.Cars)
+                dbCars.Add(deserializeModel.ConvertToCarEntityDbModel(dealer));
+
+            return dbCars;
         }
-
-        //public List<Entities.CarConfiguration> MapToDBModel(Root<T> deserializedModels)
-        //{
-        //    var dbCars = new List<Entities.CarConfiguration>();
-
-        //    foreach (var deserializeModel in deserializedModels.Cars)
-        //        dbCars.Add(deserializeModel.ConvertToDbModel());
-
-        //    return dbCars;
-        //}
     }
 }

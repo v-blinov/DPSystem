@@ -10,96 +10,90 @@ namespace ApiDPSystem.Models.Parser
         public Root<T> DeserializeFile(string fileContent) =>
             JsonSerializer.Deserialize<Root<T>>(fileContent);
 
-        public List<CarEntity> MapToDBModel(Root<T> deserializedModels)
+        public List<CarEntity> MapToDBModel(Root<T> deserializedModels, string dealer)
         {
-            throw new System.NotImplementedException();
+            var dbCars = new List<CarEntity>();
+
+            foreach (var deserializeModel in deserializedModels.Cars)
+                dbCars.Add(deserializeModel.ConvertToCarEntityDbModel(dealer));
+
+            return dbCars;
         }
 
-        //public List<Entities.CarConfiguration> MapToDBModel(Root<T> deserializedModels)
+        //public void maptodbmodel_v1(fileformat.json.version1.car deserializedcar)
         //{
+        //    var dbcar = new entities.car
+        //    {
+        //        vincode = deserializedcar.id,
+        //        year = convert.toint32(deserializedcar.year),
+        //        model = deserializedcar.model,
+        //        modeltrim = deserializedcar.modeltrim,
+        //        price = decimal.tryparse(deserializedcar.price, out decimal price) ? price : null,
+        //        drive = deserializedcar.techincaloptions.drive,
+        //        //images = (deserializedcar.images).select(p => new entities.image { url = p }).tolist()
+        //    };
+
+        //    var storedtransmission = _mapperrepository.gettransmission(deserializedcar.techincaloptions.transmission);
+        //    if (storedtransmission is null)
+        //        dbcar.transmission = new entities.transmission { value = deserializedcar.techincaloptions.transmission };
+        //    else
+        //        dbcar.transmissionid = storedtransmission.id;
 
 
-        //    var dbCars = new List<Entities.CarConfiguration>();
-
-        //    foreach (var deserializeModel in deserializedModels.Cars)
-        //        dbCars.Add(deserializeModel.ConvertToDbModel());
-
-        //    return dbCars;
-        //}
-        //public void MapToDbModel_V1(FileFormat.Json.Version1.Car deserializedCar)
-        //{
-        //    //var dbCar = new Entities.Car
-        //    //{
-        //    //    VinCode = deserializedCar.Id,
-        //    //    Year = Convert.ToInt32(deserializedCar.Year),
-        //    //    Model = deserializedCar.Model,
-        //    //    ModelTrim = deserializedCar.ModelTrim,
-        //    //    Price = Decimal.TryParse(deserializedCar.Price, out decimal price) ? price : null,
-        //    //    Drive = deserializedCar.TechincalOptions.Drive,
-        //    //    //Images = (deserializedCar.Images).Select(p => new Entities.Image { Url = p }).ToList()
-        //    //};
-
-        //    //var storedTransmission = _mapperRepository.GetTransmission(deserializedCar.TechincalOptions.Transmission);
-        //    //if (storedTransmission is null)
-        //    //    dbCar.Transmission = new Entities.Transmission { Value = deserializedCar.TechincalOptions.Transmission };
-        //    //else
-        //    //    dbCar.TransmissionId = storedTransmission.Id;
+        //    var storedproducer = _mapperrepository.getproducer(deserializedcar.make);
+        //    if (storedproducer is null)
+        //        dbcar.producer = new entities.producer { name = deserializedcar.make };
+        //    else
+        //        dbcar.producerid = storedproducer.id;
 
 
-        //    //var storedProducer = _mapperRepository.GetProducer(deserializedCar.Make);
-        //    //if (storedProducer is null)
-        //    //    dbCar.Producer = new Entities.Producer { Name = deserializedCar.Make };
-        //    //else
-        //    //    dbCar.ProducerId = storedProducer.Id;
+        //    var currentengine = new entities.engine
+        //    {
+        //        power = int32.tryparse(deserializedcar.techincaloptions.engine.power, out int power) ? power : null,
+        //        fuel = deserializedcar.techincaloptions.engine.fuel,
+        //        capacity = double.tryparse(deserializedcar.techincaloptions.engine.capacity, out double capacity) ? capacity : null
+        //    };
+        //    var storedengine = _mapperrepository.getengine(currentengine);
+        //    if (storedengine is null)
+        //        dbcar.engine = currentengine;
+        //    else
+        //        dbcar.engineid = storedengine.id;
 
 
-        //    //var currentEngine = new Entities.Engine
-        //    //{
-        //    //    Power = Int32.TryParse(deserializedCar.TechincalOptions.Engine.Power, out int power) ? power : null,
-        //    //    Fuel = deserializedCar.TechincalOptions.Engine.Fuel,
-        //    //    Capacity = Double.TryParse(deserializedCar.TechincalOptions.Engine.Capacity, out double capacity) ? capacity : null
-        //    //};
-        //    //var storedEngine = _mapperRepository.GetEngine(currentEngine);
-        //    //if (storedEngine is null)
-        //    //    dbCar.Engine = currentEngine;
-        //    //else
-        //    //    dbCar.EngineId = storedEngine.Id;
+        //    var storedinteriorcolor = _mapperrepository.getcolor(deserializedcar.colors.interior);
+        //    if (storedinteriorcolor is null)
+        //        dbcar.interiorcolor = new entities.color { name = deserializedcar.colors.interior };
+        //    else
+        //        dbcar.interiorcolor.id = storedinteriorcolor.id;
 
-
-        //    //var storedInteriorColor = _mapperRepository.getColor(deserializedCar.Colors.Interior);
-        //    //if (storedInteriorColor is null)
-        //    //    dbCar.InteriorColor = new Entities.Color { Name = deserializedCar.Colors.Interior };
-        //    //else
-        //    //    dbCar.InteriorColor.Id = storedInteriorColor.Id;
-
-        //    /////Изменить логику добавления цвета, т.к. сейчас есть баг при добавлении нового одинакогого цвета для интерьера и экстерьера
-        //    //var storedExteriorColor = _mapperRepository.getColor(deserializedCar.Colors.Exterior);
-        //    //if (storedExteriorColor is null)
-        //    //    dbCar.InteriorColor = new Entities.Color { Name = deserializedCar.Colors.Exterior };
-        //    //else
-        //    //    dbCar.InteriorColor.Id = storedExteriorColor.Id;
+        //    ///изменить логику добавления цвета, т.к. сейчас есть баг при добавлении нового одинакогого цвета для интерьера и экстерьера
+        //    var storedexteriorcolor = _mapperrepository.getcolor(deserializedcar.colors.exterior);
+        //    if (storedexteriorcolor is null)
+        //        dbcar.interiorcolor = new entities.color { name = deserializedcar.colors.exterior };
+        //    else
+        //        dbcar.interiorcolor.id = storedexteriorcolor.id;
 
 
 
-        //    //dbCar.CarFeatures.
+        //    dbcar.carfeatures.
 
 
-        //    //var newFeatures = new List<Entities.Feature>();
+        //    var newfeatures = new list<entities.feature>();
 
 
-        //    //var featureType = _mapperRepository.GetFeatureType("Exterior");
-        //    //foreach (var featureDescription in deserializedCar.OtherOptions.Exterior)
-        //    //{
-        //    //    if (featureType == null)
-        //    //    {
-        //    //        var feature = _mapperRepository.GetFeature()
-        //    //    }
-        //    //    else
-        //    //    { 
+        //    var featuretype = _mapperrepository.getfeaturetype("exterior");
+        //    foreach (var featuredescription in deserializedcar.otheroptions.exterior)
+        //    {
+        //        if (featuretype == null)
+        //        {
+        //            var feature = _mapperrepository.getfeature()
+        //        }
+        //        else
+        //        {
 
-        //    //    }
+        //        }
 
-        //    //}
+        //    }
 
 
 
@@ -137,4 +131,4 @@ namespace ApiDPSystem.Models.Parser
 
 
     }
-}
+    }
