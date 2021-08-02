@@ -8,15 +8,17 @@ namespace ApiDPSystem.Models.Parser
     {
         public Root<T> DeserializeFile(string fileContent) =>
             JsonSerializer.Deserialize<Root<T>>(fileContent);
-        public List<Entities.CarConfiguration> MapToDBModel(Root<T> deserializedModels)
-        {
-            var dbCars = new List<Entities.CarConfiguration>();
+        //public List<Entities.CarConfiguration> MapToDBModel(Root<T> deserializedModels)
+        //{
 
-            foreach (var deserializeModel in deserializedModels.Cars)
-                dbCars.Add(deserializeModel.ConvertToDbModel());
 
-            return dbCars;
-        }
+        //    var dbCars = new List<Entities.CarConfiguration>();
+
+        //    foreach (var deserializeModel in deserializedModels.Cars)
+        //        dbCars.Add(deserializeModel.ConvertToDbModel());
+
+        //    return dbCars;
+        //}
         //public void MapToDbModel_V1(FileFormat.Json.Version1.Car deserializedCar)
         //{
         //    //var dbCar = new Entities.Car

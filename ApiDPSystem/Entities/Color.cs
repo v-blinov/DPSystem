@@ -8,7 +8,7 @@ namespace ApiDPSystem.Entities
         public string Name { get; set; }
         public string HexCode { get; set; }
 
-        public ICollection<CarConfiguration> InteriorConfiguration { get; set; }
-        public ICollection<CarConfiguration> ExteriorConfiguration { get; set; }
+        public ICollection<CarEntity> InteriorCarEntity { get; set; }
+        public ICollection<CarEntity> ExteriorCarEntity { get; set; }
     }
 }

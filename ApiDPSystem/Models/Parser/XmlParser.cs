@@ -15,14 +15,14 @@ namespace ApiDPSystem.Models.Parser
             return (Root<T>)serializer.Deserialize(reader);
         }
 
-        public List<Entities.CarConfiguration> MapToDBModel(Root<T> deserializedModels)
-        {
-            var dbCars = new List<Entities.CarConfiguration>();
+        //public List<Entities.CarConfiguration> MapToDBModel(Root<T> deserializedModels)
+        //{
+        //    var dbCars = new List<Entities.CarConfiguration>();
 
-            foreach (var deserializeModel in deserializedModels.Cars)
-                dbCars.Add(deserializeModel.ConvertToDbModel());
+        //    foreach (var deserializeModel in deserializedModels.Cars)
+        //        dbCars.Add(deserializeModel.ConvertToDbModel());
 
-            return dbCars;
-        }
+        //    return dbCars;
+        //}
     }
 }

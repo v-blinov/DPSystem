@@ -12,35 +12,36 @@ namespace ApiDPSystem.Data
         }
 
         public DbSet<RefreshTokenInfo> RefreshTokenInfoTable { get; set; }
-        public DbSet<Entities.CarConfiguration> Cars { get; set; }
-        public DbSet<ConfigurationFeature> CarFeatures { get; set; }
+        public DbSet<CarEntity> CarEntities { get; set; }
+        public DbSet<CarImage> CarImages { get; set; }
         public DbSet<Color> Colors { get; set; }
+        public DbSet<Configuration> Configurations { get; set; }
+        public DbSet<ConfigurationFeature> ConfigurationFeatures { get; set; }
+        public DbSet<Dealer> Dealers { get; set; }
         public DbSet<Engine> Engines { get; set; }
         public DbSet<Feature> Features { get; set; }
-        public DbSet<FeatureType> FeatureTypes { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Producer> Producers { get; set; }
-        public DbSet<Transmission> Transmissions { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new CarConfiguration());
-            modelBuilder.ApplyConfiguration(new RefreshTokenInfoConfiguration());
-            modelBuilder.ApplyConfiguration(new ColorConfiguration());
+            modelBuilder.ApplyConfiguration(new RefreshTokenInfoSettings());
+            modelBuilder.ApplyConfiguration(new ConfigurationSettings());
+            modelBuilder.ApplyConfiguration(new CarEntitySettings());
+            modelBuilder.ApplyConfiguration(new ColorSettings());
+            modelBuilder.ApplyConfiguration(new FeatureSettings());
 
 
             modelBuilder.Entity<ConfigurationFeature>()
-                .HasKey(p => new { p.CarId, p.FeatureId });
+                .HasKey(p => new { p.ConfigurationId, p.FeatureId });
+
+            modelBuilder.Entity<CarImage>()
+                .HasKey(p => new { p.CarEntityId, p.ImageId });
 
             modelBuilder.Entity<Engine>()
                 .Property(p => p.Fuel)
                 .HasMaxLength(20);
-
-            modelBuilder.Entity<FeatureType>()
-                .Property(p => p.Name)
-                .IsRequired()
-                .HasMaxLength(50);
 
             modelBuilder.Entity<Image>()
                 .Property(p => p.Url)
@@ -51,30 +52,24 @@ namespace ApiDPSystem.Data
                 .HasMaxLength(250)
                 .IsRequired();
 
-            modelBuilder.Entity<Transmission>()
-                .Property(p => p.Value)
-                .HasMaxLength(200)
+            modelBuilder.Entity<Feature>()
+                .Property(p => p.Description)
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            modelBuilder.Entity<Dealer>()
+                .Property(p => p.Name)
+                .HasMaxLength(450)
                 .IsRequired();
         }
 
-        public class CarConfiguration : IEntityTypeConfiguration<Entities.CarConfiguration>
+        public class ConfigurationSettings : IEntityTypeConfiguration<Entities.Configuration>
         {
-            public void Configure(EntityTypeBuilder<Entities.CarConfiguration> builder)
+            public void Configure(EntityTypeBuilder<Entities.Configuration> builder)
             {
-                builder.HasOne(s => s.ExteriorColor)
-                    .WithMany(x => x.ExteriorConfiguration)
-                    .HasForeignKey(s => s.ExteriorColorId);
+                builder.Property(p => p.Year)
+                    .HasColumnType("smallint");
 
-                builder.HasOne(s => s.InteriorColor)
-                    .WithMany(x => x.InteriorConfiguration)
-                    .HasForeignKey(s => s.InteriorColorId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                builder.Property(p => p.VinCode)
-                    .IsRequired()
-                    .HasMaxLength(20)
-                    .HasColumnType("varchar");
-                
                 builder.Property(p => p.Model)
                     .IsRequired()
                     .HasMaxLength(100);
@@ -83,14 +78,37 @@ namespace ApiDPSystem.Data
                     .IsRequired()
                     .HasMaxLength(20);
 
-                builder.Property(p => p.Year)
-                    .HasColumnType("smallint");
+                builder.Property(p => p.Transmission)
+                    .HasMaxLength(10);
 
                 builder.Property(p => p.Drive)
                     .HasMaxLength(10);
             }
         }
-        public class ColorConfiguration : IEntityTypeConfiguration<Color>
+        public class CarEntitySettings : IEntityTypeConfiguration<CarEntity>
+        {
+            public void Configure(EntityTypeBuilder<CarEntity> builder)
+            {
+                builder.Property(p => p.VinCode)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("varchar");
+
+                builder.Property(p => p.IsSold)
+                    .IsRequired()
+                    .HasDefaultValue(false);
+
+                builder.HasOne(s => s.ExteriorColor)
+                        .WithMany(x => x.ExteriorCarEntity)
+                        .HasForeignKey(s => s.ExteriorColorId);
+
+                builder.HasOne(s => s.InteriorColor)
+                    .WithMany(x => x.InteriorCarEntity)
+                    .HasForeignKey(s => s.InteriorColorId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            }
+        }
+        public class ColorSettings : IEntityTypeConfiguration<Color>
         {
             public void Configure(EntityTypeBuilder<Color> builder)
             {
@@ -102,7 +120,20 @@ namespace ApiDPSystem.Data
                     .HasMaxLength(30);
             }
         }
-        public class RefreshTokenInfoConfiguration : IEntityTypeConfiguration<RefreshTokenInfo>
+        public class FeatureSettings : IEntityTypeConfiguration<Feature>
+        {
+            public void Configure(EntityTypeBuilder<Feature> builder)
+            {
+                builder.Property(p => p.Description)
+                .HasMaxLength(1000)
+                .IsRequired();
+
+                builder.Property(p => p.Type)
+                .HasMaxLength(100)
+                .IsRequired();
+            }
+        }
+        public class RefreshTokenInfoSettings : IEntityTypeConfiguration<RefreshTokenInfo>
         {
             public void Configure(EntityTypeBuilder<RefreshTokenInfo> builder)
             {

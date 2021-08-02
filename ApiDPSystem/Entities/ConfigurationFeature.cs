@@ -4,10 +4,10 @@ namespace ApiDPSystem.Entities
 {
     public class ConfigurationFeature
     {
-        public Guid CarId { get; set; }
+        public Guid ConfigurationId { get; set; }
         public int FeatureId { get; set; }
 
-        public CarConfiguration CarConfiguration { get; set; }
+        public Configuration Configuration { get; set; }
         public Feature Feature { get; set; }
     }
 }

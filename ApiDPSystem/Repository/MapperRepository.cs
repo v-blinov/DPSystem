@@ -9,36 +9,36 @@ namespace ApiDPSystem.Repository
     {
         private readonly Context _context;
 
-        public MapperRepository(Context context)
-        {
-            _context = context;
-        }
+        //public MapperRepository(Context context)
+        //{
+        //    _context = context;
+        //}
 
 
-        public FeatureType GetFeatureType(string name) =>
-            _context.FeatureTypes.FirstOrDefault(p => p.Name == name);
+        //public FeatureType GetFeatureType(string name) =>
+        //    _context.FeatureTypes.FirstOrDefault(p => p.Name == name);
 
-        public List<Feature> GetFeature(List<string> features, string name)
-        {
-            var featureType = GetFeatureType(name);
+        //public List<Feature> GetFeature(List<string> features, string name)
+        //{
+        //    var featureType = GetFeatureType(name);
             
 
-            var storedFeatures = new List<Feature>();
+        //    var storedFeatures = new List<Feature>();
 
-            foreach (var feature in features)
-                storedFeatures.Add(new Feature
-                {
-                    FeatureType = featureType,
-                    Description = feature
-                });
+        //    foreach (var feature in features)
+        //        storedFeatures.Add(new Feature
+        //        {
+        //            FeatureType = featureType,
+        //            Description = feature
+        //        });
 
-            _context.Features.AddRange(storedFeatures);
+        //    _context.Features.AddRange(storedFeatures);
 
-            return storedFeatures;
-        }
+        //    return storedFeatures;
+        //}
 
-        public Transmission GetTransmission(string value) =>
-            _context.Transmissions.FirstOrDefault(p => p.Value == value);
+        //public Transmission GetTransmission(string value) =>
+        //    _context.Transmissions.FirstOrDefault(p => p.Value == value);
 
         public Producer GetProducer(string name) =>
             _context.Producers.FirstOrDefault(p => p.Name == name);

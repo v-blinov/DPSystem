@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ApiDPSystem.Entities
@@ -9,8 +9,7 @@ namespace ApiDPSystem.Entities
         
         [Url]
         public string Url { get; set; }
-        public Guid CarId { get; set; }
 
-        public CarConfiguration Configurations { get; set; }
+        public ICollection<CarImage> CarImages { get; set; }
     }
 }
