@@ -1,4 +1,5 @@
-﻿using ApiDPSystem.Interfaces;
+﻿using ApiDPSystem.Entities;
+using ApiDPSystem.Interfaces;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
@@ -13,6 +14,11 @@ namespace ApiDPSystem.Models.Parser
 
             using var reader = new StringReader(fileContent);
             return (Root<T>)serializer.Deserialize(reader);
+        }
+
+        public List<CarEntity> MapToDBModel(Root<T> deserializedModels)
+        {
+            throw new System.NotImplementedException();
         }
 
         //public List<Entities.CarConfiguration> MapToDBModel(Root<T> deserializedModels)

@@ -48,10 +48,10 @@ namespace ApiDPSystem.Services
             switch (version.Value)
             {
                 case 1:
-                    //var jsonParser_v1 = new JsonParser<FileFormat.Json.Version1.Car>();
-                    //var deserializeJsonModel = jsonParser_v1.DeserializeFile(fileContent);
+                    var jsonParser_v1 = new JsonParser<FileFormat.Json.Version1.Car>();
+                    var deserializeJsonModel = jsonParser_v1.DeserializeFile(fileContent);
                     //dbModels = jsonParser_v1.MapToDBModel(deserializeJsonModel);
-                    //break;
+                    break;
                 default:
                     throw new Exception($"Unknown Json file version {version.Value}");
             }
@@ -65,10 +65,10 @@ namespace ApiDPSystem.Services
             switch (version.Value)
             {
                 case 1:
-                    //var xmlParser_v1 = new XmlParser<FileFormat.Xml.Version1.Car>();
-                    //var deserializeXmlModel = xmlParser_v1.DeserializeFile(fileContent);
+                    var xmlParser_v1 = new XmlParser<FileFormat.Xml.Version1.Car>();
+                    var deserializeXmlModel = xmlParser_v1.DeserializeFile(fileContent);
                     //dbModels = xmlParser_v1.MapToDBModel(deserializeXmlModel);
-                    //break;
+                    break;
                 default:
                     throw new Exception($"Unknown Xml file version {version.Value}");
             }
@@ -82,10 +82,10 @@ namespace ApiDPSystem.Services
             switch (version.Value)
             {
                 case 1:
-                    //var yamlParser_v1 = new YamlParser<FileFormat.Yaml.Version1.Car>();
-                    //var deserializeYamlModel = yamlParser_v1.DeserializeFile(fileContent);
+                    var yamlParser_v1 = new YamlParser<FileFormat.Yaml.Version1.Car>();
+                    var deserializeYamlModel = yamlParser_v1.DeserializeFile(fileContent);
                     //dbModels = yamlParser_v1.MapToDBModel(deserializeYamlModel);
-                    //break;
+                    break;
                 default:
                     throw new Exception($"Unknown Yaml file version {version.Value}");
             }
@@ -99,15 +99,15 @@ namespace ApiDPSystem.Services
             switch (version.Value)
             {
                 case 1:
-                    //var csvParser_v1 = new CsvParser<FileFormat.Csv.Version1.Car>();
-                    //var deserializeCsvModel_v1 = csvParser_v1.DeserializeFile_V1(fileContent);
+                    var csvParser_v1 = new CsvParser<FileFormat.Csv.Version1.Car>();
+                    var deserializeCsvModel_v1 = csvParser_v1.DeserializeFile_V1(fileContent);
                     //dbModels = csvParser_v1.MapToDBModel(deserializeCsvModel_v1);
-                    //break;
+                    break;
                 case 2:
-                    //var csvParser_v2 = new CsvParser<FileFormat.Csv.Version2.Car>();
-                    //var deserializeCsvModel_v2 = csvParser_v2.DeserializeFile_V2(fileContent);
+                    var csvParser_v2 = new CsvParser<FileFormat.Csv.Version2.Car>();
+                    var deserializeCsvModel_v2 = csvParser_v2.DeserializeFile_V2(fileContent);
                     //dbModels = csvParser_v2.MapToDBModel(deserializeCsvModel_v2);
-                    //break;
+                    break;
                 default:
                     throw new Exception($"Unknown Yaml file version {version.Value}");
             }
