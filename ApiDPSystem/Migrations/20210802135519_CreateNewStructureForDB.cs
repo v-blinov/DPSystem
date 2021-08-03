@@ -205,26 +205,24 @@ namespace ApiDPSystem.Migrations
                 name: "CarImages",
                 columns: table => new
                 {
-                    CarEntityId = table.Column<int>(type: "int", nullable: false),
-                    ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CarEntityId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ImageId1 = table.Column<int>(type: "int", nullable: true)
+                    CarEntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CarImages", x => new { x.CarEntityId, x.ImageId });
                     table.ForeignKey(
-                        name: "FK_CarImages_CarEntities_CarEntityId1",
-                        column: x => x.CarEntityId1,
+                        name: "FK_CarImages_CarEntities_CarEntityId",
+                        column: x => x.CarEntityId,
                         principalTable: "CarEntities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CarImages_Images_ImageId1",
-                        column: x => x.ImageId1,
+                        name: "FK_CarImages_Images_ImageId",
+                        column: x => x.ImageId,
                         principalTable: "Images",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -248,14 +246,9 @@ namespace ApiDPSystem.Migrations
                 column: "InteriorColorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CarImages_CarEntityId1",
+                name: "IX_CarImages_ImageId",
                 table: "CarImages",
-                column: "CarEntityId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CarImages_ImageId1",
-                table: "CarImages",
-                column: "ImageId1");
+                column: "ImageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ConfigurationFeatures_FeatureId",

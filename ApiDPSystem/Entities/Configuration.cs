@@ -24,5 +24,31 @@ namespace ApiDPSystem.Entities
         public ICollection<ConfigurationFeature> ConfigurationFeatures { get; set; }
         public Producer Producer { get; set; }
         public Engine Engine { get; set; }
+
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+            if (obj is not Configuration conf)
+                return false;
+
+            return conf.Year == Year &&
+                   conf.Model == Model &&
+                   conf.ModelTrim == ModelTrim &&
+                   conf.Transmission == Transmission &&
+                   conf.Drive == Drive &&
+                   conf.Producer.Equals(Producer) &&
+                   conf.Engine.Equals(Engine);
+        }
+
+        public override int GetHashCode()
+        {
+            return Model.GetHashCode() * 11
+                 + ModelTrim.GetHashCode() * 13
+                 + Transmission.GetHashCode() * 7
+                 + Drive.GetHashCode() * 17
+                 + Year.GetHashCode();
+        }
     }
 }

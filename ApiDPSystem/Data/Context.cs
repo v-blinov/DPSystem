@@ -8,7 +8,7 @@ namespace ApiDPSystem.Data
     {
         public Context(DbContextOptions<Context> options) : base(options)
         {
-            //Database.EnsureCreated();
+            Database.EnsureCreated();
         }
 
         public DbSet<RefreshTokenInfo> RefreshTokenInfoTable { get; set; }
@@ -90,22 +90,22 @@ namespace ApiDPSystem.Data
             public void Configure(EntityTypeBuilder<CarEntity> builder)
             {
                 builder.Property(p => p.VinCode)
-                    .IsRequired()
-                    .HasMaxLength(20)
-                    .HasColumnType("varchar");
+                       .IsRequired()
+                       .HasMaxLength(20)
+                       .HasColumnType("varchar");
 
-                builder.Property(p => p.IsSold)
-                    .IsRequired()
-                    .HasDefaultValue(false);
+                builder.Property(p => p.IsAvailable)
+                       .IsRequired()
+                       .HasDefaultValue(true);
 
                 builder.HasOne(s => s.ExteriorColor)
-                        .WithMany(x => x.ExteriorCarEntity)
-                        .HasForeignKey(s => s.ExteriorColorId);
+                       .WithMany(x => x.ExteriorCarEntity)
+                       .HasForeignKey(s => s.ExteriorColorId);
 
                 builder.HasOne(s => s.InteriorColor)
-                    .WithMany(x => x.InteriorCarEntity)
-                    .HasForeignKey(s => s.InteriorColorId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                       .WithMany(x => x.InteriorCarEntity)
+                       .HasForeignKey(s => s.InteriorColorId)
+                       .OnDelete(DeleteBehavior.Restrict);
             }
         }
         public class ColorSettings : IEntityTypeConfiguration<Color>

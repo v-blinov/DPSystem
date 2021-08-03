@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiDPSystem.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20210802074711_CreateNewStructureForDB")]
+    [Migration("20210802135519_CreateNewStructureForDB")]
     partial class CreateNewStructureForDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,23 +67,15 @@ namespace ApiDPSystem.Migrations
 
             modelBuilder.Entity("ApiDPSystem.Entities.CarImage", b =>
                 {
-                    b.Property<int>("CarEntityId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ImageId")
+                    b.Property<Guid>("CarEntityId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CarEntityId1")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("ImageId1")
+                    b.Property<int>("ImageId")
                         .HasColumnType("int");
 
                     b.HasKey("CarEntityId", "ImageId");
 
-                    b.HasIndex("CarEntityId1");
-
-                    b.HasIndex("ImageId1");
+                    b.HasIndex("ImageId");
 
                     b.ToTable("CarImages");
                 });
@@ -326,11 +318,15 @@ namespace ApiDPSystem.Migrations
                 {
                     b.HasOne("ApiDPSystem.Entities.CarEntity", "CarEntity")
                         .WithMany("CarImages")
-                        .HasForeignKey("CarEntityId1");
+                        .HasForeignKey("CarEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ApiDPSystem.Entities.Image", "Image")
                         .WithMany("CarImages")
-                        .HasForeignKey("ImageId1");
+                        .HasForeignKey("ImageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("CarEntity");
 
