@@ -11,6 +11,9 @@ namespace ApiDPSystem.Entities
         public ICollection<CarEntity> InteriorCarEntity { get; set; }
         public ICollection<CarEntity> ExteriorCarEntity { get; set; }
 
+        public ICollection<SoldCar> InteriorSoldCar { get; set; }
+        public ICollection<SoldCar> ExteriorSoldCar { get; set; }
+
         public override bool Equals(object obj)
         {
             if (obj == null)

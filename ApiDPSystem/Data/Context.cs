@@ -22,6 +22,8 @@ namespace ApiDPSystem.Data
         public DbSet<Feature> Features { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Producer> Producers { get; set; }
+        public DbSet<SoldCar> SoldCars { get; set; }
+        public DbSet<SoldCarImage> SoldCarImages { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,6 +31,7 @@ namespace ApiDPSystem.Data
             modelBuilder.ApplyConfiguration(new RefreshTokenInfoSettings());
             modelBuilder.ApplyConfiguration(new ConfigurationSettings());
             modelBuilder.ApplyConfiguration(new CarEntitySettings());
+            modelBuilder.ApplyConfiguration(new SoldCarSettings());
             modelBuilder.ApplyConfiguration(new ColorSettings());
             modelBuilder.ApplyConfiguration(new FeatureSettings());
 
@@ -38,6 +41,9 @@ namespace ApiDPSystem.Data
 
             modelBuilder.Entity<CarImage>()
                 .HasKey(p => new { p.CarEntityId, p.ImageId });
+
+            modelBuilder.Entity<SoldCarImage>()
+               .HasKey(p => new { p.SoldCarId, p.ImageId });
 
             modelBuilder.Entity<Engine>()
                 .Property(p => p.Fuel)
@@ -108,6 +114,31 @@ namespace ApiDPSystem.Data
                        .OnDelete(DeleteBehavior.Restrict);
             }
         }
+
+        public class SoldCarSettings : IEntityTypeConfiguration<SoldCar>
+        {
+            public void Configure(EntityTypeBuilder<SoldCar> builder)
+            {
+                builder.Property(p => p.VinCode)
+                       .IsRequired()
+                       .HasMaxLength(20)
+                       .HasColumnType("varchar");
+
+                builder.Property(p => p.IsAvailable)
+                       .IsRequired()
+                       .HasDefaultValue(true);
+
+                builder.HasOne(s => s.ExteriorColor)
+                       .WithMany(x => x.ExteriorSoldCar)
+                       .HasForeignKey(s => s.ExteriorColorId);
+
+                builder.HasOne(s => s.InteriorColor)
+                       .WithMany(x => x.InteriorSoldCar)
+                       .HasForeignKey(s => s.InteriorColorId)
+                       .OnDelete(DeleteBehavior.Restrict);
+            }
+        }
+
         public class ColorSettings : IEntityTypeConfiguration<Color>
         {
             public void Configure(EntityTypeBuilder<Color> builder)

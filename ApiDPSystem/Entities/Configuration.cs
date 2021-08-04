@@ -20,7 +20,8 @@ namespace ApiDPSystem.Entities
         public int EngineId { get; set; }
 
 
-        public ICollection<CarEntity> CarEntities { get; set; } 
+        public ICollection<CarEntity> CarEntities { get; set; }
+        public ICollection<SoldCar> SoldCars { get; set; }
         public ICollection<ConfigurationFeature> ConfigurationFeatures { get; set; }
         public Producer Producer { get; set; }
         public Engine Engine { get; set; }
