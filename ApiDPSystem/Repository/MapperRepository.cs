@@ -1,7 +1,8 @@
 ﻿using ApiDPSystem.Data;
 using ApiDPSystem.Entities;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ApiDPSystem.Repository
 {
@@ -9,45 +10,100 @@ namespace ApiDPSystem.Repository
     {
         private readonly Context _context;
 
-        //public MapperRepository(Context context)
-        //{
-        //    _context = context;
-        //}
+        public MapperRepository(Context context)
+        {
+            _context = context;
+        }
 
+        public Configuration ReturnConfigurationIfExist(Configuration configuration)
+        {
+            if (configuration == null)
+                return configuration;
 
-        //public FeatureType GetFeatureType(string name) =>
-        //    _context.FeatureTypes.FirstOrDefault(p => p.Name == name);
+            return _context.Configurations
+                           .Include(p => p.Engine)
+                           .Include(p => p.Producer)
+                           .ToList()
+                           .FirstOrDefault(p => configuration.Equals(p));
+        }
+        public Producer ReturnProducerIfExist(Producer producer)
+        {
+            if (producer == null)
+                return producer;
 
-        //public List<Feature> GetFeature(List<string> features, string name)
-        //{
-        //    var featureType = GetFeatureType(name);
-            
+            return _context.Producers
+                           .ToList()
+                           .FirstOrDefault(p => producer.Equals(p));
+        }
+        public Engine ReturnEngineIfExist(Engine engine)
+        {
+            if (engine == null)
+                return engine;
 
-        //    var storedFeatures = new List<Feature>();
+            return _context.Engines
+                           .ToList()
+                           .FirstOrDefault(p => engine.Equals(p));
+        }
+        public Feature ReturnFeatureIfExist(Feature feature)
+        {
+            if (feature == null)
+                return feature;
 
-        //    foreach (var feature in features)
-        //        storedFeatures.Add(new Feature
-        //        {
-        //            FeatureType = featureType,
-        //            Description = feature
-        //        });
+            return _context.Features
+                           .ToList()
+                           .FirstOrDefault(p => feature.Equals(p));
+        }
+        public Color ReturnColorIfExist(Color color)
+        {
+            if (color == null)
+                return color;
 
-        //    _context.Features.AddRange(storedFeatures);
+            return _context.Colors
+                           .ToList()
+                           .FirstOrDefault(p => color.Equals(p));
+        }
+        public Image ReturnImageIfExist(Image image)
+        { 
+            if (image == null)
+                return image;
 
-        //    return storedFeatures;
-        //}
+            return _context.Images
+                           .ToList()
+                           .FirstOrDefault(p => image.Equals(p));
+        }
+        public Dealer ReturnDealerIfExist(Dealer dealer)
+        {
+            if (dealer == null)
+                return dealer;
 
-        //public Transmission GetTransmission(string value) =>
-        //    _context.Transmissions.FirstOrDefault(p => p.Value == value);
+            return _context.Dealers
+                           .ToList()
+                           .FirstOrDefault(p => dealer.Equals(p));
+        }
 
-        public Producer GetProducer(string name) =>
-            _context.Producers.FirstOrDefault(p => p.Name == name);
+        public async Task AddCarEntityOrUpdateIfExist(CarEntity model)
+        {
+            var existedCar = _context.CarEntities.FirstOrDefault(p => p.IsAvailable && p.VinCode == model.VinCode && (p.Dealer == model.Dealer || p.DealerId == model.DealerId));
 
-        public Engine GetEngine(Engine currentEngine) =>
-            _context.Engines.FirstOrDefault(p => p.Equals(currentEngine));
+            if (existedCar == null)
+                _context.CarEntities.Add(model);
+            else
+            {
+                existedCar.CarImages = model.CarImages;
+                existedCar.Configuration = model.Configuration;
+                existedCar.ConfigurationId = model.ConfigurationId;
+                existedCar.Dealer = model.Dealer;
+                existedCar.DealerId = model.DealerId;
+                existedCar.ExteriorColor = model.ExteriorColor;
+                existedCar.ExteriorColorId = model.ExteriorColorId;
+                existedCar.InteriorColor = model.InteriorColor;
+                existedCar.InteriorColorId = model.InteriorColorId;
+                existedCar.Price = model.Price;
 
-        public Color getColor(string name) =>
-            _context.Colors.FirstOrDefault(p => p.Name == name);
+                _context.Entry(existedCar).State = EntityState.Modified;
+            }
 
+            await _context.SaveChangesAsync();
+        }
     }
 }
