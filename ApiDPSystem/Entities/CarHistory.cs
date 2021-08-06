@@ -19,6 +19,7 @@ namespace ApiDPSystem.Entities
             ConfigurationId = model.ConfigurationId;
             InteriorColorId = model.InteriorColorId;
             ExteriorColorId = model.ExteriorColorId;
+            Version = model.Version;
 
             CarHistoryImages = new List<CarHistoryImage>();
         }

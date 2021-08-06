@@ -66,7 +66,7 @@ namespace ApiDPSystem.Repository
                            .FirstOrDefault(p => color.Equals(p));
         }
         public Image ReturnImageIfExist(Image image)
-        { 
+        {
             if (image == null)
                 return image;
 
@@ -83,25 +83,6 @@ namespace ApiDPSystem.Repository
                            .ToList()
                            .FirstOrDefault(p => dealer.Equals(p));
         }
-
-        public async Task AddCarActualOrUpdateIfExist(CarActual model)
-        {
-            var existedCar = _context.CarActuals
-                .Include(p => p.CarImages)
-                .FirstOrDefault(p => p.VinCode == model.VinCode && (p.Dealer == model.Dealer || p.DealerId == model.DealerId));
-
-            if (existedCar == null)
-            {
-                _context.CarActuals.Add(model);
-            }
-            else
-            {
-                existedCar.Copy(model);
-            }
-
-            await _context.SaveChangesAsync();
-        }
-
         public void TransferSoldCars(List<CarActual> newListCars, string dealerName)
         {
             //распараллелить
@@ -119,28 +100,37 @@ namespace ApiDPSystem.Repository
                                         .Except(newListCarVinCodes)
                                         .ToList();
 
+            foreach (var vincode in soldCarVinCodes)
+            {
+                var car = _context.CarActuals
+                                    .Include(p => p.Dealer)
+                                    .Include(p => p.CarImages)
+                                    .FirstOrDefault(p => p.Dealer.Name == dealerName && p.VinCode == vincode);
+
+                TransferOneCar(car, true);
+            }
+        }
+
+        public void TransferOneCar(CarActual car, bool isSold = false)
+        {
             var transaction = _context.Database.BeginTransaction();
+
             try
             {
-                foreach (var vincode in soldCarVinCodes)
+                var carHistoryModel = new CarHistory();
+                carHistoryModel.Copy(car);
+
+                foreach (var carImage in car.CarImages)
                 {
-                    var car = _context.CarActuals
-                                        .Include(p => p.Dealer)
-                                        .Include(p => p.CarImages)
-                                        .FirstOrDefault(p => p.Dealer.Name == dealerName && p.VinCode == vincode);
-
-                    var soldCar = new CarHistory();
-                    soldCar.Copy(car);
-
-                    foreach (var carImage in car.CarImages)
-                    { 
-                        soldCar.CarHistoryImages.Add(new CarHistoryImage { ImageId = carImage.ImageId });
-                        _context.CarImages.RemoveRange(carImage);
-                    }
-
-                    _context.CarActuals.Remove(car);
-                    _context.CarHistories.Add(soldCar);
+                    carHistoryModel.CarHistoryImages.Add(new CarHistoryImage { ImageId = carImage.ImageId });
+                    _context.CarImages.RemoveRange(carImage);
                 }
+
+                _context.CarActuals.Remove(car);
+                carHistoryModel.IsSold = isSold;
+                _context.CarHistories.Add(carHistoryModel);
+                _context.SaveChanges();
+
                 transaction.Commit();
             }
             catch (Exception ex)
@@ -149,6 +139,58 @@ namespace ApiDPSystem.Repository
                 transaction.Rollback();
                 throw new Exception(ex.Message);
             }
+        }
+
+        public CarActual GetThatDealerCarIfExist(CarActual model) =>
+            _context.CarActuals
+                .Include(p => p.CarImages)
+                .FirstOrDefault(p => p.VinCode == model.VinCode &&
+                    (p.DealerId == model.DealerId || model.Dealer != null && p.Dealer == model.Dealer));
+
+        public void AddCarToDB(CarActual model)
+        {
+            var maxVersion = GetMaxVersionByVincode(model.VinCode);
+            model.Version = (maxVersion != null) ? (int)maxVersion + 1 : 1;
+            _context.CarActuals.Add(model);
+            _context.SaveChanges();
+        }
+        private int? GetMaxVersionByVincode(string vinCode)
+        {
+            var actualVersions = _context.CarActuals.Where(p => p.VinCode == vinCode).ToList();
+            var historyVersions = _context.CarHistories.Where(p => p.VinCode == vinCode).ToList();
+            
+            int? maxActualVersion = (actualVersions.Count > 0) ? actualVersions.Max(p => p.Version) : null;
+            int? maxHistoryVersion = (historyVersions.Count > 0) ? historyVersions.Max(p => p.Version) : null;
+
+            if (maxActualVersion != null)
+                if (maxHistoryVersion != null)
+                    return Math.Max((int)maxActualVersion, (int)maxHistoryVersion);
+                else
+                    return maxActualVersion;
+            
+            return maxHistoryVersion;
+        }
+
+        public List<CarImage> GetCarImagesListByCarId(Guid carId) =>
+            _context.CarImages.Where(p => p.CarActualId == carId).ToList();
+
+        public async Task AddCarActualOrUpdateIfExist(CarActual model)
+        {
+            var existedCar = _context.CarActuals
+                .Include(p => p.CarImages)
+                .FirstOrDefault(p => p.VinCode == model.VinCode && (p.Dealer == model.Dealer || p.DealerId == model.DealerId));
+
+
+            if (existedCar == null)
+            {
+                _context.CarActuals.Add(model);
+            }
+            else
+            {
+                existedCar.Copy(model);
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

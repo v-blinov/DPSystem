@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApiDPSystem.Services
@@ -33,7 +34,7 @@ namespace ApiDPSystem.Services
             };
 
             _mapperRepository.TransferSoldCars(ProcessedDbModels, dealer);
-            await SetToDatabaseAsync(ProcessedDbModels);
+            SetToDatabase(ProcessedDbModels);
         }
 
         private async Task<string> ReadFileAsync(IFormFile file)
@@ -124,24 +125,37 @@ namespace ApiDPSystem.Services
         }
 
 
-        private async Task SetToDatabaseAsync(List<Entities.CarActual> models)
+
+        private void SetToDatabase(List<Entities.CarActual> models)
         {
             foreach (var model in models)
             {
-                var isUsingExistedConfiguration = ChangeIfConfigurationExist(model);
-                if (!isUsingExistedConfiguration) 
-                    ChangeIfExistConfigurationFeature(model);
+                var isUsingExistedConfiguration = SetConfigurationIdIfExist(model);
+                if (!isUsingExistedConfiguration)
+                    SetConfigurationFeatureIdsIfExist(model);
 
-                ChangeIfColorExist(model);
-                ChangeCarImageIfExist(model);
-                ChangeDealerIfExist(model);
+                SetColorIdIfExist(model);
+                SetCarImageIdsIfExist(model);
+                SetDealerIdIfExist(model);
 
-                await _mapperRepository.AddCarActualOrUpdateIfExist(model);
+                var existedCar = _mapperRepository.GetThatDealerCarIfExist(model);
+
+                if (existedCar == null)
+                {
+                    _mapperRepository.AddCarToDB(model);
+                    continue;
+                }
+
+                var isModified = IsCarModified(model, existedCar);
+                if (isModified)
+                {
+                    _mapperRepository.TransferOneCar(existedCar, false);
+                    _mapperRepository.AddCarToDB(model);
+                }
             }
         }
-        
 
-        private bool ChangeIfConfigurationExist(Entities.CarActual model)
+        private bool SetConfigurationIdIfExist(Entities.CarActual model)
         {
             var exitedConfiguration = _mapperRepository.ReturnConfigurationIfExist(model.Configuration);
             if (exitedConfiguration != null)
@@ -169,7 +183,7 @@ namespace ApiDPSystem.Services
             }
         }
 
-        private void ChangeIfExistConfigurationFeature(Entities.CarActual model)
+        private void SetConfigurationFeatureIdsIfExist(Entities.CarActual model)
         {
             foreach (var configurationFeature in model.Configuration.ConfigurationFeatures)
             {
@@ -182,7 +196,7 @@ namespace ApiDPSystem.Services
             }
         }
 
-        private void ChangeIfColorExist(Entities.CarActual model)
+        private void SetColorIdIfExist(Entities.CarActual model)
         {
             var existedInteriorColor = _mapperRepository.ReturnColorIfExist(model.InteriorColor);
             if (existedInteriorColor != null)
@@ -202,7 +216,7 @@ namespace ApiDPSystem.Services
                 model.ExteriorColor = model.InteriorColor;
         }
 
-        private void ChangeCarImageIfExist(Entities.CarActual model)
+        private void SetCarImageIdsIfExist(Entities.CarActual model)
         {
             foreach (var carImage in model.CarImages)
             {
@@ -215,7 +229,7 @@ namespace ApiDPSystem.Services
             }
         }
 
-        private void ChangeDealerIfExist(Entities.CarActual model)
+        private void SetDealerIdIfExist(Entities.CarActual model)
         {
             var existedDealer = _mapperRepository.ReturnDealerIfExist(model.Dealer);
             if (existedDealer != null)
@@ -223,6 +237,23 @@ namespace ApiDPSystem.Services
                 model.Dealer = null;
                 model.DealerId = existedDealer.Id;
             }
+        }
+
+        private bool IsCarModified(Entities.CarActual newCar, Entities.CarActual existedCar)
+        {
+            if (newCar.ConfigurationId != existedCar.ConfigurationId) return true;
+            if (newCar.ExteriorColorId != existedCar.ExteriorColorId) return true;
+            if (newCar.InteriorColorId != existedCar.InteriorColorId) return true;
+            if (newCar.Price != existedCar.Price) return true;
+
+            var existedCarImages = _mapperRepository.GetCarImagesListByCarId(existedCar.Id);
+            if (newCar.CarImages.Count != existedCarImages.Count) return true;
+
+            var existedCarImagesIds = existedCarImages.OrderBy(p => p.ImageId).Select(p => p.ImageId).ToList();
+            var newCarImagesIds = newCar.CarImages.OrderBy(p => p.ImageId).Select(p => p.ImageId).ToList();
+            if (!existedCarImagesIds.SequenceEqual(newCarImagesIds)) return true;
+
+            return false;
         }
     }
 }
