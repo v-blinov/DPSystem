@@ -24,7 +24,7 @@ namespace ApiDPSystem.Services
 
             var fileContent = await ReadFileAsync(file);
 
-            var ProcessedDbModel = fileExtension switch {
+            var ProcessedDbModels = fileExtension switch {
                 ".json" => ProcessJsonWithVersion(fileContent, dealer),
                 ".xml" => ProcessXmlWithVersion(fileContent, dealer),
                 ".yaml" => ProcessYamlWithVersion(fileContent, dealer),
@@ -32,7 +32,8 @@ namespace ApiDPSystem.Services
                 _ => throw new Exception("Unknown file format")
             };
 
-            await SetToDatabaseAsync(ProcessedDbModel);
+            _mapperRepository.TransferSoldCars(ProcessedDbModels, dealer);
+            await SetToDatabaseAsync(ProcessedDbModels);
         }
 
         private async Task<string> ReadFileAsync(IFormFile file)

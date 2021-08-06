@@ -19,6 +19,8 @@
     },
     "ApiDPSystem": {
       "commandName": "Project",
+      // ≈сли true, будет отладку запускать в новом окне браузера
+      // ≈сли false, будет запускать отладку в новой вкладке
       "launchBrowser": true,
       "launchUrl": "",
       "environmentVariables": {

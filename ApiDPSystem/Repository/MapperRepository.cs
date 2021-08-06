@@ -1,6 +1,9 @@
 ﻿using ApiDPSystem.Data;
 using ApiDPSystem.Entities;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -83,27 +86,69 @@ namespace ApiDPSystem.Repository
 
         public async Task AddCarEntityOrUpdateIfExist(CarEntity model)
         {
-            var existedCar = _context.CarEntities.FirstOrDefault(p => p.IsAvailable && p.VinCode == model.VinCode && (p.Dealer == model.Dealer || p.DealerId == model.DealerId));
+            var existedCar = _context.CarEntities
+                .Include(p => p.CarImages)
+                .FirstOrDefault(p => p.VinCode == model.VinCode && (p.Dealer == model.Dealer || p.DealerId == model.DealerId));
 
             if (existedCar == null)
+            {
                 _context.CarEntities.Add(model);
+            }
             else
             {
-                existedCar.CarImages = model.CarImages;
-                existedCar.Configuration = model.Configuration;
-                existedCar.ConfigurationId = model.ConfigurationId;
-                existedCar.Dealer = model.Dealer;
-                existedCar.DealerId = model.DealerId;
-                existedCar.ExteriorColor = model.ExteriorColor;
-                existedCar.ExteriorColorId = model.ExteriorColorId;
-                existedCar.InteriorColor = model.InteriorColor;
-                existedCar.InteriorColorId = model.InteriorColorId;
-                existedCar.Price = model.Price;
-
-                _context.Entry(existedCar).State = EntityState.Modified;
+                existedCar.Copy(model);
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        public void TransferSoldCars(List<CarEntity> newListCars, string dealerName)
+        {
+            //распараллелить
+            var currentListCarVinCodes = _context.CarEntities
+                                        .Include(p => p.Dealer)
+                                        .Where(p => p.Dealer.Name == dealerName)
+                                        .Select(p => p.VinCode)
+                                        .ToList();
+
+            var newListCarVinCodes = newListCars
+                                        .Select(p => p.VinCode)
+                                        .ToList();
+
+            var soldCarVinCodes = currentListCarVinCodes
+                                        .Except(newListCarVinCodes)
+                                        .ToList();
+
+            var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                foreach (var vincode in soldCarVinCodes)
+                {
+                    var car = _context.CarEntities
+                                        .Include(p => p.Dealer)
+                                        .Include(p => p.CarImages)
+                                        .FirstOrDefault(p => p.Dealer.Name == dealerName && p.VinCode == vincode);
+
+                    var soldCar = new SoldCar();
+                    soldCar.Copy(car);
+
+                    foreach (var carImage in car.CarImages)
+                    { 
+                        soldCar.SoldCarImages.Add(new SoldCarImage { ImageId = carImage.ImageId });
+                        _context.CarImages.RemoveRange(carImage);
+                    }
+
+                    _context.CarEntities.Remove(car);
+                    _context.SoldCars.Add(soldCar);
+                }
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Ошибка при переносе данных из таблицы CarEntities в таблицу SoldCars");
+                transaction.Rollback();
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

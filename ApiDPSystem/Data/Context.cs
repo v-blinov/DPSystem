@@ -1,11 +1,17 @@
 ﻿using ApiDPSystem.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace ApiDPSystem.Data
 {
     public class Context : DbContext
     {
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            => optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
+
+
         public Context(DbContextOptions<Context> options) : base(options)
         {
             Database.EnsureCreated();
@@ -100,10 +106,6 @@ namespace ApiDPSystem.Data
                        .HasMaxLength(20)
                        .HasColumnType("varchar");
 
-                builder.Property(p => p.IsAvailable)
-                       .IsRequired()
-                       .HasDefaultValue(true);
-
                 builder.HasOne(s => s.ExteriorColor)
                        .WithMany(x => x.ExteriorCarEntity)
                        .HasForeignKey(s => s.ExteriorColorId);
@@ -123,10 +125,6 @@ namespace ApiDPSystem.Data
                        .IsRequired()
                        .HasMaxLength(20)
                        .HasColumnType("varchar");
-
-                builder.Property(p => p.IsAvailable)
-                       .IsRequired()
-                       .HasDefaultValue(true);
 
                 builder.HasOne(s => s.ExteriorColor)
                        .WithMany(x => x.ExteriorSoldCar)

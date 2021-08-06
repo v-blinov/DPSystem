@@ -4,14 +4,16 @@ using ApiDPSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ApiDPSystem.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20210804115850_AddNessessaryFields")]
+    partial class AddNessessaryFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,6 +38,11 @@ namespace ApiDPSystem.Migrations
 
                     b.Property<int>("InteriorColorId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsAvailable")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -289,6 +296,11 @@ namespace ApiDPSystem.Migrations
 
                     b.Property<int>("InteriorColorId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsAvailable")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");

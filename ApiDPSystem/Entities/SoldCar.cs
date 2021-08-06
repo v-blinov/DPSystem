@@ -1,26 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiDPSystem.Entities
 {
-    public class SoldCar
+    [Table("SoldCars")]
+    public class SoldCar : Car
     {
-        public Guid Id { get; set; }
-        public string VinCode { get; set; }
-        public decimal? Price { get; set; }
-        public bool IsAvailable { get; set; }
+        public void Copy(CarEntity model)
+        {
+            VinCode = model.VinCode;
+            Price = model.Price;
+            DealerId = model.DealerId;
+            ConfigurationId = model.ConfigurationId;
+            InteriorColorId = model.InteriorColorId;
+            ExteriorColorId = model.ExteriorColorId;
 
+            SoldCarImages = new List<SoldCarImage>();
+        }
 
-        public int DealerId { get; set; }
-        public Guid ConfigurationId { get; set; }
-        public int ExteriorColorId { get; set; }
-        public int InteriorColorId { get; set; }
-
-
-        public Dealer Dealer { get; set; }
-        public Configuration Configuration { get; set; }
-        public Color ExteriorColor { get; set; }
-        public Color InteriorColor { get; set; }
         public ICollection<SoldCarImage> SoldCarImages { get; set; }
     }
 }
