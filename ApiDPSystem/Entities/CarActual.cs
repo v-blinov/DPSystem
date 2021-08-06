@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiDPSystem.Entities
 {
-    [Table("CarEntities")]
-    public class CarEntity : Car
+    [Table("CarActuals")]
+    public class CarActual : Car
     {
-        public void Copy(CarEntity model)
+        public void Copy(CarActual model)
         {
             VinCode = model.VinCode;
             CarImages = model.CarImages;

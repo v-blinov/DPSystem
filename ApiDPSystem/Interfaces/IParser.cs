@@ -8,6 +8,6 @@ namespace ApiDPSystem.Interfaces
     {
         public Root<T> DeserializeFile(string fileContent);
 
-        public List<Entities.CarEntity> MapToDBModel(Root<T> deserializedModels, string dealer);
+        public List<Entities.CarActual> MapToDBModel(Root<T> deserializedModels, string dealer);
     }
 }

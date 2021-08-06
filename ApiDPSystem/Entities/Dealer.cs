@@ -6,8 +6,8 @@ namespace ApiDPSystem.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<CarEntity> CarEntities { get; set; }
-        public ICollection<SoldCar> SoldCars { get; set; }
+        public ICollection<CarActual> CarActuals { get; set; }
+        public ICollection<CarHistory> CarHistories { get; set; }
 
 
         public override bool Equals(object obj)

@@ -4,7 +4,7 @@ namespace ApiDPSystem.FileFormat
 {
     public interface ICar
     {
-        public Entities.CarEntity ConvertToCarEntityDbModel(string DealerName);
+        public Entities.CarActual ConvertToCarActualDbModel(string DealerName);
 
         public static List<Entities.ConfigurationFeature> GetFeaturesCollection(List<string> collection, string type)
         {

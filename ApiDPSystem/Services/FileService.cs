@@ -42,10 +42,10 @@ namespace ApiDPSystem.Services
             return await reader.ReadToEndAsync();
         }
 
-        private List<Entities.CarEntity> ProcessJsonWithVersion(string fileContent, string dealer)
+        private List<Entities.CarActual> ProcessJsonWithVersion(string fileContent, string dealer)
         {
             var version = new Distributer().JsonGetVersion(fileContent);
-            var dbModels = new List<Entities.CarEntity>();
+            var dbModels = new List<Entities.CarActual>();
 
             switch (version.Value)
             {
@@ -61,10 +61,10 @@ namespace ApiDPSystem.Services
             return dbModels;
         }
 
-        private List<Entities.CarEntity> ProcessXmlWithVersion(string fileContent, string dealer)
+        private List<Entities.CarActual> ProcessXmlWithVersion(string fileContent, string dealer)
         {
             var version = new Distributer().XmlGetVersion(fileContent);
-            var dbModels = new List<Entities.CarEntity>();
+            var dbModels = new List<Entities.CarActual>();
 
             switch (version.Value)
             {
@@ -80,10 +80,10 @@ namespace ApiDPSystem.Services
             return dbModels;
         }
 
-        private List<Entities.CarEntity> ProcessYamlWithVersion(string fileContent, string dealer)
+        private List<Entities.CarActual> ProcessYamlWithVersion(string fileContent, string dealer)
         {
             var version = new Distributer().YamlGetVersion(fileContent);
-            var dbModels = new List<Entities.CarEntity>();
+            var dbModels = new List<Entities.CarActual>();
 
             switch (version.Value)
             {
@@ -99,10 +99,10 @@ namespace ApiDPSystem.Services
             return dbModels;
         }
 
-        private List<Entities.CarEntity> ProcessCsvWithVersion(string fileContent, string fileName, string dealer) 
+        private List<Entities.CarActual> ProcessCsvWithVersion(string fileContent, string fileName, string dealer) 
         {
             var version = new Distributer().CsvGetVersion(fileName);
-            var dbModels = new List<Entities.CarEntity>();
+            var dbModels = new List<Entities.CarActual>();
 
             switch (version.Value)
             {
@@ -124,7 +124,7 @@ namespace ApiDPSystem.Services
         }
 
 
-        private async Task SetToDatabaseAsync(List<Entities.CarEntity> models)
+        private async Task SetToDatabaseAsync(List<Entities.CarActual> models)
         {
             foreach (var model in models)
             {
@@ -136,12 +136,12 @@ namespace ApiDPSystem.Services
                 ChangeCarImageIfExist(model);
                 ChangeDealerIfExist(model);
 
-                await _mapperRepository.AddCarEntityOrUpdateIfExist(model);
+                await _mapperRepository.AddCarActualOrUpdateIfExist(model);
             }
         }
         
 
-        private bool ChangeIfConfigurationExist(Entities.CarEntity model)
+        private bool ChangeIfConfigurationExist(Entities.CarActual model)
         {
             var exitedConfiguration = _mapperRepository.ReturnConfigurationIfExist(model.Configuration);
             if (exitedConfiguration != null)
@@ -169,7 +169,7 @@ namespace ApiDPSystem.Services
             }
         }
 
-        private void ChangeIfExistConfigurationFeature(Entities.CarEntity model)
+        private void ChangeIfExistConfigurationFeature(Entities.CarActual model)
         {
             foreach (var configurationFeature in model.Configuration.ConfigurationFeatures)
             {
@@ -182,7 +182,7 @@ namespace ApiDPSystem.Services
             }
         }
 
-        private void ChangeIfColorExist(Entities.CarEntity model)
+        private void ChangeIfColorExist(Entities.CarActual model)
         {
             var existedInteriorColor = _mapperRepository.ReturnColorIfExist(model.InteriorColor);
             if (existedInteriorColor != null)
@@ -202,7 +202,7 @@ namespace ApiDPSystem.Services
                 model.ExteriorColor = model.InteriorColor;
         }
 
-        private void ChangeCarImageIfExist(Entities.CarEntity model)
+        private void ChangeCarImageIfExist(Entities.CarActual model)
         {
             foreach (var carImage in model.CarImages)
             {
@@ -215,7 +215,7 @@ namespace ApiDPSystem.Services
             }
         }
 
-        private void ChangeDealerIfExist(Entities.CarEntity model)
+        private void ChangeDealerIfExist(Entities.CarActual model)
         {
             var existedDealer = _mapperRepository.ReturnDealerIfExist(model.Dealer);
             if (existedDealer != null)

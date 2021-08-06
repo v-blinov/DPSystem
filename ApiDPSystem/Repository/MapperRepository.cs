@@ -84,15 +84,15 @@ namespace ApiDPSystem.Repository
                            .FirstOrDefault(p => dealer.Equals(p));
         }
 
-        public async Task AddCarEntityOrUpdateIfExist(CarEntity model)
+        public async Task AddCarActualOrUpdateIfExist(CarActual model)
         {
-            var existedCar = _context.CarEntities
+            var existedCar = _context.CarActuals
                 .Include(p => p.CarImages)
                 .FirstOrDefault(p => p.VinCode == model.VinCode && (p.Dealer == model.Dealer || p.DealerId == model.DealerId));
 
             if (existedCar == null)
             {
-                _context.CarEntities.Add(model);
+                _context.CarActuals.Add(model);
             }
             else
             {
@@ -102,10 +102,10 @@ namespace ApiDPSystem.Repository
             await _context.SaveChangesAsync();
         }
 
-        public void TransferSoldCars(List<CarEntity> newListCars, string dealerName)
+        public void TransferSoldCars(List<CarActual> newListCars, string dealerName)
         {
             //распараллелить
-            var currentListCarVinCodes = _context.CarEntities
+            var currentListCarVinCodes = _context.CarActuals
                                         .Include(p => p.Dealer)
                                         .Where(p => p.Dealer.Name == dealerName)
                                         .Select(p => p.VinCode)
@@ -124,22 +124,22 @@ namespace ApiDPSystem.Repository
             {
                 foreach (var vincode in soldCarVinCodes)
                 {
-                    var car = _context.CarEntities
+                    var car = _context.CarActuals
                                         .Include(p => p.Dealer)
                                         .Include(p => p.CarImages)
                                         .FirstOrDefault(p => p.Dealer.Name == dealerName && p.VinCode == vincode);
 
-                    var soldCar = new SoldCar();
+                    var soldCar = new CarHistory();
                     soldCar.Copy(car);
 
                     foreach (var carImage in car.CarImages)
                     { 
-                        soldCar.SoldCarImages.Add(new SoldCarImage { ImageId = carImage.ImageId });
+                        soldCar.CarHistoryImages.Add(new CarHistoryImage { ImageId = carImage.ImageId });
                         _context.CarImages.RemoveRange(carImage);
                     }
 
-                    _context.CarEntities.Remove(car);
-                    _context.SoldCars.Add(soldCar);
+                    _context.CarActuals.Remove(car);
+                    _context.CarHistories.Add(soldCar);
                 }
                 transaction.Commit();
             }

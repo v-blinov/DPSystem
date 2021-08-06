@@ -11,7 +11,7 @@ namespace ApiDPSystem.Entities
         public string Url { get; set; }
 
         public ICollection<CarImage> CarImages { get; set; }
-        public ICollection<SoldCarImage> SoldCarImages { get; set; }
+        public ICollection<CarHistoryImage> CarHistoryImages { get; set; }
 
 
         public override bool Equals(object obj)

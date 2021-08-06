@@ -4,10 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiDPSystem.Entities
 {
-    [Table("SoldCars")]
-    public class SoldCar : Car
+    [Table("CarHistories")]
+    public class CarHistory : Car
     {
-        public void Copy(CarEntity model)
+        public bool IsSold { get; set; }
+        public ICollection<CarHistoryImage> CarHistoryImages { get; set; }
+
+
+        public void Copy(CarActual model)
         {
             VinCode = model.VinCode;
             Price = model.Price;
@@ -16,9 +20,7 @@ namespace ApiDPSystem.Entities
             InteriorColorId = model.InteriorColorId;
             ExteriorColorId = model.ExteriorColorId;
 
-            SoldCarImages = new List<SoldCarImage>();
+            CarHistoryImages = new List<CarHistoryImage>();
         }
-
-        public ICollection<SoldCarImage> SoldCarImages { get; set; }
     }
 }

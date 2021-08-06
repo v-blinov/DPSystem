@@ -8,11 +8,11 @@ namespace ApiDPSystem.Entities
         public string Name { get; set; }
         public string HexCode { get; set; }
 
-        public ICollection<CarEntity> InteriorCarEntity { get; set; }
-        public ICollection<CarEntity> ExteriorCarEntity { get; set; }
+        public ICollection<CarActual> InteriorCarActual { get; set; }
+        public ICollection<CarActual> ExteriorCarActual { get; set; }
 
-        public ICollection<SoldCar> InteriorSoldCar { get; set; }
-        public ICollection<SoldCar> ExteriorSoldCar { get; set; }
+        public ICollection<CarHistory> InteriorCarHistory { get; set; }
+        public ICollection<CarHistory> ExteriorCarHistory { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -24,7 +24,6 @@ namespace ApiDPSystem.Entities
             return color.HexCode == HexCode &&
                    color.Name == Name;
         }
-
         public override int GetHashCode()
         {
             return Name.GetHashCode() * 11

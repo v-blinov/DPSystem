@@ -13,12 +13,12 @@ namespace ApiDPSystem.Models.Parser
             return deserializer.Deserialize<Root<T>>(fileContent);
         }
 
-        public List<CarEntity> MapToDBModel(Root<T> deserializedModels, string dealer)
+        public List<CarActual> MapToDBModel(Root<T> deserializedModels, string dealer)
         {
-            var dbCars = new List<CarEntity>();
+            var dbCars = new List<CarActual>();
 
             foreach (var deserializeModel in deserializedModels.Cars)
-                dbCars.Add(deserializeModel.ConvertToCarEntityDbModel(dealer));
+                dbCars.Add(deserializeModel.ConvertToCarActualDbModel(dealer));
 
             return dbCars;
         }

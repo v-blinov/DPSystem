@@ -37,7 +37,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
         [Name("price")]
         public string Price { get; set; }
 
-        public Entities.CarEntity ConvertToCarEntityDbModel(string DealerName)
+        public Entities.CarActual ConvertToCarActualDbModel(string DealerName)
         {
             var configurationFeatures = new List<Entities.ConfigurationFeature>();
 
@@ -66,7 +66,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
                 ConfigurationFeatures = configurationFeatures
             };
 
-            var dbCarEntity = new Entities.CarEntity
+            var dbCarActual = new Entities.CarActual
             {
                 VinCode = Id,
                 Price = Int32.TryParse(Price, out int price) ? price : null,
@@ -77,7 +77,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
                 Configuration = dbConfiguration
             };
 
-            return dbCarEntity;
+            return dbCarActual;
         }
     }
 }

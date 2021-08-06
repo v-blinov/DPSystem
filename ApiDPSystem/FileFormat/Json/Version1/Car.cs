@@ -36,7 +36,7 @@ namespace ApiDPSystem.FileFormat.Json.Version1
         [JsonPropertyName("price")]
         public string Price { get; set; }
 
-        public Entities.CarEntity ConvertToCarEntityDbModel(string DealerName)
+        public Entities.CarActual ConvertToCarActualDbModel(string DealerName)
         {
             var configurationFeatures = new List<Entities.ConfigurationFeature>();
 
@@ -65,7 +65,7 @@ namespace ApiDPSystem.FileFormat.Json.Version1
                 ConfigurationFeatures = configurationFeatures
             };
 
-            var dbCarEntity = new Entities.CarEntity
+            var dbCarActual = new Entities.CarActual
             {
                 VinCode = Id,
                 Price = Int32.TryParse(Price, out int price) ? price : null,
@@ -76,7 +76,7 @@ namespace ApiDPSystem.FileFormat.Json.Version1
                 Configuration = dbConfiguration
             };
 
-            return dbCarEntity;
+            return dbCarActual;
         }
 
         //private List<Entities.CarFeature> GetFeaturesCollection(List<string> collection, string featureType)

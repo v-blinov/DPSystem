@@ -2,13 +2,13 @@
 
 namespace ApiDPSystem.Entities
 {
-    public class SoldCarImage
+    public class CarHistoryImage
 
     {
-        public Guid SoldCarId { get; set; }
+        public Guid CarHistoryId { get; set; }
         public int ImageId { get; set; }
 
-        public SoldCar SoldCar { get; set; }
+        public CarHistory CarHistory { get; set; }
         public Image Image { get; set; }
     }
 }
