@@ -1,11 +1,7 @@
-﻿using ApiDPSystem.Entities;
-using ApiDPSystem.FileFormat;
-using ApiDPSystem.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text.Json;
+using ApiDPSystem.Entities;
+using ApiDPSystem.Interfaces;
 
 namespace ApiDPSystem.Models.Parser
 {
@@ -29,9 +25,6 @@ namespace ApiDPSystem.Models.Parser
     {
         public string ConvertableFileExtension => ".json";
 
-        public Version JsonGetVersion(string file) =>
-            JsonSerializer.Deserialize<Version>(file);
-
         public List<CarActual> Parse(string fileContent, string fileName, string dealer)
         {
             var version = JsonGetVersion(fileContent);
@@ -42,6 +35,11 @@ namespace ApiDPSystem.Models.Parser
             var dbCars = deserializedModels.ConvertToActualDbModel(dealer);
 
             return dbCars;
+        }
+
+        public Version JsonGetVersion(string file)
+        {
+            return JsonSerializer.Deserialize<Version>(file);
         }
     }
 }

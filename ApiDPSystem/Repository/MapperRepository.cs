@@ -1,11 +1,11 @@
-﻿using ApiDPSystem.Data;
-using ApiDPSystem.Entities;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ApiDPSystem.Data;
+using ApiDPSystem.Entities;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace ApiDPSystem.Repository
 {
@@ -24,88 +24,95 @@ namespace ApiDPSystem.Repository
                 return configuration;
 
             return _context.Configurations
-                           .Include(p => p.Engine)
-                           .Include(p => p.Producer)
-                           .ToList()
-                           .FirstOrDefault(p => configuration.Equals(p));
+                .Include(p => p.Engine)
+                .Include(p => p.Producer)
+                .ToList()
+                .FirstOrDefault(p => configuration.Equals(p));
         }
+
         public Producer ReturnProducerIfExist(Producer producer)
         {
             if (producer == null)
                 return producer;
 
             return _context.Producers
-                           .ToList()
-                           .FirstOrDefault(p => producer.Equals(p));
+                .ToList()
+                .FirstOrDefault(p => producer.Equals(p));
         }
+
         public Engine ReturnEngineIfExist(Engine engine)
         {
             if (engine == null)
                 return engine;
 
             return _context.Engines
-                           .ToList()
-                           .FirstOrDefault(p => engine.Equals(p));
+                .ToList()
+                .FirstOrDefault(p => engine.Equals(p));
         }
+
         public Feature ReturnFeatureIfExist(Feature feature)
         {
             if (feature == null)
                 return feature;
 
             return _context.Features
-                           .ToList()
-                           .FirstOrDefault(p => feature.Equals(p));
+                .ToList()
+                .FirstOrDefault(p => feature.Equals(p));
         }
+
         public Color ReturnColorIfExist(Color color)
         {
             if (color == null)
                 return color;
 
             return _context.Colors
-                           .ToList()
-                           .FirstOrDefault(p => color.Equals(p));
+                .ToList()
+                .FirstOrDefault(p => color.Equals(p));
         }
+
         public Image ReturnImageIfExist(Image image)
         {
             if (image == null)
                 return image;
 
             return _context.Images
-                           .ToList()
-                           .FirstOrDefault(p => image.Equals(p));
+                .ToList()
+                .FirstOrDefault(p => image.Equals(p));
         }
+
         public Dealer ReturnDealerIfExist(Dealer dealer)
         {
             if (dealer == null)
                 return dealer;
 
             return _context.Dealers
-                           .ToList()
-                           .FirstOrDefault(p => dealer.Equals(p));
+                .ToList()
+                .FirstOrDefault(p => dealer.Equals(p));
         }
+
         public void TransferSoldCars(List<CarActual> newListCars, string dealerName)
         {
             //распараллелить
             var currentListCarVinCodes = _context.CarActuals
-                                        .Include(p => p.Dealer)
-                                        .Where(p => p.Dealer.Name == dealerName)
-                                        .Select(p => p.VinCode)
-                                        .ToList();
+                .Include(p => p.Dealer)
+                .Where(p => p.Dealer.Name == dealerName)
+                .Select(p => p.VinCode)
+                .ToList();
 
             var newListCarVinCodes = newListCars
-                                        .Select(p => p.VinCode)
-                                        .ToList();
+                .Select(p => p.VinCode)
+                .ToList();
 
             var soldCarVinCodes = currentListCarVinCodes
-                                        .Except(newListCarVinCodes)
-                                        .ToList();
+                .Except(newListCarVinCodes)
+                .ToList();
 
             foreach (var vincode in soldCarVinCodes)
             {
                 var car = _context.CarActuals
-                                    .Include(p => p.Dealer)
-                                    .Include(p => p.CarImages)
-                                    .FirstOrDefault(p => p.Dealer.Name == dealerName && p.VinCode == vincode);
+                    .Include(p => p.Dealer)
+                    .Include(p => p.CarImages)
+                    .FirstOrDefault(p => p.Dealer.Name == dealerName && p.VinCode == vincode);
 
                 TransferOneCar(car, true);
             }
@@ -122,7 +129,7 @@ namespace ApiDPSystem.Repository
 
                 foreach (var carImage in car.CarImages)
                 {
-                    carHistoryModel.CarHistoryImages.Add(new CarHistoryImage { ImageId = carImage.ImageId });
+                    carHistoryModel.CarHistoryImages.Add(new CarHistoryImage {ImageId = carImage.ImageId});
                     _context.CarImages.RemoveRange(carImage);
                 }
 
@@ -141,38 +148,43 @@ namespace ApiDPSystem.Repository
             }
         }
 
-        public CarActual GetThatDealerCarIfExist(CarActual model) =>
-            _context.CarActuals
+        public CarActual GetThatDealerCarIfExist(CarActual model)
+        {
+            return _context.CarActuals
                 .Include(p => p.CarImages)
                 .FirstOrDefault(p => p.VinCode == model.VinCode &&
-                    (p.DealerId == model.DealerId || model.Dealer != null && p.Dealer == model.Dealer));
+                                     (p.DealerId == model.DealerId || model.Dealer != null && p.Dealer == model.Dealer));
+        }
 
         public void AddCarToDB(CarActual model)
         {
             var maxVersion = GetMaxVersionByVincode(model.VinCode);
-            model.Version = (maxVersion != null) ? (int)maxVersion + 1 : 1;
+            model.Version = maxVersion != null ? (int) maxVersion + 1 : 1;
             _context.CarActuals.Add(model);
             _context.SaveChanges();
         }
+
         private int? GetMaxVersionByVincode(string vinCode)
         {
             var actualVersions = _context.CarActuals.Where(p => p.VinCode == vinCode).ToList();
             var historyVersions = _context.CarHistories.Where(p => p.VinCode == vinCode).ToList();
-            
-            int? maxActualVersion = (actualVersions.Count > 0) ? actualVersions.Max(p => p.Version) : null;
-            int? maxHistoryVersion = (historyVersions.Count > 0) ? historyVersions.Max(p => p.Version) : null;
+
+            int? maxActualVersion = actualVersions.Count > 0 ? actualVersions.Max(p => p.Version) : null;
+            int? maxHistoryVersion = historyVersions.Count > 0 ? historyVersions.Max(p => p.Version) : null;
 
             if (maxActualVersion != null)
                 if (maxHistoryVersion != null)
-                    return Math.Max((int)maxActualVersion, (int)maxHistoryVersion);
+                    return Math.Max((int) maxActualVersion, (int) maxHistoryVersion);
                 else
                     return maxActualVersion;
-            
+
             return maxHistoryVersion;
         }
 
-        public List<CarImage> GetCarImagesListByCarId(Guid carId) =>
-            _context.CarImages.Where(p => p.CarActualId == carId).ToList();
+        public List<CarImage> GetCarImagesListByCarId(Guid carId)
+        {
+            return _context.CarImages.Where(p => p.CarActualId == carId).ToList();
+        }
 
         public async Task AddCarActualOrUpdateIfExist(CarActual model)
         {
@@ -182,13 +194,9 @@ namespace ApiDPSystem.Repository
 
 
             if (existedCar == null)
-            {
                 _context.CarActuals.Add(model);
-            }
             else
-            {
                 existedCar.Copy(model);
-            }
 
             await _context.SaveChangesAsync();
         }

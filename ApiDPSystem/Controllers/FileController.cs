@@ -1,12 +1,12 @@
-﻿using ApiDPSystem.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using ApiDPSystem.Models;
 using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace ApiDPSystem.Controllers
 {
@@ -16,6 +16,7 @@ namespace ApiDPSystem.Controllers
     public class FileController : Controller
     {
         private readonly FileService _fileService;
+
         public FileController(FileService fileService)
         {
             _fileService = fileService;
@@ -23,37 +24,40 @@ namespace ApiDPSystem.Controllers
 
 
         [HttpPost]
-        public async Task<ApiResponse> SendFileAsync(IFormFile file, [FromForm] string dealer = "Izhevsk")
+        public async Task<ApiResponse> SendFileAsync(IFormFile file, [FromForm]
+            string dealer = "Izhevsk")
         {
-            var availableExtensions = new List<string> { ".json", ".xml", ".yaml", ".csv" };
+            var availableExtensions = new List<string> {".json", ".xml", ".yaml", ".csv"};
             if (!availableExtensions.Contains(Path.GetExtension(file.FileName)))
             {
                 Log.Error($"Отправлен неподдерживаемый формат файла {Path.GetExtension(file.FileName)}");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Message = $"Неподдерживаемый формат файла {Path.GetExtension(file.FileName)}",
+                    Message = $"Неподдерживаемый формат файла {Path.GetExtension(file.FileName)}"
                 };
             }
+
             if (file == null || file.Length == 0)
             {
                 Log.Error("Файл не отправлен, или он пустой");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Файл не отправлен, или он пустой.",
+                    Message = "Файл не отправлен, или он пустой."
                 };
             }
-            if (String.IsNullOrEmpty(dealer))
+
+            if (string.IsNullOrEmpty(dealer))
             {
                 Log.Error("Имя диллера пустое или не отправлено.");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Message = $"Имя диллера пустое или не отправлено.",
+                    Message = "Имя диллера пустое или не отправлено."
                 };
             }
 
@@ -62,16 +66,16 @@ namespace ApiDPSystem.Controllers
                 // Написать реализацию обратного вызова,
                 // возвращающего результат обработки файла для пользователя
                 await _fileService.ProcessFileAsync(file, dealer);
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = true,
-                    StatusCode = StatusCodes.Status200OK,
+                    StatusCode = StatusCodes.Status200OK
                 };
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,

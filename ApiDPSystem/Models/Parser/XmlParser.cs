@@ -1,8 +1,8 @@
-﻿using ApiDPSystem.Entities;
-using ApiDPSystem.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
+using ApiDPSystem.Entities;
+using ApiDPSystem.Interfaces;
 
 namespace ApiDPSystem.Models.Parser
 {
@@ -31,14 +31,6 @@ namespace ApiDPSystem.Models.Parser
     {
         public string ConvertableFileExtension => ".xml";
 
-        public Version XmlGetVersion(string fileContent)
-        {
-            var serializer = new XmlSerializer(typeof(Version));
-
-            using var reader = new StringReader(fileContent);
-            return (Version)serializer.Deserialize(reader);
-        }
-
         public List<CarActual> Parse(string fileContent, string fileName, string dealer)
         {
             var version = XmlGetVersion(fileContent);
@@ -46,12 +38,20 @@ namespace ApiDPSystem.Models.Parser
 
 
             var serializer = new XmlSerializer(deserializedType);
-           
+
             using var reader = new StringReader(fileContent);
             var deserializedModels = serializer.Deserialize(reader) as IRoot;
 
             var dbCars = deserializedModels.ConvertToActualDbModel(dealer);
             return dbCars;
+        }
+
+        public Version XmlGetVersion(string fileContent)
+        {
+            var serializer = new XmlSerializer(typeof(Version));
+
+            using var reader = new StringReader(fileContent);
+            return (Version) serializer.Deserialize(reader);
         }
     }
 }

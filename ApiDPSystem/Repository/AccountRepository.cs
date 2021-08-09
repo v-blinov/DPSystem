@@ -1,10 +1,10 @@
-﻿using ApiDPSystem.Data;
-using ApiDPSystem.Entities;
-using ApiDPSystem.Models;
-using System;
+﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using ApiDPSystem.Data;
+using ApiDPSystem.Entities;
+using ApiDPSystem.Models;
 
 namespace ApiDPSystem.Repository
 {
@@ -19,7 +19,7 @@ namespace ApiDPSystem.Repository
 
         public async Task<string> GetRefreshTokenAsync(string tokenId, User user)
         {
-            var refreshTokenInfo = new RefreshTokenInfo()
+            var refreshTokenInfo = new RefreshTokenInfo
             {
                 JwtId = tokenId,
                 UserId = user.Id,
@@ -41,8 +41,10 @@ namespace ApiDPSystem.Repository
             return Convert.ToBase64String(randomNumber);
         }
 
-        public RefreshTokenInfo GetStoredRefreshToken(string requestRefreshToken) => 
-            _context.RefreshTokenInfoTable.FirstOrDefault(x => x.RefreshToken == requestRefreshToken);
+        public RefreshTokenInfo GetStoredRefreshToken(string requestRefreshToken)
+        {
+            return _context.RefreshTokenInfoTable.FirstOrDefault(x => x.RefreshToken == requestRefreshToken);
+        }
 
         public async Task UpdateStoredRefreshTokenAsync(RefreshTokenInfo storedRefreshToken)
         {

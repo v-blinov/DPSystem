@@ -6,6 +6,8 @@ namespace ApiDPSystem.Entities
     [Table("CarActuals")]
     public class CarActual : Car
     {
+        public ICollection<CarImage> CarImages { get; set; }
+
         public void Copy(CarActual model)
         {
             VinCode = model.VinCode;
@@ -17,14 +19,12 @@ namespace ApiDPSystem.Entities
 
             if (model.Dealer != null) Dealer = model.Dealer;
             else DealerId = model.DealerId;
-            
+
             if (model.ExteriorColor != null) ExteriorColor = model.ExteriorColor;
             else ExteriorColorId = model.ExteriorColorId;
 
             if (model.InteriorColor != null) InteriorColor = model.InteriorColor;
             else InteriorColorId = model.InteriorColorId;
         }
-
-        public ICollection<CarImage> CarImages { get; set; }
     }
 }

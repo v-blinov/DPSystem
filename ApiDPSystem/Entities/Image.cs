@@ -6,7 +6,7 @@ namespace ApiDPSystem.Entities
     public class Image
     {
         public int Id { get; set; }
-        
+
         [Url]
         public string Url { get; set; }
 
@@ -23,6 +23,7 @@ namespace ApiDPSystem.Entities
 
             return image.Url == Url;
         }
+
         public override int GetHashCode()
         {
             return Url.GetHashCode() * 22;

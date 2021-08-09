@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using YamlDotNet.Serialization;
 
 namespace ApiDPSystem.Models.Parser
 {
@@ -19,30 +20,30 @@ namespace ApiDPSystem.Models.Parser
             var serializer = new XmlSerializer(typeof(Version));
 
             using var reader = new StringReader(fileContent);
-            return (Version)serializer.Deserialize(reader);
+            return (Version) serializer.Deserialize(reader);
         }
 
         public Version YamlGetVersion(string fileContent)
         {
-            var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
-                                             .IgnoreUnmatchedProperties()
-                                             .Build();
-            
+            var deserializer = new DeserializerBuilder()
+                .IgnoreUnmatchedProperties()
+                .Build();
+
             return deserializer.Deserialize<Version>(fileContent);
         }
 
         public Version CsvGetVersion(string fileName)
         {
-            Regex regex = new Regex(@"_v(\d)+\.");
-            MatchCollection matches = regex.Matches(fileName);
+            var regex = new Regex(@"_v(\d)+\.");
+            var matches = regex.Matches(fileName);
 
             if (matches.Count > 0)
             {
                 var versionString = matches.Last().Value.Replace("_v", "").Replace(".", "");
-                return new Version { Value = Convert.ToInt32(versionString) };
+                return new Version {Value = Convert.ToInt32(versionString)};
             }
-            else
-                return new Version();
+
+            return new Version();
         }
     }
 }

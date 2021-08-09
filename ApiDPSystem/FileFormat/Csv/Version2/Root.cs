@@ -1,10 +1,11 @@
-﻿using ApiDPSystem.Interfaces;
-using CsvHelper;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
+using ApiDPSystem.Entities;
+using ApiDPSystem.Interfaces;
+using CsvHelper;
 
 namespace ApiDPSystem.FileFormat.Csv.Version2
 {
@@ -15,15 +16,15 @@ namespace ApiDPSystem.FileFormat.Csv.Version2
             Cars = new List<Car>();
         }
 
-        public string FileFormat => ".csv";
-        public int Version => 2;
-
         [JsonPropertyName("cars")]
         public List<Car> Cars { get; set; }
 
-        public List<Entities.CarActual> ConvertToActualDbModel(string dealerName)
+        public string FileFormat => ".csv";
+        public int Version => 2;
+
+        public List<CarActual> ConvertToActualDbModel(string dealerName)
         {
-            var dbModels = new List<Entities.CarActual>();
+            var dbModels = new List<CarActual>();
 
             foreach (var car in Cars)
                 dbModels.Add(car.ConvertToCarActualDbModel(dealerName));
@@ -55,6 +56,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version2
 
                 root.Cars.Add(car);
             }
+
             return root;
         }
     }

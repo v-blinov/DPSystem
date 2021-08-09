@@ -1,6 +1,6 @@
 ﻿namespace ApiDPSystem.Interfaces
 {
-    interface ICsvRoot : IRoot
+    internal interface ICsvRoot : IRoot
     {
         public IRoot Deserialize(string fileContent);
     }

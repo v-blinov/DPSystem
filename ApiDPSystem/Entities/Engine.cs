@@ -23,6 +23,7 @@ namespace ApiDPSystem.Entities
                    engine.Capacity == Capacity &&
                    engine.Power == Power;
         }
+
         public override int GetHashCode()
         {
             return Fuel.GetHashCode() * 22 + Capacity.GetHashCode() * 13 + Power.GetHashCode() * 7;

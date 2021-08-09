@@ -1,5 +1,6 @@
-﻿using ApiDPSystem.Models.Parser;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using ApiDPSystem.Entities;
+using ApiDPSystem.Models.Parser;
 
 namespace ApiDPSystem.Interfaces
 {
@@ -7,6 +8,6 @@ namespace ApiDPSystem.Interfaces
     {
         public Root<T> DeserializeFile(string fileContent);
 
-        public List<Entities.CarActual> MapToDBModel(Root<T> deserializedModels, string dealer);
+        public List<CarActual> MapToDBModel(Root<T> deserializedModels, string dealer);
     }
 }

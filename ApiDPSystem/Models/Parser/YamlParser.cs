@@ -1,6 +1,6 @@
-﻿using ApiDPSystem.Entities;
+﻿using System.Collections.Generic;
+using ApiDPSystem.Entities;
 using ApiDPSystem.Interfaces;
-using System.Collections.Generic;
 using YamlDotNet.Serialization;
 
 namespace ApiDPSystem.Models.Parser
@@ -25,19 +25,9 @@ namespace ApiDPSystem.Models.Parser
     //}
 
 
-
     public class YamlParser : IBParser
     {
         public string ConvertableFileExtension => ".yaml";
-
-        public Version YamlGetVersion(string fileContent)
-        {
-            var deserializer = new DeserializerBuilder()
-                                    .IgnoreUnmatchedProperties()
-                                    .Build();
-
-            return deserializer.Deserialize<Version>(fileContent);
-        }
 
         public List<CarActual> Parse(string fileContent, string fileName, string dealer)
         {
@@ -50,6 +40,15 @@ namespace ApiDPSystem.Models.Parser
             var dbCars = deserializedModels.ConvertToActualDbModel(dealer);
 
             return dbCars;
+        }
+
+        public Version YamlGetVersion(string fileContent)
+        {
+            var deserializer = new DeserializerBuilder()
+                .IgnoreUnmatchedProperties()
+                .Build();
+
+            return deserializer.Deserialize<Version>(fileContent);
         }
     }
 }

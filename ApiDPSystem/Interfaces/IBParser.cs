@@ -1,5 +1,5 @@
-﻿using ApiDPSystem.FileFormat;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using ApiDPSystem.Entities;
 
 namespace ApiDPSystem.Interfaces
 {
@@ -8,6 +8,6 @@ namespace ApiDPSystem.Interfaces
         public string ConvertableFileExtension { get; }
 
         //public int GetVersion()
-        public List<Entities.CarActual> Parse(string fileContent, string fileName, string dealer);
+        public List<CarActual> Parse(string fileContent, string fileName, string dealer);
     }
 }

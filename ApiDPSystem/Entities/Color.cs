@@ -24,10 +24,11 @@ namespace ApiDPSystem.Entities
             return color.HexCode == HexCode &&
                    color.Name == Name;
         }
+
         public override int GetHashCode()
         {
             return Name.GetHashCode() * 11
-                 + HexCode.GetHashCode() * 19;
+                   + HexCode.GetHashCode() * 19;
         }
     }
 }

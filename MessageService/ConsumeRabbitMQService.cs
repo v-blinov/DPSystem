@@ -1,26 +1,26 @@
-﻿using MessageService.Models;
+﻿using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using MessageService.Models;
 using MessageService.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MessageService
 {
     public class ConsumeRabbitMQService : BackgroundService
     {
-        private IConfiguration _configuration;      
-        private ConnectionFactory _connectionFactory;
-        private IConnection _connection;
-        private IModel _channel;
-        private readonly string QueueName;
-        private readonly string ExchangeName;
         private readonly EmailService _emailService;
+        private readonly string ExchangeName;
+        private readonly string QueueName;
+        private IModel _channel;
+        private readonly IConfiguration _configuration;
+        private IConnection _connection;
+        private ConnectionFactory _connectionFactory;
 
         public ConsumeRabbitMQService(IConfiguration configuration, EmailService emailService)
         {
@@ -37,6 +37,7 @@ namespace MessageService
             InitializeRabbitMQ();
             return base.StartAsync(cancellationToken);
         }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var consumer = new EventingBasicConsumer(_channel);
@@ -53,7 +54,7 @@ namespace MessageService
             };
 
             _channel.BasicQos(0, 1, false);
-            _channel.BasicConsume(queue: QueueName, autoAck: true, consumer: consumer);
+            _channel.BasicConsume(QueueName, true, consumer);
 
             await Task.CompletedTask;
         }
@@ -70,6 +71,7 @@ namespace MessageService
                 _channel.Dispose();
             }
         }
+
         private void InitializeRabbitMQ()
         {
             var rabbitHostName = Environment.GetEnvironmentVariable("RABBIT_HOSTNAME");
@@ -86,9 +88,9 @@ namespace MessageService
             _channel = _connection.CreateModel();
             _channel.ConfirmSelect();
 
-            _channel.ExchangeDeclare(exchange: ExchangeName, type: ExchangeType.Direct, durable: true);
-            _channel.QueueDeclare(queue: QueueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-            _channel.QueueBind(queue: QueueName, exchange: ExchangeName, routingKey: QueueName);
+            _channel.ExchangeDeclare(ExchangeName, ExchangeType.Direct, true);
+            _channel.QueueDeclare(QueueName, true, false, false, null);
+            _channel.QueueBind(QueueName, ExchangeName, QueueName);
             _channel.BasicQos(0, 1, false);
         }
     }

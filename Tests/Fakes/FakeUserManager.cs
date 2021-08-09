@@ -8,6 +8,7 @@ namespace Tests.Fakes
     {
         public FakeUserManager()
             : base(new Mock<IUserStore<User>>().Object, null, null, null, null, null, null, null, null)
-        { }
+        {
+        }
     }
 }

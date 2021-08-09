@@ -1,15 +1,4 @@
 using NUnit.Framework;
-using ApiDPSystem;
-using ApiDPSystem.Controllers;
-using ApiDPSystem.Services;
-using Moq;
-using ApiDPSystem.Records;
-using ApiDPSystem.Models;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Tests.Fakes;
-using Castle.Core.Configuration;
 
 namespace Tests
 {

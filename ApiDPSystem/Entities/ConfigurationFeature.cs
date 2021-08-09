@@ -17,9 +17,10 @@ namespace ApiDPSystem.Entities
             if (obj is not ConfigurationFeature configurationFeature)
                 return false;
 
-            return configurationFeature.Configuration.Equals(Configuration) && 
+            return configurationFeature.Configuration.Equals(Configuration) &&
                    configurationFeature.Feature.Equals(Feature);
         }
+
         public override int GetHashCode()
         {
             return Configuration.GetHashCode() * 31 + Feature.GetHashCode() * 17;

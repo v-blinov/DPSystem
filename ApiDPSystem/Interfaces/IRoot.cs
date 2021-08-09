@@ -1,5 +1,5 @@
-﻿using ApiDPSystem.FileFormat;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using ApiDPSystem.Entities;
 
 namespace ApiDPSystem.Interfaces
 {
@@ -8,6 +8,6 @@ namespace ApiDPSystem.Interfaces
         public int Version { get; }
         public string FileFormat { get; }
 
-        public List<Entities.CarActual> ConvertToActualDbModel(string dealerName);
+        public List<CarActual> ConvertToActualDbModel(string dealerName);
     }
 }

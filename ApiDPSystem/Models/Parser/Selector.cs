@@ -1,7 +1,7 @@
-﻿using ApiDPSystem.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ApiDPSystem.Interfaces;
 
 namespace ApiDPSystem.Models.Parser
 {
@@ -9,6 +9,7 @@ namespace ApiDPSystem.Models.Parser
     {
         private static readonly Dictionary<string, Type> _parserTypes;
         private static readonly Dictionary<(string, int), Type> _modelTypes;
+
         static Selector()
         {
             //Select all classes that implement IBParser interface 
@@ -39,12 +40,14 @@ namespace ApiDPSystem.Models.Parser
         }
 
         public static IBParser GetParser(string fileExtension)
-        { 
+        {
             var parserType = _parserTypes[fileExtension];
             return Activator.CreateInstance(parserType) as IBParser;
         }
 
-        public static Type GetResultType(string fileExtension, int version) =>
-            _modelTypes[(fileExtension, version)];
+        public static Type GetResultType(string fileExtension, int version)
+        {
+            return _modelTypes[(fileExtension, version)];
+        }
     }
 }

@@ -1,13 +1,13 @@
-﻿using ApiDPSystem.Extension;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using ApiDPSystem.Extension;
 using ApiDPSystem.Models;
 using ApiDPSystem.Records;
 using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ApiDPSystem.Controllers
 {
@@ -26,12 +26,13 @@ namespace ApiDPSystem.Controllers
 
         [HttpPost]
         [ActionName("LogIn")]
-        public async Task<ApiResponse<AuthenticationResult>> LogInAsync([FromForm] LogInRecord logInModel)
+        public async Task<ApiResponse<AuthenticationResult>> LogInAsync([FromForm]
+            LogInRecord logInModel)
         {
             if (!ModelState.IsValid)
             {
                 Log.Warning("В метод LogIn в контроллере AccountController отправлена невалидная модель.");
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -44,7 +45,7 @@ namespace ApiDPSystem.Controllers
             {
                 var logInResult = await _accountService.LogInAsync(logInModel);
                 if (!logInResult.Succeeded)
-                    return new ApiResponse<AuthenticationResult>()
+                    return new ApiResponse<AuthenticationResult>
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -53,17 +54,17 @@ namespace ApiDPSystem.Controllers
                     };
 
                 var tokenResult = await _accountService.GenerateJWTTokenAsync(logInModel.Email);
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Content = tokenResult,
+                    Content = tokenResult
                 };
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -74,12 +75,13 @@ namespace ApiDPSystem.Controllers
 
         [HttpPost]
         [ActionName("RegisterUser")]
-        public async Task<ApiResponse> RegisterUserAsync([FromForm] RegisterRecord registerModel)
+        public async Task<ApiResponse> RegisterUserAsync([FromForm]
+            RegisterRecord registerModel)
         {
             if (!ModelState.IsValid)
             {
                 Log.Warning("Предоставлены некорректные данные для метода RegisterModel");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -90,28 +92,28 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                string confirmEmailUrl = Url.Action("ConfirmEmail", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
+                var confirmEmailUrl = Url.Action("ConfirmEmail", "Account", new {userId = "userIdValue", code = "codeValue"}, HttpContext.Request.Scheme);
 
                 var registerResult = await _accountService.RegisterAsync(registerModel, confirmEmailUrl);
                 if (registerResult.Succeeded)
-                    return new ApiResponse()
+                    return new ApiResponse
                     {
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status200OK
                     };
 
-                return new ApiResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Ошибка регистрации пользователя.",
-                        Errors = registerResult.Errors.Select(p => p.Description).ToList()
-                    };
+                return new ApiResponse
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Ошибка регистрации пользователя.",
+                    Errors = registerResult.Errors.Select(p => p.Description).ToList()
+                };
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -122,29 +124,31 @@ namespace ApiDPSystem.Controllers
 
         [HttpGet]
         [ActionName("ConfirmEmail")]
-        public async Task<ApiResponse> ConfirmEmailAsync([FromQuery] string userId, [FromQuery] string code)
+        public async Task<ApiResponse> ConfirmEmailAsync([FromQuery]
+            string userId, [FromQuery]
+            string code)
         {
             try
             {
-                bool result = await _accountService.ConfirmEmailAsync(userId, code);
+                var result = await _accountService.ConfirmEmailAsync(userId, code);
                 if (result)
-                    return new ApiResponse()
+                    return new ApiResponse
                     {
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status200OK
                     };
 
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Ошибка при подтверждении email.",
+                    Message = "Ошибка при подтверждении email."
                 };
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -155,12 +159,13 @@ namespace ApiDPSystem.Controllers
 
         [HttpPost]
         [ActionName("ForgotPasswor")]
-        public async Task<ApiResponse> ForgotPasswordAsync([FromForm] EmailRecord emailRecord)
+        public async Task<ApiResponse> ForgotPasswordAsync([FromForm]
+            EmailRecord emailRecord)
         {
             if (!ModelState.IsValid)
             {
                 Log.Warning("предоставлены некорректные данные для метода ForgotPassword");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -171,10 +176,10 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                string url = Url.Action("ResetPassword", "Account", new { userId = "userIdValue", code = "codeValue" }, protocol: HttpContext.Request.Scheme);
+                var url = Url.Action("ResetPassword", "Account", new {userId = "userIdValue", code = "codeValue"}, HttpContext.Request.Scheme);
                 await _accountService.ForgotPasswordAsync(emailRecord, url);
-                
-                return new ApiResponse()
+
+                return new ApiResponse
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK
@@ -183,7 +188,7 @@ namespace ApiDPSystem.Controllers
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -194,12 +199,13 @@ namespace ApiDPSystem.Controllers
 
         [HttpPost]
         [ActionName("ResetPassword")]
-        public async Task<ApiResponse> ResetPasswordAsync([FromForm] ResetPasswordRecord resetPassword)
+        public async Task<ApiResponse> ResetPasswordAsync([FromForm]
+            ResetPasswordRecord resetPassword)
         {
             if (!ModelState.IsValid)
             {
                 Log.Warning("Предоставлены некорректные данные для метода RegisterModel");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -213,13 +219,13 @@ namespace ApiDPSystem.Controllers
                 var result = await _accountService.ResetPasswordAsync(resetPassword);
 
                 if (result.Succeeded)
-                    return new ApiResponse()
+                    return new ApiResponse
                     {
                         IsSuccess = result.Succeeded,
                         StatusCode = StatusCodes.Status200OK
                     };
 
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = result.Succeeded,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -230,7 +236,7 @@ namespace ApiDPSystem.Controllers
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -241,12 +247,13 @@ namespace ApiDPSystem.Controllers
 
         [HttpPost]
         [ActionName("RefreshToken")]
-        public async Task<ApiResponse<AuthenticationResult>> RefreshTokenAsync([FromForm] TokenRequest tokenRequest)
+        public async Task<ApiResponse<AuthenticationResult>> RefreshTokenAsync([FromForm]
+            TokenRequest tokenRequest)
         {
             if (!ModelState.IsValid)
             {
                 Log.Warning("Предоставлены некорректные данные для метода RefreshToken");
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -260,14 +267,14 @@ namespace ApiDPSystem.Controllers
                 var refreshTokenResult = await _accountService.RefreshAsync(tokenRequest);
 
                 if (refreshTokenResult.Success)
-                    return new ApiResponse<AuthenticationResult>()
+                    return new ApiResponse<AuthenticationResult>
                     {
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status200OK,
                         Content = refreshTokenResult
                     };
 
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -278,7 +285,7 @@ namespace ApiDPSystem.Controllers
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,

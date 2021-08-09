@@ -1,11 +1,11 @@
-﻿using ApiDPSystem.Models;
+﻿using System;
+using System.Threading.Tasks;
+using ApiDPSystem.Models;
 using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Serilog;
-using System;
-using System.Threading.Tasks;
 
 namespace ApiDPSystem.Controllers
 {
@@ -13,8 +13,8 @@ namespace ApiDPSystem.Controllers
     [ApiController]
     public class MessageSenderController : ControllerBase
     {
-        private readonly RabbitMqService _rabbitMqService;
         private readonly EmailService _emailService;
+        private readonly RabbitMqService _rabbitMqService;
 
         public MessageSenderController(RabbitMqService rabbitMqService, EmailService emailService)
         {
@@ -23,11 +23,13 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendMessageAsync([FromForm] string subject, [FromForm] string message)
+        public async Task<IActionResult> SendMessageAsync([FromForm]
+            string subject, [FromForm]
+            string message)
         {
-            try 
+            try
             {
-                RabbitMessage rabbitMessage = new RabbitMessage()
+                var rabbitMessage = new RabbitMessage
                 {
                     Addresses = await _emailService.GetUserEmailsAsync(),
                     Message = message,
@@ -39,7 +41,7 @@ namespace ApiDPSystem.Controllers
                 _rabbitMqService.Publish(jsonMessage);
                 return Ok();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Error(ex, "");
                 return StatusCode(StatusCodes.Status500InternalServerError);

@@ -1,19 +1,18 @@
-﻿using ApiDPSystem.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using ApiDPSystem.Models;
 using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ApiDPSystem.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-
     public class RolesController : Controller
     {
         private readonly RoleService _roleService;
@@ -32,7 +31,7 @@ namespace ApiDPSystem.Controllers
             {
                 var roles = _roleService.GetAllRoles();
 
-                return new ApiResponse<List<string>>()
+                return new ApiResponse<List<string>>
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
@@ -42,7 +41,7 @@ namespace ApiDPSystem.Controllers
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -57,7 +56,7 @@ namespace ApiDPSystem.Controllers
             if (string.IsNullOrEmpty(name))
             {
                 Log.Error("Попытка добавить роль с пустым именем");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -70,13 +69,13 @@ namespace ApiDPSystem.Controllers
                 var result = await _roleService.AddRoleAsync(name);
 
                 if (result.Succeeded)
-                    return new ApiResponse<List<string>>()
+                    return new ApiResponse<List<string>>
                     {
                         IsSuccess = true,
-                        StatusCode = StatusCodes.Status200OK,
+                        StatusCode = StatusCodes.Status200OK
                     };
 
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -87,7 +86,7 @@ namespace ApiDPSystem.Controllers
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -99,10 +98,10 @@ namespace ApiDPSystem.Controllers
         [HttpDelete]
         public async Task<ApiResponse> DeleteRoleAsync(string id)
         {
-            if (String.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(id))
             {
                 Log.Error("Переданный парметр id пустой или равен null.");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -115,29 +114,29 @@ namespace ApiDPSystem.Controllers
                 var result = await _roleService.DeleteRoleAsync(id);
 
                 if (result.Succeeded)
-                    return new ApiResponse<List<string>>()
+                {
+                    return new ApiResponse<List<string>>
                     {
                         IsSuccess = true,
-                        StatusCode = StatusCodes.Status200OK,
-                    };
-                else
-                {
-                    foreach (var error in result.Errors)
-                        ModelState.AddModelError(string.Empty, error.Description);
-
-                    return new ApiResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Ошибка при удалении роли.",
-                        Errors = result.Errors.Select(e => e.Description).ToList()
+                        StatusCode = StatusCodes.Status200OK
                     };
                 }
+
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
+
+                return new ApiResponse
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Ошибка при удалении роли.",
+                    Errors = result.Errors.Select(e => e.Description).ToList()
+                };
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -149,20 +148,21 @@ namespace ApiDPSystem.Controllers
         [HttpPost]
         public async Task<ApiResponse> AddRoleForUserAsync(string userId, string role)
         {
-            if (String.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(userId))
             {
                 Log.Error("Переданный парметр userId пустой или равен null.");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = "Ошибка при добавлении роли для пользователя: Идентификатор пользователя пустой или не указан."
                 };
             }
-            if (String.IsNullOrEmpty(role))
+
+            if (string.IsNullOrEmpty(role))
             {
                 Log.Error("Попытка добавить пользователю роль с пустым именем");
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -176,7 +176,7 @@ namespace ApiDPSystem.Controllers
                 if (user == null)
                 {
                     Log.Error($"Пользователь с id = {userId} не найден.");
-                    return new ApiResponse<AuthenticationResult>()
+                    return new ApiResponse<AuthenticationResult>
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -186,13 +186,13 @@ namespace ApiDPSystem.Controllers
 
                 var result = await _userService.AddRoleToUser(user, role);
                 if (result.Succeeded)
-                    return new ApiResponse<List<string>>()
+                    return new ApiResponse<List<string>>
                     {
                         IsSuccess = true,
-                        StatusCode = StatusCodes.Status200OK,
+                        StatusCode = StatusCodes.Status200OK
                     };
 
-                return new ApiResponse()
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -203,7 +203,7 @@ namespace ApiDPSystem.Controllers
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,

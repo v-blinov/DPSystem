@@ -1,10 +1,4 @@
-﻿using ApiDPSystem.Models;
-using ApiDPSystem.Records;
-using ApiDPSystem.Repository;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -12,34 +6,38 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using ApiDPSystem.Models;
+using ApiDPSystem.Records;
+using ApiDPSystem.Repository;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ApiDPSystem.Services
 {
     public class AccountService
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserService _userService;
-        private readonly EmailService _emailService;
-        private readonly TokenValidationParameters _tokenValidationParameters;
-        private readonly IConfiguration _configuration;
-
-        private readonly AccountRepository _accountRepository;
-        
         public delegate Task RegisterHandler(User user, string subject, string message);
-        public event RegisterHandler SendMessage;
 
 
         private const string UserRole = "User";
 
+        private readonly AccountRepository _accountRepository;
+        private readonly IConfiguration _configuration;
+        private readonly EmailService _emailService;
+        private readonly SignInManager<User> _signInManager;
+        private readonly TokenValidationParameters _tokenValidationParameters;
+        private readonly UserManager<User> _userManager;
+        private readonly UserService _userService;
+
 
         public AccountService(UserManager<User> userManager,
-                              SignInManager<User> signInManager,
-                              UserService userService,
-                              EmailService emailService,
-                              IConfiguration configuration,
-                              TokenValidationParameters tokenValidationParameters,
-                              AccountRepository accountRepository)
+            SignInManager<User> signInManager,
+            UserService userService,
+            EmailService emailService,
+            IConfiguration configuration,
+            TokenValidationParameters tokenValidationParameters,
+            AccountRepository accountRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -51,6 +49,8 @@ namespace ApiDPSystem.Services
             _accountRepository = accountRepository;
         }
 
+        public event RegisterHandler SendMessage;
+
 
         public async Task<IdentityResult> LogInAsync(LogInRecord logInModel)
         {
@@ -60,7 +60,7 @@ namespace ApiDPSystem.Services
 
             var signInResult = await _signInManager.PasswordSignInAsync(logInModel.Email, logInModel.Password, false, false);
             if (!signInResult.Succeeded)
-                return IdentityResult.Failed(new IdentityError()
+                return IdentityResult.Failed(new IdentityError
                 {
                     Description = "Неправильный логин и(или) пароль."
                 });
@@ -75,13 +75,13 @@ namespace ApiDPSystem.Services
                 UserName = registerModel.Email,
                 Email = registerModel.Email,
                 FirstName = registerModel.FirstName,
-                LastName = registerModel.LastName,
+                LastName = registerModel.LastName
             };
 
             var createUserOperationResult = await _userManager.CreateAsync(user, registerModel.Password);
             if (!createUserOperationResult.Succeeded)
                 return createUserOperationResult;
-            
+
             var addRoleOperationResult = await _userService.AddRoleToUser(user, UserRole);
             if (!addRoleOperationResult.Succeeded)
             {
@@ -94,7 +94,7 @@ namespace ApiDPSystem.Services
 
             return IdentityResult.Success;
         }
-        
+
         private async Task SendRegistrationEmailAsync(User user, string url)
         {
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -130,7 +130,7 @@ namespace ApiDPSystem.Services
                 await SendForgotPasswordEmailAsync(user, url);
             }
         }
-        
+
         private async Task SendForgotPasswordEmailAsync(User user, string url)
         {
             var code = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -146,7 +146,7 @@ namespace ApiDPSystem.Services
             var user = await _userManager.FindByEmailAsync(resetPassword.Email);
 
             if (user == null)
-                return IdentityResult.Failed(new IdentityError()
+                return IdentityResult.Failed(new IdentityError
                 {
                     Description = $"Пользователь с email {resetPassword.Email} не найден."
                 });
@@ -159,13 +159,13 @@ namespace ApiDPSystem.Services
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
-                return IdentityResult.Failed(new IdentityError()
+                return IdentityResult.Failed(new IdentityError
                 {
                     Description = $"Пользователь с email {email} не найден."
                 });
 
             if (!await _userManager.IsEmailConfirmedAsync(user))
-                return IdentityResult.Failed(new IdentityError()
+                return IdentityResult.Failed(new IdentityError
                 {
                     Description = $"Email {email} не подтвержден."
                 });
@@ -173,7 +173,10 @@ namespace ApiDPSystem.Services
             return IdentityResult.Success;
         }
 
-        public async Task<User> FindUserByEmailAsync (string email) => await _userManager.FindByEmailAsync(email);
+        public async Task<User> FindUserByEmailAsync(string email)
+        {
+            return await _userManager.FindByEmailAsync(email);
+        }
 
         public async Task<AuthenticationResult> GenerateJWTTokenAsync(string userEmail)
         {
@@ -206,7 +209,7 @@ namespace ApiDPSystem.Services
 
             var refreshToken = await _accountRepository.GetRefreshTokenAsync(token.Id, user);
 
-            return new AuthenticationResult()
+            return new AuthenticationResult
             {
                 Token = jwtToken,
                 RefreshToken = refreshToken,
@@ -224,37 +227,37 @@ namespace ApiDPSystem.Services
             {
                 var result = jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
                 if (!result)
-                    return new AuthenticationResult()
+                    return new AuthenticationResult
                     {
                         Success = false,
-                        Errors = new List<string>() { "Invalid Token" }
+                        Errors = new List<string> {"Invalid Token"}
                     };
             }
 
             var storedRefreshToken = _accountRepository.GetStoredRefreshToken(tokenRequest.RefreshToken);
             if (storedRefreshToken == null)
-                return new AuthenticationResult()
+                return new AuthenticationResult
                 {
                     Success = false,
-                    Errors = new List<string>() { "Refresh token doesnt exist." }
+                    Errors = new List<string> {"Refresh token doesnt exist."}
                 };
 
             // Check the date of the saved token if it has expired
             if (DateTime.UtcNow > storedRefreshToken.ExpiryDate)
-                return new AuthenticationResult()
+                return new AuthenticationResult
                 {
                     Success = false,
-                    Errors = new List<string>() { "Token has expired, user needs to relogin" }
+                    Errors = new List<string> {"Token has expired, user needs to relogin"}
                 };
 
             // we are getting here the jwt token id
             // check the id that the recieved token has against the id saved in the db
             var jti = principal.Claims.SingleOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
             if (storedRefreshToken.JwtId != jti)
-                return new AuthenticationResult()
+                return new AuthenticationResult
                 {
                     Success = false,
-                    Errors = new List<string>() { "The token didn't matech the saved token" }
+                    Errors = new List<string> {"The token didn't matech the saved token"}
                 };
 
             await _accountRepository.UpdateStoredRefreshTokenAsync(storedRefreshToken);
@@ -265,7 +268,9 @@ namespace ApiDPSystem.Services
             return await GenerateJWTTokenAsync(user, role);
         }
 
-        public async Task<IdentityResult> RegisterExternalUser(User user) =>
-            await _userManager.CreateAsync(user);
+        public async Task<IdentityResult> RegisterExternalUser(User user)
+        {
+            return await _userManager.CreateAsync(user);
+        }
     }
 }

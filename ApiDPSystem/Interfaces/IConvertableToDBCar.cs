@@ -1,20 +1,19 @@
 ﻿using System.Collections.Generic;
+using ApiDPSystem.Entities;
 
 namespace ApiDPSystem.Interfaces
 {
     public interface IConvertableToDBCar
     {
-        public Entities.CarActual ConvertToCarActualDbModel(string DealerName);
+        public CarActual ConvertToCarActualDbModel(string DealerName);
 
-        public static List<Entities.ConfigurationFeature> GetFeaturesCollection(List<string> collection, string type)
+        public static List<ConfigurationFeature> GetFeaturesCollection(List<string> collection, string type)
         {
-            var features = new List<Entities.ConfigurationFeature>();
+            var features = new List<ConfigurationFeature>();
 
             if (collection != null)
-            {
                 foreach (var feature in collection)
-                    features.Add(new Entities.ConfigurationFeature { Feature = new Entities.Feature { Type = type, Description = feature } });
-            }
+                    features.Add(new ConfigurationFeature {Feature = new Feature {Type = type, Description = feature}});
 
             return features;
         }

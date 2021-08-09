@@ -23,6 +23,5 @@ namespace ApiDPSystem.Records
         [DataType(DataType.Password)]
         [Display(Name = "Подтвердить пароль")]
         public string PasswordConfirm { get; init; }
-
     }
 }

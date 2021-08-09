@@ -1,6 +1,6 @@
-﻿using CsvHelper.Configuration.Attributes;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using System.Xml.Serialization;
+using CsvHelper.Configuration.Attributes;
 using YamlDotNet.Serialization;
 
 namespace ApiDPSystem.Models.Parser

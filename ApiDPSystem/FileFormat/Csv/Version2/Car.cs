@@ -1,7 +1,7 @@
-﻿using ApiDPSystem.Interfaces;
+﻿using System.Collections.Generic;
+using ApiDPSystem.Entities;
+using ApiDPSystem.Interfaces;
 using CsvHelper.Configuration.Attributes;
-using System;
-using System.Collections.Generic;
 
 namespace ApiDPSystem.FileFormat.Csv.Version2
 {
@@ -40,42 +40,42 @@ namespace ApiDPSystem.FileFormat.Csv.Version2
         public string Price { get; set; }
 
 
-        public Entities.CarActual ConvertToCarActualDbModel(string DealerName)
+        public CarActual ConvertToCarActualDbModel(string DealerName)
         {
-            var configurationFeatures = new List<Entities.ConfigurationFeature>();
+            var configurationFeatures = new List<ConfigurationFeature>();
 
             configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
             configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
 
-            var carImages = new List<Entities.CarImage>();
+            var carImages = new List<CarImage>();
             foreach (var image in Images)
-                carImages.Add(new Entities.CarImage { Image = new Entities.Image { Url = image } });
+                carImages.Add(new CarImage {Image = new Image {Url = image}});
 
-            var dbConfiguration = new Entities.Configuration
+            var dbConfiguration = new Configuration
             {
-                Year = Int32.Parse(Year),
+                Year = int.Parse(Year),
                 Model = Model,
                 ModelTrim = ModelTrim,
                 Transmission = TechincalOptions.Transmission,
                 Drive = TechincalOptions.Drive,
-                Producer = new Entities.Producer { Name = Make },
+                Producer = new Producer {Name = Make},
                 Engine = new Entities.Engine
                 {
-                    Power = Int32.TryParse(TechincalOptions.Engine.Power, out int power) ? power : null,
+                    Power = int.TryParse(TechincalOptions.Engine.Power, out var power) ? power : null,
                     Fuel = TechincalOptions.Engine.Fuel,
-                    Capacity = Double.TryParse(TechincalOptions.Engine.Capacity, out double capacity) ? capacity : null
+                    Capacity = double.TryParse(TechincalOptions.Engine.Capacity, out var capacity) ? capacity : null
                 },
                 ConfigurationFeatures = configurationFeatures
             };
 
-            var dbCarActual = new Entities.CarActual
+            var dbCarActual = new CarActual
             {
                 VinCode = Id,
-                Price = Int32.TryParse(Price, out int price) ? price : null,
-                Dealer = new Entities.Dealer { Name = DealerName },
+                Price = int.TryParse(Price, out var price) ? price : null,
+                Dealer = new Dealer {Name = DealerName},
                 CarImages = carImages,
-                InteriorColor = new Entities.Color { Name = Colors.Interior },
-                ExteriorColor = new Entities.Color { Name = Colors.Exterior },
+                InteriorColor = new Color {Name = Colors.Interior},
+                ExteriorColor = new Color {Name = Colors.Exterior},
                 Configuration = dbConfiguration
             };
 

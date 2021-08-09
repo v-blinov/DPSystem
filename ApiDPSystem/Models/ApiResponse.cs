@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ApiDPSystem.Models
 {
@@ -7,7 +6,7 @@ namespace ApiDPSystem.Models
     {
         public ApiResponse()
         {
-            Message = String.Empty;
+            Message = string.Empty;
             Errors = new List<string>();
         }
 
@@ -18,7 +17,7 @@ namespace ApiDPSystem.Models
     }
 
     public class ApiResponse<T> : ApiResponse
-    { 
+    {
         public T Content { get; set; }
     }
 }

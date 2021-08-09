@@ -1,14 +1,14 @@
-﻿using ApiDPSystem.Models;
+﻿using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using ApiDPSystem.Models;
 using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using System;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace ApiDPSystem.Controllers
 {
@@ -17,12 +17,11 @@ namespace ApiDPSystem.Controllers
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class GoogleAccountController : Controller
     {
+        private const string UserRole = "User";
         private readonly AccountService _accountService;
+        private readonly string _googleRedirectUrlEndpoint;
         private readonly SignInManager<User> _signInManager;
         private readonly UserService _userService;
-
-        private const string UserRole = "User";
-        private readonly string _googleRedirectUrlEndpoint;
 
         public GoogleAccountController(IConfiguration configuration, AccountService accountService, SignInManager<User> signInManager, UserService userService)
         {
@@ -48,28 +47,26 @@ namespace ApiDPSystem.Controllers
         {
             try
             {
-                ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync();
+                var info = await _signInManager.GetExternalLoginInfoAsync();
                 if (info == null)
-                {
-                    return new ApiResponse<AuthenticationResult>()
+                    return new ApiResponse<AuthenticationResult>
                     {
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status400BadRequest,
                         Message = "Данные пользователя не обнаружены."
                     };
-                    //возможно стоит редиректнуть на страницу входа
-                }
+                //возможно стоит редиректнуть на страницу входа
 
                 //Если внешний пользователь уже сохранен в нашей базе, то генерируем токены
                 var user = await _userService.GetUserByEmail(info.Principal.FindFirst(ClaimTypes.Email).Value);
                 if (user != null)
                 {
                     var authenticationResult = await _accountService.GenerateJWTTokenAsync(user, UserRole);
-                    return new ApiResponse<AuthenticationResult>()
+                    return new ApiResponse<AuthenticationResult>
                     {
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status200OK,
-                        Content = authenticationResult,
+                        Content = authenticationResult
                     };
                 }
 
@@ -94,30 +91,28 @@ namespace ApiDPSystem.Controllers
                     {
                         var authenticationResult = await _accountService.GenerateJWTTokenAsync(user, UserRole);
 
-                        return new ApiResponse<AuthenticationResult>()
+                        return new ApiResponse<AuthenticationResult>
                         {
                             IsSuccess = true,
                             StatusCode = StatusCodes.Status200OK,
-                            Content = authenticationResult,
+                            Content = authenticationResult
                         };
                     }
-                    else
-                    {
-                        Log.Error($"Ошибка при добавлении роли {UserRole} для пользователя {user.Email}.");
-                        await _userService.RemoveUser(user.Email);
 
-                        return new ApiResponse<AuthenticationResult>()
-                        {
-                            IsSuccess = false,
-                            StatusCode = StatusCodes.Status400BadRequest,
-                            Message = "Ошибка регистрации пользователя.",
-                            Errors = roleAddingResult.Errors.Select(p => p.Description).ToList()
-                        };
-                    }
+                    Log.Error($"Ошибка при добавлении роли {UserRole} для пользователя {user.Email}.");
+                    await _userService.RemoveUser(user.Email);
+
+                    return new ApiResponse<AuthenticationResult>
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Ошибка регистрации пользователя.",
+                        Errors = roleAddingResult.Errors.Select(p => p.Description).ToList()
+                    };
                 }
 
                 Log.Error($"Ошибка при регистрации пользователя {user.Email}. {externalRegisterResult.Errors.Select(p => p.Description).ToList()}");
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -128,7 +123,7 @@ namespace ApiDPSystem.Controllers
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return new ApiResponse<AuthenticationResult>()
+                return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -139,6 +134,7 @@ namespace ApiDPSystem.Controllers
 
 
         #region AdditionalFunctionality
+
         //[HttpGet]
         //public IActionResult OAuthGoogleLoginGetUrl()
         //{
@@ -253,6 +249,7 @@ namespace ApiDPSystem.Controllers
         //        return StatusCode(StatusCodes.Status500InternalServerError);
         //    }
         //}
+
         #endregion
     }
 }

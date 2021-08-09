@@ -5,7 +5,7 @@ namespace ApiDPSystem.Entities
     public class Car
     {
         public Guid Id { get; set; }
-        public int Version { get; set; } 
+        public int Version { get; set; }
         public string VinCode { get; set; }
         public decimal? Price { get; set; }
 

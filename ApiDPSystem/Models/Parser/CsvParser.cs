@@ -1,8 +1,9 @@
-﻿using ApiDPSystem.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ApiDPSystem.Entities;
+using ApiDPSystem.Interfaces;
 
 namespace ApiDPSystem.Models.Parser
 {
@@ -104,21 +105,7 @@ namespace ApiDPSystem.Models.Parser
     {
         public string ConvertableFileExtension => ".csv";
 
-        public Version CsvGetVersion(string fileName)
-        {
-            Regex regex = new Regex(@"_v(\d)+\.");
-            MatchCollection matches = regex.Matches(fileName);
-
-            if (matches.Count > 0)
-            {
-                var versionString = matches.Last().Value.Replace("_v", "").Replace(".", "");
-                return new Version { Value = Convert.ToInt32(versionString) };
-            }
-            else
-                return new Version();
-        }
-
-        public List<Entities.CarActual> Parse(string fileContent, string fileName, string dealer)
+        public List<CarActual> Parse(string fileContent, string fileName, string dealer)
         {
             var version = CsvGetVersion(fileName);
             var deserializedType = Selector.GetResultType(ConvertableFileExtension, version.Value);
@@ -130,6 +117,20 @@ namespace ApiDPSystem.Models.Parser
             var dbCars = deserializedModels.ConvertToActualDbModel(dealer);
 
             return dbCars;
+        }
+
+        public Version CsvGetVersion(string fileName)
+        {
+            var regex = new Regex(@"_v(\d)+\.");
+            var matches = regex.Matches(fileName);
+
+            if (matches.Count > 0)
+            {
+                var versionString = matches.Last().Value.Replace("_v", "").Replace(".", "");
+                return new Version {Value = Convert.ToInt32(versionString)};
+            }
+
+            return new Version();
         }
     }
 }

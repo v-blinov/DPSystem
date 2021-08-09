@@ -1,10 +1,10 @@
-﻿using MailKit.Net.Smtp;
-using MailKit.Security;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using MailKit.Net.Smtp;
 using MessageService.Models;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
-using System.Linq;
-using System.Threading.Tasks;
+using MimeKit.Text;
 
 namespace MessageService.Services
 {
@@ -25,11 +25,11 @@ namespace MessageService.Services
             emailMessage.To.AddRange(rabbitMessage.Addresses.Select(p => new MailboxAddress("", p)));
             //emailMessage.To.Add(new MailboxAddress("", address));
             emailMessage.Subject = rabbitMessage.Subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = rabbitMessage.Message };
+            emailMessage.Body = new TextPart(TextFormat.Html) {Text = rabbitMessage.Message};
 
             using (var client = new SmtpClient())
             {
-                await client.ConnectAsync("smtp.mail.ru", 465, SecureSocketOptions.Auto);
+                await client.ConnectAsync("smtp.mail.ru", 465);
                 await client.AuthenticateAsync(_configuration["EmailSender:AuthorEmail"], _configuration["EmailSender:AuthorPassword"]);
                 await client.SendAsync(emailMessage);
                 await client.DisconnectAsync(true);

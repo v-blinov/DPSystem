@@ -1,17 +1,13 @@
-﻿using ApiDPSystem.Entities;
+﻿using System;
+using ApiDPSystem.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace ApiDPSystem.Data
 {
     public class Context : DbContext
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
-
-
         public Context(DbContextOptions<Context> options) : base(options)
         {
             Database.EnsureCreated();
@@ -31,6 +27,11 @@ namespace ApiDPSystem.Data
         public DbSet<CarHistory> CarHistories { get; set; }
         public DbSet<CarHistoryImage> CarHistoryImages { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
+        }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,13 +44,13 @@ namespace ApiDPSystem.Data
 
 
             modelBuilder.Entity<ConfigurationFeature>()
-                .HasKey(p => new { p.ConfigurationId, p.FeatureId });
+                .HasKey(p => new {p.ConfigurationId, p.FeatureId});
 
             modelBuilder.Entity<CarImage>()
-                .HasKey(p => new { p.CarActualId, p.ImageId });
+                .HasKey(p => new {p.CarActualId, p.ImageId});
 
             modelBuilder.Entity<CarHistoryImage>()
-               .HasKey(p => new { p.CarHistoryId, p.ImageId });
+                .HasKey(p => new {p.CarHistoryId, p.ImageId});
 
             modelBuilder.Entity<Engine>()
                 .Property(p => p.Fuel)
@@ -75,9 +76,9 @@ namespace ApiDPSystem.Data
                 .IsRequired();
         }
 
-        public class ConfigurationSettings : IEntityTypeConfiguration<Entities.Configuration>
+        public class ConfigurationSettings : IEntityTypeConfiguration<Configuration>
         {
-            public void Configure(EntityTypeBuilder<Entities.Configuration> builder)
+            public void Configure(EntityTypeBuilder<Configuration> builder)
             {
                 builder.Property(p => p.Year)
                     .HasColumnType("smallint");
@@ -97,53 +98,56 @@ namespace ApiDPSystem.Data
                     .HasMaxLength(10);
             }
         }
+
         public class CarActualSettings : IEntityTypeConfiguration<CarActual>
         {
             public void Configure(EntityTypeBuilder<CarActual> builder)
             {
-                builder.HasIndex(p => new { p.DealerId });
+                builder.HasIndex(p => new {p.DealerId});
 
-                builder.HasIndex(p => new { p.DealerId, p.Id }).IsUnique();
+                builder.HasIndex(p => new {p.DealerId, p.Id}).IsUnique();
 
                 builder.Property(p => p.VinCode)
-                       .IsRequired()
-                       .HasMaxLength(20)
-                       .HasColumnType("varchar");
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("varchar");
 
                 builder.HasOne(s => s.ExteriorColor)
-                       .WithMany(x => x.ExteriorCarActual)
-                       .HasForeignKey(s => s.ExteriorColorId);
+                    .WithMany(x => x.ExteriorCarActual)
+                    .HasForeignKey(s => s.ExteriorColorId);
 
                 builder.HasOne(s => s.InteriorColor)
-                       .WithMany(x => x.InteriorCarActual)
-                       .HasForeignKey(s => s.InteriorColorId)
-                       .OnDelete(DeleteBehavior.Restrict);
+                    .WithMany(x => x.InteriorCarActual)
+                    .HasForeignKey(s => s.InteriorColorId)
+                    .OnDelete(DeleteBehavior.Restrict);
             }
         }
+
         public class CarHistorySettings : IEntityTypeConfiguration<CarHistory>
         {
             public void Configure(EntityTypeBuilder<CarHistory> builder)
             {
-                builder.HasIndex(p => new { p.VinCode, p.Version });
+                builder.HasIndex(p => new {p.VinCode, p.Version});
 
                 builder.Property(p => p.IsSold)
-                       .HasDefaultValue(false);
+                    .HasDefaultValue(false);
 
                 builder.Property(p => p.VinCode)
-                       .IsRequired()
-                       .HasMaxLength(20)
-                       .HasColumnType("varchar");
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("varchar");
 
                 builder.HasOne(s => s.ExteriorColor)
-                       .WithMany(x => x.ExteriorCarHistory)
-                       .HasForeignKey(s => s.ExteriorColorId);
+                    .WithMany(x => x.ExteriorCarHistory)
+                    .HasForeignKey(s => s.ExteriorColorId);
 
                 builder.HasOne(s => s.InteriorColor)
-                       .WithMany(x => x.InteriorCarHistory)
-                       .HasForeignKey(s => s.InteriorColorId)
-                       .OnDelete(DeleteBehavior.Restrict);
+                    .WithMany(x => x.InteriorCarHistory)
+                    .HasForeignKey(s => s.InteriorColorId)
+                    .OnDelete(DeleteBehavior.Restrict);
             }
         }
+
         public class ColorSettings : IEntityTypeConfiguration<Color>
         {
             public void Configure(EntityTypeBuilder<Color> builder)
@@ -156,19 +160,21 @@ namespace ApiDPSystem.Data
                     .HasMaxLength(30);
             }
         }
+
         public class FeatureSettings : IEntityTypeConfiguration<Feature>
         {
             public void Configure(EntityTypeBuilder<Feature> builder)
             {
                 builder.Property(p => p.Description)
-                .HasMaxLength(1000)
-                .IsRequired();
+                    .HasMaxLength(1000)
+                    .IsRequired();
 
                 builder.Property(p => p.Type)
-                .HasMaxLength(100)
-                .IsRequired();
+                    .HasMaxLength(100)
+                    .IsRequired();
             }
         }
+
         public class RefreshTokenInfoSettings : IEntityTypeConfiguration<RefreshTokenInfo>
         {
             public void Configure(EntityTypeBuilder<RefreshTokenInfo> builder)

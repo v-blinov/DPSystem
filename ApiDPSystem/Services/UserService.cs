@@ -1,14 +1,14 @@
-﻿using ApiDPSystem.Models;
-using Microsoft.AspNetCore.Identity;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using ApiDPSystem.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace ApiDPSystem.Services
 {
     public class UserService
     {
-        private readonly UserManager<User> _userManager;
         private readonly RoleService _roleService;
+        private readonly UserManager<User> _userManager;
 
         public UserService(UserManager<User> userManager, RoleService roleService)
         {
@@ -17,11 +17,15 @@ namespace ApiDPSystem.Services
         }
 
 
-        public async Task<User> GetUserById(string userId) =>
-            await _userManager.FindByIdAsync(userId);
+        public async Task<User> GetUserById(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
 
-        public async Task<User> GetUserByEmail(string userEmail) =>
-            await _userManager.FindByEmailAsync(userEmail);
+        public async Task<User> GetUserByEmail(string userEmail)
+        {
+            return await _userManager.FindByEmailAsync(userEmail);
+        }
 
         public async Task<IdentityResult> AddRoleToUser(User user, string roleName)
         {

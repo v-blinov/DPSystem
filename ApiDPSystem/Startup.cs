@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
 using ApiDPSystem.Data;
 using ApiDPSystem.Models;
 using ApiDPSystem.Repository;
@@ -14,9 +17,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ApiDPSystem
 {
@@ -26,11 +26,13 @@ namespace ApiDPSystem
         {
             Configuration = configuration;
         }
+
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
             #region DbContexts and Identity
+
             services.AddDbContext<IdentityContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
 
@@ -40,15 +42,17 @@ namespace ApiDPSystem
 
             services.AddDbContext<Context>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             #endregion
 
             #region AuthenticationShemes
+
             services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                 .AddGoogle(googleOptions =>
                 {
                     //IConfigurationSection googleAuthNSection =
@@ -56,7 +60,7 @@ namespace ApiDPSystem
                     //googleOptions.ClientId = googleAuthNSection["ClientId"];
                     //googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
 
-                    // Надо придумать, как вынести эти данные в docker secret
+                    // РќР°РґРѕ РїСЂРёРґСѓРјР°С‚СЊ, РєР°Рє РІС‹РЅРµСЃС‚Рё СЌС‚Рё РґР°РЅРЅС‹Рµ РІ docker secret
                     googleOptions.ClientId = "1015102078067-mo5ds31rjrtocd7dfk4vt663946ijftq.apps.googleusercontent.com";
                     googleOptions.ClientSecret = "19-tLf4MHfV13WoYlUN_HXNF";
 
@@ -76,9 +80,11 @@ namespace ApiDPSystem
                         ClockSkew = TimeSpan.Zero
                     };
                 });
+
             #endregion
 
             #region RabbitMQ
+
             var rabbitHostName = Environment.GetEnvironmentVariable("RABBIT_HOSTNAME");
             var connectionFactory = new ConnectionFactory
             {
@@ -91,17 +97,16 @@ namespace ApiDPSystem
 
             services.AddSingleton(rabbitMqConnection);
             services.AddSingleton<RabbitMqService>();
+
             #endregion
 
             services.AddControllers()
-                .ConfigureApiBehaviorOptions(options =>
-                {
-                    options.SuppressModelStateInvalidFilter = true;
-                });
+                .ConfigureApiBehaviorOptions(options => { options.SuppressModelStateInvalidFilter = true; });
 
             services.Configure<DataProtectionTokenProviderOptions>(p => p.TokenLifespan = TimeSpan.FromMinutes(30));
 
             #region Swagger
+
             services.AddSwaggerGen(c =>
             {
                 //SwaggerXmlComments
@@ -109,9 +114,10 @@ namespace ApiDPSystem
                 //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 //c.IncludeXmlComments(xmlPath);
 
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "DPSystemAPI", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "DPSystemAPI", Version = "v1"});
 
                 #region OAuthAuthentication
+
                 // addOAuthAuthentication
                 //var OauthSecurityScheme = new OpenApiSecurityScheme
                 //{
@@ -138,6 +144,7 @@ namespace ApiDPSystem
                 //};
                 //c.AddSecurityDefinition(OauthSecurityScheme.Reference.Id, OauthSecurityScheme);
                 //c.AddSecurityRequirement(new OpenApiSecurityRequirement { { OauthSecurityScheme, new List<string>() } });
+
                 #endregion
 
                 // add JWT Authentication
@@ -156,26 +163,24 @@ namespace ApiDPSystem
                     }
                 };
                 c.AddSecurityDefinition(JwtSecurityScheme.Reference.Id, JwtSecurityScheme);
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement { { JwtSecurityScheme, new List<string>() } });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement {{JwtSecurityScheme, new List<string>()}});
             });
+
             #endregion
 
             #region AuthorizationByRoles
+
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("Admin", builder =>
-                {
-                    builder.RequireRole("Admin");
-                });
+                options.AddPolicy("Admin", builder => { builder.RequireRole("Admin"); });
 
-                options.AddPolicy("User", builder =>
-                {
-                    builder.RequireRole("User");
-                });
+                options.AddPolicy("User", builder => { builder.RequireRole("User"); });
             });
+
             #endregion
 
             #region DI
+
             services.AddSingleton<TokenValidationParameters>();
             services.AddScoped<AccountService>();
             services.AddScoped<EmailService>();
@@ -185,6 +190,7 @@ namespace ApiDPSystem
 
             services.AddScoped<AccountRepository>();
             services.AddScoped<MapperRepository>();
+
             #endregion
         }
 
@@ -195,10 +201,7 @@ namespace ApiDPSystem
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -218,10 +221,7 @@ namespace ApiDPSystem
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }

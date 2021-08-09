@@ -1,20 +1,20 @@
-﻿using ApiDPSystem.Models;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using ApiDPSystem.Models;
 using MailKit.Net.Smtp;
-using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
+using MimeKit.Text;
 
 namespace ApiDPSystem.Services
 {
     public class EmailService
     {
+        private const string userRole = "User";
         private readonly IConfiguration _configuration;
         private readonly UserManager<User> _userManager;
-        private const string userRole = "User";
 
         public EmailService(IConfiguration configuration, UserManager<User> userManager)
         {
@@ -29,12 +29,12 @@ namespace ApiDPSystem.Services
             emailMessage.From.Add(new MailboxAddress(_configuration["EmailSender:AuthorName"], _configuration["EmailSender:AuthorEmail"]));
             emailMessage.To.Add(new MailboxAddress("", user.Email));
             emailMessage.Subject = subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = message };
+            emailMessage.Body = new TextPart(TextFormat.Html) {Text = message};
 
 
             using (var client = new SmtpClient())
             {
-                await client.ConnectAsync("smtp.mail.ru", 465, SecureSocketOptions.Auto);
+                await client.ConnectAsync("smtp.mail.ru", 465);
                 await client.AuthenticateAsync(_configuration["EmailSender:AuthorEmail"], _configuration["EmailSender:AuthorPassword"]);
                 await client.SendAsync(emailMessage);
                 await client.DisconnectAsync(true);

@@ -10,6 +10,7 @@ namespace ApiDPSystem.Entities
 
         [Range(1900, 9999)]
         public int Year { get; set; }
+
         public string Model { get; set; }
         public string ModelTrim { get; set; }
         public string Transmission { get; set; }
@@ -42,13 +43,14 @@ namespace ApiDPSystem.Entities
                    conf.Producer.Equals(Producer) &&
                    conf.Engine.Equals(Engine);
         }
+
         public override int GetHashCode()
         {
             return Model.GetHashCode() * 11
-                 + ModelTrim.GetHashCode() * 13
-                 + Transmission.GetHashCode() * 7
-                 + Drive.GetHashCode() * 17
-                 + Year.GetHashCode();
+                   + ModelTrim.GetHashCode() * 13
+                   + Transmission.GetHashCode() * 7
+                   + Drive.GetHashCode() * 17
+                   + Year.GetHashCode();
         }
     }
 }
