@@ -103,6 +103,8 @@ namespace ApiDPSystem.Data
             {
                 builder.HasIndex(p => new { p.DealerId });
 
+                builder.HasIndex(p => new { p.DealerId, p.Id }).IsUnique();
+
                 builder.Property(p => p.VinCode)
                        .IsRequired()
                        .HasMaxLength(20)
