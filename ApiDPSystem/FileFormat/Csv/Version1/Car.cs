@@ -1,10 +1,11 @@
-﻿using CsvHelper.Configuration.Attributes;
+﻿using ApiDPSystem.Interfaces;
+using CsvHelper.Configuration.Attributes;
 using System;
 using System.Collections.Generic;
 
 namespace ApiDPSystem.FileFormat.Csv.Version1
 {
-    public class Car : ICar
+    public class Car : IConvertableToDBCar
     {
         public Car()
         {
@@ -41,9 +42,9 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
         {
             var configurationFeatures = new List<Entities.ConfigurationFeature>();
 
-            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
-            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
-            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Multimedia, nameof(OtherOptions.Multimedia)));
+            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
+            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
+            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Multimedia, nameof(OtherOptions.Multimedia)));
 
             var carImages = new List<Entities.CarImage>();
             foreach (var image in Images)

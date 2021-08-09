@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace ApiDPSystem.FileFormat
+namespace ApiDPSystem.Interfaces
 {
-    public interface ICar
+    public interface IConvertableToDBCar
     {
         public Entities.CarActual ConvertToCarActualDbModel(string DealerName);
 

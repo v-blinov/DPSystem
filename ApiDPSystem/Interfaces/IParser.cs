@@ -1,10 +1,9 @@
 ﻿using ApiDPSystem.Models.Parser;
-using System;
 using System.Collections.Generic;
 
 namespace ApiDPSystem.Interfaces
 {
-    public interface IParser<T> where T : FileFormat.ICar
+    public interface IParser<T> where T : IConvertableToDBCar
     {
         public Root<T> DeserializeFile(string fileContent);
 

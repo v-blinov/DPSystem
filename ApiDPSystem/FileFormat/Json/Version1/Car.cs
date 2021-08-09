@@ -1,10 +1,11 @@
-﻿using System;
+﻿using ApiDPSystem.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace ApiDPSystem.FileFormat.Json.Version1
 {
-    public class Car : ICar
+    public class Car : IConvertableToDBCar
     {
         [JsonPropertyName("id")]
         public string Id { get; set; }
@@ -40,9 +41,9 @@ namespace ApiDPSystem.FileFormat.Json.Version1
         {
             var configurationFeatures = new List<Entities.ConfigurationFeature>();
 
-            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
-            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
-            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
+            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
+            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
+            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
 
             var carImages = new List<Entities.CarImage>();
             foreach (var image in Images)
@@ -78,18 +79,5 @@ namespace ApiDPSystem.FileFormat.Json.Version1
 
             return dbCarActual;
         }
-
-        //private List<Entities.CarFeature> GetFeaturesCollection(List<string> collection, string featureType)
-        //{
-        //    var features = new List<Entities.CarFeature>();
-
-        //    if (collection != null)
-        //    {
-        //        foreach (var feature in collection)
-        //            features.Add(new Entities.CarFeature { Feature = new Entities.Feature { FeatureType = new Entities.FeatureType { Name = featureType }, Description = feature } });
-        //    }
-
-        //    return features;
-        //}
     }
 }

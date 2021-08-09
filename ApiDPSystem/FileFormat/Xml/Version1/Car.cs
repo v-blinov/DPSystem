@@ -1,11 +1,12 @@
-﻿using System;
+﻿using ApiDPSystem.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace ApiDPSystem.FileFormat.Xml.Version1
 {
     [XmlRoot(ElementName = "cars")]
-    public class Car : ICar
+    public class Car : IConvertableToDBCar
     {
         [XmlElement(ElementName = "id")]
         public string Id { get; set; }
@@ -42,9 +43,9 @@ namespace ApiDPSystem.FileFormat.Xml.Version1
         {
             var configurationFeatures = new List<Entities.ConfigurationFeature>();
 
-            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
-            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
-            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
+            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
+            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
+            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
 
             var carImages = new List<Entities.CarImage>();
             foreach (var image in Images)

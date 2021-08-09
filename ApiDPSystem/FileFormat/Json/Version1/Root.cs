@@ -1,10 +1,9 @@
 ﻿using ApiDPSystem.Interfaces;
 using System.Collections.Generic;
-using System.Xml.Serialization;
+using System.Text.Json.Serialization;
 
-namespace ApiDPSystem.FileFormat.Xml.Version1
+namespace ApiDPSystem.FileFormat.Json.Version1
 {
-    [XmlRoot(ElementName = "root")]
     public class Root : IRoot
     {
         public Root()
@@ -12,10 +11,10 @@ namespace ApiDPSystem.FileFormat.Xml.Version1
             Cars = new List<Car>();
         }
 
-        public string FileFormat => ".xml";
+        public string FileFormat => ".json";
         public int Version => 1;
 
-        [XmlElement(ElementName = "cars")]
+        [JsonPropertyName("cars")]
         public List<Car> Cars { get; set; }
 
         public List<Entities.CarActual> ConvertToActualDbModel(string dealerName)

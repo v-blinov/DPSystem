@@ -1,14 +1,16 @@
-﻿using CsvHelper.Configuration.Attributes;
+﻿using ApiDPSystem.Interfaces;
+using CsvHelper.Configuration.Attributes;
 using System;
 using System.Collections.Generic;
 
 namespace ApiDPSystem.FileFormat.Csv.Version2
 {
-    public class Car : ICar
+    public class Car : IConvertableToDBCar
     {
         public Car()
         {
             OtherOptions = new OtherOptions();
+            Images = new List<string>();
         }
 
         [Name("id")]
@@ -42,8 +44,8 @@ namespace ApiDPSystem.FileFormat.Csv.Version2
         {
             var configurationFeatures = new List<Entities.ConfigurationFeature>();
 
-            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
-            configurationFeatures.AddRange(ICar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
+            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
+            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
 
             var carImages = new List<Entities.CarImage>();
             foreach (var image in Images)

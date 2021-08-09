@@ -5,20 +5,49 @@ using YamlDotNet.Serialization;
 
 namespace ApiDPSystem.Models.Parser
 {
-    public class YamlParser<T> : IParser<T> where T : FileFormat.ICar
+    //public class YamlParser<T> : IParser<T> where T : IConvertableToDBCar
+    //{
+    //    public Root<T> DeserializeFile(string fileContent)
+    //    {
+    //        var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
+    //        return deserializer.Deserialize<Root<T>>(fileContent);
+    //    }
+
+    //    public List<CarActual> MapToDBModel(Root<T> deserializedModels, string dealer)
+    //    {
+    //        var dbCars = new List<CarActual>();
+
+    //        foreach (var deserializeModel in deserializedModels.Cars)
+    //            dbCars.Add(deserializeModel.ConvertToCarActualDbModel(dealer));
+
+    //        return dbCars;
+    //    }
+    //}
+
+
+
+    public class YamlParser : IBParser
     {
-        public Root<T> DeserializeFile(string fileContent)
+        public string ConvertableFileExtension => ".yaml";
+
+        public Version YamlGetVersion(string fileContent)
         {
-            var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
-            return deserializer.Deserialize<Root<T>>(fileContent);
+            var deserializer = new DeserializerBuilder()
+                                    .IgnoreUnmatchedProperties()
+                                    .Build();
+
+            return deserializer.Deserialize<Version>(fileContent);
         }
 
-        public List<CarActual> MapToDBModel(Root<T> deserializedModels, string dealer)
+        public List<CarActual> Parse(string fileContent, string fileName, string dealer)
         {
-            var dbCars = new List<CarActual>();
+            var version = YamlGetVersion(fileContent);
+            var deserializedType = Selector.GetResultType(ConvertableFileExtension, version.Value);
 
-            foreach (var deserializeModel in deserializedModels.Cars)
-                dbCars.Add(deserializeModel.ConvertToCarActualDbModel(dealer));
+            var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
+            var deserializedModels = deserializer.Deserialize(fileContent, deserializedType) as IRoot;
+
+            var dbCars = deserializedModels.ConvertToActualDbModel(dealer);
 
             return dbCars;
         }
