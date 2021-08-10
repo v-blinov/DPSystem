@@ -18,26 +18,8 @@ namespace ApiDPSystem.Services
             _mapperRepository = mapperRepository;
         }
 
-
         public async Task ProcessFileAsync(IFormFile file, string dealer)
         {
-            //var fileExtension = Path.GetExtension(file.FileName);
-
-            //var fileContent = await ReadFileAsync(file);
-
-            //var ProcessedDbModels = fileExtension switch {
-            //    ".json" => ProcessJsonWithVersion(fileContent, dealer),
-            //    ".xml" => ProcessXmlWithVersion(fileContent, dealer),
-            //    ".yaml" => ProcessYamlWithVersion(fileContent, dealer),
-            //    ".csv" => ProcessCsvWithVersion(fileContent, file.FileName, dealer),
-            //    _ => throw new Exception("Unknown file format")
-            //};
-
-            //_mapperRepository.TransferSoldCars(ProcessedDbModels, dealer);
-            //SetToDatabase(ProcessedDbModels);
-
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
             var fileContent = await ReadFileAsync(file);
             var fileExtension = Path.GetExtension(file.FileName);
 
@@ -53,88 +35,6 @@ namespace ApiDPSystem.Services
             using var reader = new StreamReader(file.OpenReadStream());
             return await reader.ReadToEndAsync();
         }
-
-        //private List<Entities.CarActual> ProcessJsonWithVersion(string fileContent, string dealer)
-        //{
-        //    var version = new Distributer().JsonGetVersion(fileContent);
-        //    var dbModels = new List<Entities.CarActual>();
-
-        //    //switch (version.Value)
-        //    //{
-        //    //    case 1:
-        //    //        var jsonParser_v1 = new JsonParser<FileFormat.Json.Version1.Car>();
-        //    //        var deserializeJsonModel = jsonParser_v1.DeserializeFile(fileContent);
-        //    //        dbModels = jsonParser_v1.MapToDBModel(deserializeJsonModel, dealer);
-        //    //        break;
-        //    //    default:
-        //    //        throw new Exception($"Unknown Json file version {version.Value}");
-        //    //}
-
-        //    return dbModels;
-        //}
-
-        //private List<Entities.CarActual> ProcessXmlWithVersion(string fileContent, string dealer)
-        //{
-        //    var version = new Distributer().XmlGetVersion(fileContent);
-        //    var dbModels = new List<Entities.CarActual>();
-
-        //    switch (version.Value)
-        //    {
-        //        case 1:
-        //            var xmlParser_v1 = new XmlParser<FileFormat.Xml.Version1.Car>();
-        //            var deserializeXmlModel = xmlParser_v1.DeserializeFile(fileContent);
-        //            dbModels = xmlParser_v1.MapToDBModel(deserializeXmlModel, dealer);
-        //            break;
-        //        default:
-        //            throw new Exception($"Unknown Xml file version {version.Value}");
-        //    }
-
-        //    return dbModels;
-        //}
-
-        //private List<Entities.CarActual> ProcessYamlWithVersion(string fileContent, string dealer)
-        //{
-        //    var version = new Distributer().YamlGetVersion(fileContent);
-        //    var dbModels = new List<Entities.CarActual>();
-
-        //    switch (version.Value)
-        //    {
-        //        case 1:
-        //            var yamlParser_v1 = new YamlParser<FileFormat.Yaml.Version1.Car>();
-        //            var deserializeYamlModel = yamlParser_v1.DeserializeFile(fileContent);
-        //            dbModels = yamlParser_v1.MapToDBModel(deserializeYamlModel, dealer);
-        //            break;
-        //        default:
-        //            throw new Exception($"Unknown Yaml file version {version.Value}");
-        //    }
-
-        //    return dbModels;
-        //}
-
-        //private List<Entities.CarActual> ProcessCsvWithVersion(string fileContent, string fileName, string dealer) 
-        //{
-        //    var version = new Distributer().CsvGetVersion(fileName);
-        //    var dbModels = new List<Entities.CarActual>();
-
-        //    switch (version.Value)
-        //    {
-        //        case 1:
-        //            var csvParser_v1 = new CsvParser<FileFormat.Csv.Version1.Car>();
-        //            var deserializeCsvModel_v1 = csvParser_v1.DeserializeFile_V1(fileContent);
-        //            dbModels = csvParser_v1.MapToDBModel(deserializeCsvModel_v1, dealer);
-        //            break;
-        //        case 2:
-        //            var csvParser_v2 = new CsvParser<FileFormat.Csv.Version2.Car>();
-        //            var deserializeCsvModel_v2 = csvParser_v2.DeserializeFile_V2(fileContent);
-        //            dbModels = csvParser_v2.MapToDBModel(deserializeCsvModel_v2, dealer);
-        //            break;
-        //        default:
-        //            throw new Exception($"Unknown Yaml file version {version.Value}");
-        //    }
-
-        //    return dbModels;
-        //}
-
 
         private void SetToDatabase(List<CarActual> models)
         {

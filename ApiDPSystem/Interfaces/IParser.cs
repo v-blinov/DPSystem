@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using ApiDPSystem.Entities;
-using ApiDPSystem.Models.Parser;
 
 namespace ApiDPSystem.Interfaces
 {
-    public interface IParser<T> where T : IConvertableToDbCar
+    public interface IParser
     {
-        public Root<T> DeserializeFile(string fileContent);
+        public string ConvertableFileExtension { get; }
 
-        public List<CarActual> MapToDbModel(Root<T> deserializedModels, string dealer);
+        //public int GetVersion()
+        public List<CarActual> Parse(string fileContent, string fileName, string dealer);
     }
 }

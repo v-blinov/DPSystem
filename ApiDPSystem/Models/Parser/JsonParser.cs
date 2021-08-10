@@ -5,29 +5,13 @@ using ApiDPSystem.Interfaces;
 
 namespace ApiDPSystem.Models.Parser
 {
-    //public class JsonParser<T> : IParser<T> where T : FileFormat.ICar
-    //{
-    //    public Root<T> DeserializeFile(string fileContent) =>
-    //        JsonSerializer.Deserialize<Root<T>>(fileContent);
-
-    //    public List<CarActual> MapToDBModel(Root<T> deserializedModels, string dealer)
-    //    {
-    //        var dbCars = new List<CarActual>();
-
-    //        foreach (var deserializeModel in deserializedModels.Cars)
-    //            dbCars.Add(deserializeModel.ConvertToCarActualDbModel(dealer));
-
-    //        return dbCars;
-    //    }
-    //}
-
-    public class JsonParser : IBParser
+    public class JsonParser : IParser
     {
         public string ConvertableFileExtension => ".json";
 
         public List<CarActual> Parse(string fileContent, string fileName, string dealer)
         {
-            var version = JsonGetVersion(fileContent);
+            var version = GetVersion(fileContent);
             var deserializedType = Selector.GetResultType(ConvertableFileExtension, version.Value);
 
             var deserializedModels = JsonSerializer.Deserialize(fileContent, deserializedType) as IRoot;
@@ -37,7 +21,7 @@ namespace ApiDPSystem.Models.Parser
             return dbCars;
         }
 
-        private Version JsonGetVersion(string file)
+        private Version GetVersion(string file)
         {
             return JsonSerializer.Deserialize<Version>(file);
         }

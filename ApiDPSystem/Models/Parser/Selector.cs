@@ -12,8 +12,8 @@ namespace ApiDPSystem.Models.Parser
 
         static Selector()
         {
-            //Select all classes that implement IBParser interface 
-            var parserType = typeof(IBParser);
+            //Select all classes that implement IParser interface 
+            var parserType = typeof(IParser);
             var parserTypeNames = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(p => p.GetTypes())
                 .Where(p => parserType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
@@ -21,7 +21,7 @@ namespace ApiDPSystem.Models.Parser
             ParserTypes = new Dictionary<string, Type>();
             foreach (var type in parserTypeNames)
             {
-                var instance = Activator.CreateInstance(type) as IBParser;
+                var instance = Activator.CreateInstance(type) as IParser;
                 ParserTypes.Add(instance.ConvertableFileExtension, type);
             }
 
@@ -39,10 +39,10 @@ namespace ApiDPSystem.Models.Parser
             }
         }
 
-        public static IBParser GetParser(string fileExtension)
+        public static IParser GetParser(string fileExtension)
         {
             var parserType = ParserTypes[fileExtension];
-            return Activator.CreateInstance(parserType) as IBParser;
+            return Activator.CreateInstance(parserType) as IParser;
         }
 
         public static Type GetResultType(string fileExtension, int version)

@@ -38,8 +38,7 @@ namespace ApiDPSystem.Controllers
                 };
             }
 
-            //Проверить правильность сравнения
-            if (file == null || file.Length == 0)
+            if (file.Length == 0)
             {
                 Log.Error("Файл не отправлен, или он пустой");
                 return new ApiResponse
