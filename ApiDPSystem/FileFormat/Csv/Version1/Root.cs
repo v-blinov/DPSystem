@@ -45,17 +45,17 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
 
                 var headers = csv.HeaderRecord.ToList();
 
-                var images_FieldNames = headers.Where(p => p.StartsWith("images/")).ToList();
-                car.Images = images_FieldNames.Select(name => csv.GetField(name)).ToList();
+                var imagesFieldNames = headers.Where(p => p.StartsWith("images/")).ToList();
+                car.Images = imagesFieldNames.Select(name => csv.GetField(name)).ToList();
 
-                var otherOptions_Multimedia_FieldNames = headers.Where(p => p.StartsWith("other options/multimedia/")).ToList();
-                car.OtherOptions.Multimedia = otherOptions_Multimedia_FieldNames.Select(name => csv.GetField(name)).ToList();
+                var multimediaFieldNames = headers.Where(p => p.StartsWith("other options/multimedia/")).ToList();
+                car.OtherOptions.Multimedia = multimediaFieldNames.Select(name => csv.GetField(name)).ToList();
 
-                var otherOptions_Interior_FieldNames = headers.Where(p => p.StartsWith("other options/interior/")).ToList();
-                car.OtherOptions.Interior = otherOptions_Interior_FieldNames.Select(name => csv.GetField(name)).ToList();
+                var interiorFieldNames = headers.Where(p => p.StartsWith("other options/interior/")).ToList();
+                car.OtherOptions.Interior = interiorFieldNames.Select(name => csv.GetField(name)).ToList();
 
-                var otherOptions_Exterior_FieldNames = headers.Where(p => p.StartsWith("other options/exterior/")).ToList();
-                car.OtherOptions.Exterior = otherOptions_Exterior_FieldNames.Select(name => csv.GetField(name)).ToList();
+                var exteriorFieldNames = headers.Where(p => p.StartsWith("other options/exterior/")).ToList();
+                car.OtherOptions.Exterior = exteriorFieldNames.Select(name => csv.GetField(name)).ToList();
 
                 root.Cars.Add(car);
             }

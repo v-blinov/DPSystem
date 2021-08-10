@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using ApiDPSystem.Extension;
+using ApiDPSystem.Extensions;
 using ApiDPSystem.Models;
 using ApiDPSystem.Records;
 using ApiDPSystem.Services;
@@ -53,7 +53,7 @@ namespace ApiDPSystem.Controllers
                         Errors = logInResult.Errors.Select(p => p.Description).ToList()
                     };
 
-                var tokenResult = await _accountService.GenerateJWTTokenAsync(logInModel.Email);
+                var tokenResult = await _accountService.GenerateJwtTokenAsync(logInModel.Email);
                 return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = true,

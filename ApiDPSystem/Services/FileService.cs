@@ -152,7 +152,7 @@ namespace ApiDPSystem.Services
 
                 if (existedCar == null)
                 {
-                    _mapperRepository.AddCarToDB(model);
+                    _mapperRepository.AddCarToDb(model);
                     continue;
                 }
 
@@ -160,7 +160,7 @@ namespace ApiDPSystem.Services
                 if (isModified)
                 {
                     _mapperRepository.TransferOneCar(existedCar);
-                    _mapperRepository.AddCarToDB(model);
+                    _mapperRepository.AddCarToDb(model);
                 }
             }
         }

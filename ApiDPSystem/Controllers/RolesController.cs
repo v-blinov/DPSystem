@@ -114,13 +114,11 @@ namespace ApiDPSystem.Controllers
                 var result = await _roleService.DeleteRoleAsync(id);
 
                 if (result.Succeeded)
-                {
                     return new ApiResponse<List<string>>
                     {
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status200OK
                     };
-                }
 
                 foreach (var error in result.Errors)
                     ModelState.AddModelError(string.Empty, error.Description);

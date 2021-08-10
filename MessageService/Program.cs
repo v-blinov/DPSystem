@@ -14,9 +14,9 @@ namespace MessageService
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureServices((hostContext, services) =>
+                .ConfigureServices((_, services) =>
                 {
-                    services.AddHostedService<ConsumeRabbitMQService>();
+                    services.AddHostedService<ConsumeRabbitMqService>();
                     services.AddSingleton<EmailService>();
                 });
         }

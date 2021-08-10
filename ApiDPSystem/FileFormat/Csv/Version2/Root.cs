@@ -45,14 +45,14 @@ namespace ApiDPSystem.FileFormat.Csv.Version2
 
                 var headers = csv.HeaderRecord.ToList();
 
-                var images_FieldNames = headers.Where(p => p.StartsWith("images/")).ToList();
-                car.Images = images_FieldNames.Select(name => csv.GetField(name)).ToList();
+                var imagesFieldNames = headers.Where(p => p.StartsWith("images/")).ToList();
+                car.Images = imagesFieldNames.Select(name => csv.GetField(name)).ToList();
 
-                var otherOptions_Safety_FieldNames = headers.Where(p => p.StartsWith("other options/safety/")).ToList();
-                car.OtherOptions.Safety = otherOptions_Safety_FieldNames.Select(name => csv.GetField(name)).ToList();
+                var safetyFieldNames = headers.Where(p => p.StartsWith("other options/safety/")).ToList();
+                car.OtherOptions.Safety = safetyFieldNames.Select(name => csv.GetField(name)).ToList();
 
-                var otherOptions_Exterior_FieldNames = headers.Where(p => p.StartsWith("other options/exterior/")).ToList();
-                car.OtherOptions.Exterior = otherOptions_Exterior_FieldNames.Select(name => csv.GetField(name)).ToList();
+                var exteriorFieldNames = headers.Where(p => p.StartsWith("other options/exterior/")).ToList();
+                car.OtherOptions.Exterior = exteriorFieldNames.Select(name => csv.GetField(name)).ToList();
 
                 root.Cars.Add(car);
             }

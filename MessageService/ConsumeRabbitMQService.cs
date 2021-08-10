@@ -12,29 +12,29 @@ using RabbitMQ.Client.Events;
 
 namespace MessageService
 {
-    public class ConsumeRabbitMQService : BackgroundService
+    public class ConsumeRabbitMqService : BackgroundService
     {
-        private readonly EmailService _emailService;
-        private readonly string ExchangeName;
-        private readonly string QueueName;
-        private IModel _channel;
         private readonly IConfiguration _configuration;
+        private readonly EmailService _emailService;
+        private readonly string _exchangeName;
+        private readonly string _queueName;
+        private IModel _channel;
         private IConnection _connection;
         private ConnectionFactory _connectionFactory;
 
-        public ConsumeRabbitMQService(IConfiguration configuration, EmailService emailService)
+        public ConsumeRabbitMqService(IConfiguration configuration, EmailService emailService)
         {
             _emailService = emailService;
             _configuration = configuration;
 
-            QueueName = _configuration["RabbitMQ:QueueName"];
-            ExchangeName = _configuration["RabbitMQ:ExchangeName"];
+            _queueName = _configuration["RabbitMQ:QueueName"];
+            _exchangeName = _configuration["RabbitMQ:ExchangeName"];
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
             //Первоначальная настройка
-            InitializeRabbitMQ();
+            InitializeRabbitMq();
             return base.StartAsync(cancellationToken);
         }
 
@@ -42,7 +42,7 @@ namespace MessageService
         {
             var consumer = new EventingBasicConsumer(_channel);
 
-            consumer.Received += async (sender, e) =>
+            consumer.Received += async (_, e) =>
             {
                 var body = e.Body;
                 var messageJson = Encoding.UTF8.GetString(body.ToArray());
@@ -54,7 +54,7 @@ namespace MessageService
             };
 
             _channel.BasicQos(0, 1, false);
-            _channel.BasicConsume(QueueName, true, consumer);
+            _channel.BasicConsume(_queueName, true, consumer);
 
             await Task.CompletedTask;
         }
@@ -72,7 +72,7 @@ namespace MessageService
             }
         }
 
-        private void InitializeRabbitMQ()
+        private void InitializeRabbitMq()
         {
             var rabbitHostName = Environment.GetEnvironmentVariable("RABBIT_HOSTNAME");
 
@@ -88,9 +88,9 @@ namespace MessageService
             _channel = _connection.CreateModel();
             _channel.ConfirmSelect();
 
-            _channel.ExchangeDeclare(ExchangeName, ExchangeType.Direct, true);
-            _channel.QueueDeclare(QueueName, true, false, false, null);
-            _channel.QueueBind(QueueName, ExchangeName, QueueName);
+            _channel.ExchangeDeclare(_exchangeName, ExchangeType.Direct, true);
+            _channel.QueueDeclare(_queueName, true, false, false, null);
+            _channel.QueueBind(_queueName, _exchangeName, _queueName);
             _channel.BasicQos(0, 1, false);
         }
     }

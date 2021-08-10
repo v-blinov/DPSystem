@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.FileFormat.Json.Version1
 {
-    public class TechincalOptions
+    public class TechnicalOptions
     {
         [JsonPropertyName("engine")]
         public Engine Engine { get; set; }

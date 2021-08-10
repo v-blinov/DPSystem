@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.FileFormat.Yaml.Version1
 {
-    public class TechincalOptions
+    public class TechnicalOptions
     {
         [YamlMember(Alias = "engine")]
         public Engine Engine { get; set; }

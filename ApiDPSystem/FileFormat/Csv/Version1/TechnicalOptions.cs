@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.FileFormat.Csv.Version1
 {
-    public class TechincalOptions
+    public class TechnicalOptions
     {
         public Engine Engine { get; set; }
 

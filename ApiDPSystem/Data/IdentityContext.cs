@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApiDPSystem.Data
 {
-    public class IdentityContext : IdentityDbContext<User>
+    public sealed class IdentityContext : IdentityDbContext<User>
     {
         public IdentityContext(DbContextOptions<IdentityContext> options) : base(options)
         {

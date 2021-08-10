@@ -12,7 +12,7 @@ namespace ApiDPSystem.Services
 {
     public class EmailService
     {
-        private const string userRole = "User";
+        private const string UserRole = "User";
         private readonly IConfiguration _configuration;
         private readonly UserManager<User> _userManager;
 
@@ -43,7 +43,7 @@ namespace ApiDPSystem.Services
 
         public async Task<List<string>> GetUserEmailsAsync()
         {
-            var users = await _userManager.GetUsersInRoleAsync(userRole);
+            var users = await _userManager.GetUsersInRoleAsync(UserRole);
             return users.Where(p => p.EmailConfirmed).Select(p => p.Email).ToList();
         }
     }

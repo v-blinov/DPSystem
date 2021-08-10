@@ -8,12 +8,10 @@ namespace ApiDPSystem.Services
         private const string QueueName = "EmailQueue";
         private const string ExchangeName = "EmailExchange";
         private readonly IModel _channel;
-        private readonly IConnection _connection;
 
         public RabbitMqService(IConnection connection)
         {
-            _connection = connection;
-            _channel = _connection.CreateModel();
+            _channel = connection.CreateModel();
             _channel.ConfirmSelect();
 
             _channel.ExchangeDeclare(ExchangeName, ExchangeType.Direct, true);

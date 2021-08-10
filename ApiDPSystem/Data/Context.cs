@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ApiDPSystem.Data
 {
-    public class Context : DbContext
+    public sealed class Context : DbContext
     {
         public Context(DbContextOptions<Context> options) : base(options)
         {

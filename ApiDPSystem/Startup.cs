@@ -27,7 +27,7 @@ namespace ApiDPSystem
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -60,7 +60,7 @@ namespace ApiDPSystem
                     //googleOptions.ClientId = googleAuthNSection["ClientId"];
                     //googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
 
-                    // Надо придумать, как вынести эти данные в docker secret
+                    //Надо придумать, как вынести эти данные в docker secret
                     googleOptions.ClientId = "1015102078067-mo5ds31rjrtocd7dfk4vt663946ijftq.apps.googleusercontent.com";
                     googleOptions.ClientSecret = "19-tLf4MHfV13WoYlUN_HXNF";
 
@@ -148,7 +148,7 @@ namespace ApiDPSystem
                 #endregion
 
                 // add JWT Authentication
-                var JwtSecurityScheme = new OpenApiSecurityScheme
+                var jwtSecurityScheme = new OpenApiSecurityScheme
                 {
                     Name = "JWT Authentication",
                     Description = "Enter JWT Bearer token **_only_**",
@@ -162,8 +162,8 @@ namespace ApiDPSystem
                         Type = ReferenceType.SecurityScheme
                     }
                 };
-                c.AddSecurityDefinition(JwtSecurityScheme.Reference.Id, JwtSecurityScheme);
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement {{JwtSecurityScheme, new List<string>()}});
+                c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement {{jwtSecurityScheme, new List<string>()}});
             });
 
             #endregion

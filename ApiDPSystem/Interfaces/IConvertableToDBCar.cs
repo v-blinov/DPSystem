@@ -3,9 +3,9 @@ using ApiDPSystem.Entities;
 
 namespace ApiDPSystem.Interfaces
 {
-    public interface IConvertableToDBCar
+    public interface IConvertableToDbCar
     {
-        public CarActual ConvertToCarActualDbModel(string DealerName);
+        public CarActual ConvertToCarActualDbModel(string dealerName);
 
         public static List<ConfigurationFeature> GetFeaturesCollection(List<string> collection, string type)
         {

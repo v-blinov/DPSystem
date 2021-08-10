@@ -24,8 +24,7 @@ namespace ApiDPSystem.Controllers
 
 
         [HttpPost]
-        public async Task<ApiResponse> SendFileAsync(IFormFile file, [FromForm]
-            string dealer = "Izhevsk")
+        public async Task<ApiResponse> SendFileAsync(IFormFile file, [FromForm] string dealer = "Izhevsk")
         {
             var availableExtensions = new List<string> {".json", ".xml", ".yaml", ".csv"};
             if (!availableExtensions.Contains(Path.GetExtension(file.FileName)))
@@ -39,6 +38,7 @@ namespace ApiDPSystem.Controllers
                 };
             }
 
+            //Проверить правильность сравнения
             if (file == null || file.Length == 0)
             {
                 Log.Error("Файл не отправлен, или он пустой");
@@ -63,8 +63,7 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                // Написать реализацию обратного вызова,
-                // возвращающего результат обработки файла для пользователя
+                //Написать реализацию обратного вызова, возвращающего результат обработки файла для пользователя
                 await _fileService.ProcessFileAsync(file, dealer);
                 return new ApiResponse
                 {

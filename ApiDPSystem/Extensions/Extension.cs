@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace ApiDPSystem.Extension
+namespace ApiDPSystem.Extensions
 {
     public static class Extension
     {

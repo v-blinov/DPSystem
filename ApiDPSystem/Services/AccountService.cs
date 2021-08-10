@@ -178,15 +178,15 @@ namespace ApiDPSystem.Services
             return await _userManager.FindByEmailAsync(email);
         }
 
-        public async Task<AuthenticationResult> GenerateJWTTokenAsync(string userEmail)
+        public async Task<AuthenticationResult> GenerateJwtTokenAsync(string userEmail)
         {
             var user = await FindUserByEmailAsync(userEmail);
             var role = await _userService.GetRole(user);
 
-            return await GenerateJWTTokenAsync(user, role);
+            return await GenerateJwtTokenAsync(user, role);
         }
 
-        public async Task<AuthenticationResult> GenerateJWTTokenAsync(User user, string role)
+        public async Task<AuthenticationResult> GenerateJwtTokenAsync(User user, string role)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -250,8 +250,6 @@ namespace ApiDPSystem.Services
                     Errors = new List<string> {"Token has expired, user needs to relogin"}
                 };
 
-            // we are getting here the jwt token id
-            // check the id that the recieved token has against the id saved in the db
             var jti = principal.Claims.SingleOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
             if (storedRefreshToken.JwtId != jti)
                 return new AuthenticationResult
@@ -265,7 +263,7 @@ namespace ApiDPSystem.Services
             var user = await _userManager.FindByIdAsync(storedRefreshToken.UserId);
             var role = await _userService.GetRole(user);
 
-            return await GenerateJWTTokenAsync(user, role);
+            return await GenerateJwtTokenAsync(user, role);
         }
 
         public async Task<IdentityResult> RegisterExternalUser(User user)

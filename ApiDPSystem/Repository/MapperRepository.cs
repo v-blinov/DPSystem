@@ -21,7 +21,7 @@ namespace ApiDPSystem.Repository
         public Configuration ReturnConfigurationIfExist(Configuration configuration)
         {
             if (configuration == null)
-                return configuration;
+                return null;
 
             return _context.Configurations
                 .Include(p => p.Engine)
@@ -33,7 +33,7 @@ namespace ApiDPSystem.Repository
         public Producer ReturnProducerIfExist(Producer producer)
         {
             if (producer == null)
-                return producer;
+                return null;
 
             return _context.Producers
                 .ToList()
@@ -43,7 +43,7 @@ namespace ApiDPSystem.Repository
         public Engine ReturnEngineIfExist(Engine engine)
         {
             if (engine == null)
-                return engine;
+                return null;
 
             return _context.Engines
                 .ToList()
@@ -53,7 +53,7 @@ namespace ApiDPSystem.Repository
         public Feature ReturnFeatureIfExist(Feature feature)
         {
             if (feature == null)
-                return feature;
+                return null;
 
             return _context.Features
                 .ToList()
@@ -63,7 +63,7 @@ namespace ApiDPSystem.Repository
         public Color ReturnColorIfExist(Color color)
         {
             if (color == null)
-                return color;
+                return null;
 
             return _context.Colors
                 .ToList()
@@ -73,7 +73,7 @@ namespace ApiDPSystem.Repository
         public Image ReturnImageIfExist(Image image)
         {
             if (image == null)
-                return image;
+                return null;
 
             return _context.Images
                 .ToList()
@@ -83,7 +83,7 @@ namespace ApiDPSystem.Repository
         public Dealer ReturnDealerIfExist(Dealer dealer)
         {
             if (dealer == null)
-                return dealer;
+                return null;
 
             return _context.Dealers
                 .ToList()
@@ -156,7 +156,7 @@ namespace ApiDPSystem.Repository
                                      (p.DealerId == model.DealerId || model.Dealer != null && p.Dealer == model.Dealer));
         }
 
-        public void AddCarToDB(CarActual model)
+        public void AddCarToDb(CarActual model)
         {
             var maxVersion = GetMaxVersionByVincode(model.VinCode);
             model.Version = maxVersion != null ? (int) maxVersion + 1 : 1;

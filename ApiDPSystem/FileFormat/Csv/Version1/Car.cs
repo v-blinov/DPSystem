@@ -5,7 +5,7 @@ using CsvHelper.Configuration.Attributes;
 
 namespace ApiDPSystem.FileFormat.Csv.Version1
 {
-    public class Car : IConvertableToDBCar
+    public class Car : IConvertableToDbCar
     {
         public Car()
         {
@@ -27,7 +27,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
         [Name("model trim")]
         public string ModelTrim { get; set; }
 
-        public TechincalOptions TechincalOptions { get; set; }
+        public TechnicalOptions TechnicalOptions { get; set; }
 
         public OtherOptions OtherOptions { get; set; }
 
@@ -38,13 +38,13 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
         [Name("price")]
         public string Price { get; set; }
 
-        public CarActual ConvertToCarActualDbModel(string DealerName)
+        public CarActual ConvertToCarActualDbModel(string dealerName)
         {
             var configurationFeatures = new List<ConfigurationFeature>();
 
-            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
-            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
-            configurationFeatures.AddRange(IConvertableToDBCar.GetFeaturesCollection(OtherOptions.Multimedia, nameof(OtherOptions.Multimedia)));
+            configurationFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
+            configurationFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
+            configurationFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Multimedia, nameof(OtherOptions.Multimedia)));
 
             var carImages = new List<CarImage>();
             foreach (var image in Images)
@@ -55,14 +55,14 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
                 Year = int.Parse(Year),
                 Model = Model,
                 ModelTrim = ModelTrim,
-                Transmission = TechincalOptions.Transmission,
-                Drive = TechincalOptions.Drive,
+                Transmission = TechnicalOptions.Transmission,
+                Drive = TechnicalOptions.Drive,
                 Producer = new Producer {Name = Make},
                 Engine = new Entities.Engine
                 {
-                    Power = int.TryParse(TechincalOptions.Engine.Power, out var power) ? power : null,
-                    Fuel = TechincalOptions.Engine.Fuel,
-                    Capacity = double.TryParse(TechincalOptions.Engine.Capacity, out var capacity) ? capacity : null
+                    Power = int.TryParse(TechnicalOptions.Engine.Power, out var power) ? power : null,
+                    Fuel = TechnicalOptions.Engine.Fuel,
+                    Capacity = double.TryParse(TechnicalOptions.Engine.Capacity, out var capacity) ? capacity : null
                 },
                 ConfigurationFeatures = configurationFeatures
             };
@@ -71,7 +71,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
             {
                 VinCode = Id,
                 Price = int.TryParse(Price, out var price) ? price : null,
-                Dealer = new Dealer {Name = DealerName},
+                Dealer = new Dealer {Name = dealerName},
                 CarImages = carImages,
                 InteriorColor = new Color {Name = Colors.Interior},
                 ExteriorColor = new Color {Name = Colors.Exterior},

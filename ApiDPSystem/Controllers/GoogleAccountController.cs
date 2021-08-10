@@ -58,10 +58,10 @@ namespace ApiDPSystem.Controllers
                 //возможно стоит редиректнуть на страницу входа
 
                 //Если внешний пользователь уже сохранен в нашей базе, то генерируем токены
-                var user = await _userService.GetUserByEmail(info.Principal.FindFirst(ClaimTypes.Email).Value);
+                var user = await _userService.GetUserByEmail(info.Principal.FindFirst(ClaimTypes.Email)?.Value);
                 if (user != null)
                 {
-                    var authenticationResult = await _accountService.GenerateJWTTokenAsync(user, UserRole);
+                    var authenticationResult = await _accountService.GenerateJwtTokenAsync(user, UserRole);
                     return new ApiResponse<AuthenticationResult>
                     {
                         IsSuccess = true,
@@ -89,7 +89,7 @@ namespace ApiDPSystem.Controllers
                     var roleAddingResult = await _userService.AddRoleToUser(user, UserRole);
                     if (roleAddingResult.Succeeded)
                     {
-                        var authenticationResult = await _accountService.GenerateJWTTokenAsync(user, UserRole);
+                        var authenticationResult = await _accountService.GenerateJwtTokenAsync(user, UserRole);
 
                         return new ApiResponse<AuthenticationResult>
                         {

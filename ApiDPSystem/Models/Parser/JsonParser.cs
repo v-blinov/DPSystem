@@ -32,12 +32,12 @@ namespace ApiDPSystem.Models.Parser
 
             var deserializedModels = JsonSerializer.Deserialize(fileContent, deserializedType) as IRoot;
 
-            var dbCars = deserializedModels.ConvertToActualDbModel(dealer);
+            var dbCars = deserializedModels!.ConvertToActualDbModel(dealer);
 
             return dbCars;
         }
 
-        public Version JsonGetVersion(string file)
+        private Version JsonGetVersion(string file)
         {
             return JsonSerializer.Deserialize<Version>(file);
         }
