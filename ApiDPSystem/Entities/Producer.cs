@@ -20,9 +20,7 @@ namespace ApiDPSystem.Entities
             return producer.Name == Name;
         }
 
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode() * 22;
-        }
+        public override int GetHashCode() =>
+            Name.GetHashCode() * 22;
     }
 }

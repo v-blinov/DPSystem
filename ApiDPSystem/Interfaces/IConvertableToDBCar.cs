@@ -13,7 +13,7 @@ namespace ApiDPSystem.Interfaces
 
             if (collection != null)
                 foreach (var feature in collection)
-                    features.Add(new ConfigurationFeature {Feature = new Feature {Type = type, Description = feature}});
+                    features.Add(new ConfigurationFeature { Feature = new Feature { Type = type, Description = feature } });
 
             return features;
         }

@@ -21,9 +21,7 @@ namespace ApiDPSystem.Entities
                    configurationFeature.Feature.Equals(Feature);
         }
 
-        public override int GetHashCode()
-        {
-            return Configuration.GetHashCode() * 31 + Feature.GetHashCode() * 17;
-        }
+        public override int GetHashCode() =>
+            Configuration.GetHashCode() * 31 + Feature.GetHashCode() * 17;
     }
 }

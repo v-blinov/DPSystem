@@ -23,9 +23,8 @@ namespace MessageService.Services
 
             emailMessage.From.Add(new MailboxAddress(_configuration["EmailSender:AuthorName"], _configuration["EmailSender:AuthorEmail"]));
             emailMessage.To.AddRange(rabbitMessage.Addresses.Select(p => new MailboxAddress("", p)));
-            //emailMessage.To.Add(new MailboxAddress("", address));
             emailMessage.Subject = rabbitMessage.Subject;
-            emailMessage.Body = new TextPart(TextFormat.Html) {Text = rabbitMessage.Message};
+            emailMessage.Body = new TextPart(TextFormat.Html) { Text = rabbitMessage.Message };
 
             using (var client = new SmtpClient())
             {

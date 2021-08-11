@@ -30,7 +30,7 @@ namespace ApiDPSystem.Models.Parser
             var serializer = new XmlSerializer(typeof(Version));
 
             using var reader = new StringReader(fileContent);
-            return (Version) serializer.Deserialize(reader);
+            return (Version)serializer.Deserialize(reader);
         }
     }
 }

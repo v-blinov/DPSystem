@@ -44,13 +44,11 @@ namespace ApiDPSystem.Entities
                    conf.Engine.Equals(Engine);
         }
 
-        public override int GetHashCode()
-        {
-            return Model.GetHashCode() * 11
-                   + ModelTrim.GetHashCode() * 13
-                   + Transmission.GetHashCode() * 7
-                   + Drive.GetHashCode() * 17
-                   + Year.GetHashCode();
-        }
+        public override int GetHashCode() =>
+            Model.GetHashCode() * 11
+            + ModelTrim.GetHashCode() * 13
+            + Transmission.GetHashCode() * 7
+            + Drive.GetHashCode() * 17
+            + Year.GetHashCode();
     }
 }

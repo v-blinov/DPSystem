@@ -32,12 +32,12 @@ namespace ApiDPSystem.Services
 
 
         public AccountService(UserManager<User> userManager,
-            SignInManager<User> signInManager,
-            UserService userService,
-            EmailService emailService,
-            IConfiguration configuration,
-            TokenValidationParameters tokenValidationParameters,
-            AccountRepository accountRepository)
+                              SignInManager<User> signInManager,
+                              UserService userService,
+                              EmailService emailService,
+                              IConfiguration configuration,
+                              TokenValidationParameters tokenValidationParameters,
+                              AccountRepository accountRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -173,10 +173,8 @@ namespace ApiDPSystem.Services
             return IdentityResult.Success;
         }
 
-        public async Task<User> FindUserByEmailAsync(string email)
-        {
-            return await _userManager.FindByEmailAsync(email);
-        }
+        public async Task<User> FindUserByEmailAsync(string email) =>
+            await _userManager.FindByEmailAsync(email);
 
         public async Task<AuthenticationResult> GenerateJwtTokenAsync(string userEmail)
         {
@@ -230,7 +228,7 @@ namespace ApiDPSystem.Services
                     return new AuthenticationResult
                     {
                         Success = false,
-                        Errors = new List<string> {"Invalid Token"}
+                        Errors = new List<string> { "Invalid Token" }
                     };
             }
 
@@ -239,7 +237,7 @@ namespace ApiDPSystem.Services
                 return new AuthenticationResult
                 {
                     Success = false,
-                    Errors = new List<string> {"Refresh token doesnt exist."}
+                    Errors = new List<string> { "Refresh token doesnt exist." }
                 };
 
             // Check the date of the saved token if it has expired
@@ -247,7 +245,7 @@ namespace ApiDPSystem.Services
                 return new AuthenticationResult
                 {
                     Success = false,
-                    Errors = new List<string> {"Token has expired, user needs to relogin"}
+                    Errors = new List<string> { "Token has expired, user needs to relogin" }
                 };
 
             var jti = principal.Claims.SingleOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
@@ -255,7 +253,7 @@ namespace ApiDPSystem.Services
                 return new AuthenticationResult
                 {
                     Success = false,
-                    Errors = new List<string> {"The token didn't matech the saved token"}
+                    Errors = new List<string> { "The token didn't matech the saved token" }
                 };
 
             await _accountRepository.UpdateStoredRefreshTokenAsync(storedRefreshToken);
@@ -266,9 +264,7 @@ namespace ApiDPSystem.Services
             return await GenerateJwtTokenAsync(user, role);
         }
 
-        public async Task<IdentityResult> RegisterExternalUser(User user)
-        {
-            return await _userManager.CreateAsync(user);
-        }
+        public async Task<IdentityResult> RegisterExternalUser(User user) =>
+            await _userManager.CreateAsync(user);
     }
 }

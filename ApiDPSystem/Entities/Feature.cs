@@ -21,9 +21,7 @@ namespace ApiDPSystem.Entities
             return feature.Type == Type && feature.Description == Description;
         }
 
-        public override int GetHashCode()
-        {
-            return Type.GetHashCode() * 22 + Description.GetHashCode() * 13;
-        }
+        public override int GetHashCode() =>
+            Type.GetHashCode() * 22 + Description.GetHashCode() * 13;
     }
 }

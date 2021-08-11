@@ -26,7 +26,7 @@ namespace ApiDPSystem.Controllers
         [HttpPost]
         public async Task<ApiResponse> SendFileAsync(IFormFile file, [FromForm] string dealer = "Izhevsk")
         {
-            var availableExtensions = new List<string> {".json", ".xml", ".yaml", ".csv"};
+            var availableExtensions = new List<string> { ".json", ".xml", ".yaml", ".csv" };
             if (!availableExtensions.Contains(Path.GetExtension(file.FileName)))
             {
                 Log.Error($"Отправлен неподдерживаемый формат файла {Path.GetExtension(file.FileName)}");

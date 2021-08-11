@@ -45,9 +45,7 @@ namespace ApiDPSystem.Models.Parser
             return Activator.CreateInstance(parserType) as IParser;
         }
 
-        public static Type GetResultType(string fileExtension, int version)
-        {
-            return ModelTypes[(fileExtension, version)];
-        }
+        public static Type GetResultType(string fileExtension, int version) =>
+            ModelTypes[(fileExtension, version)];
     }
 }

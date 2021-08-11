@@ -33,7 +33,7 @@ namespace ApiDPSystem.Models.Parser
             if (matches.Count > 0)
             {
                 var versionString = matches.Last().Value.Replace("_v", "").Replace(".", "");
-                return new Version {Value = Convert.ToInt32(versionString)};
+                return new Version { Value = Convert.ToInt32(versionString) };
             }
 
             return new Version();

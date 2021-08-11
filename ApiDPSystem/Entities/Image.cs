@@ -24,9 +24,7 @@ namespace ApiDPSystem.Entities
             return image.Url == Url;
         }
 
-        public override int GetHashCode()
-        {
-            return Url.GetHashCode() * 22;
-        }
+        public override int GetHashCode() =>
+            Url.GetHashCode() * 22;
     }
 }

@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <UserSecretsId>dotnet-MessageService-EFE58385-947D-4F2A-9587-D68E6A64DD01</UserSecretsId>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <UserSecretsId>dotnet-MessageService-EFE58385-947D-4F2A-9587-D68E6A64DD01</UserSecretsId>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="ConsumeRabbitMQService.cs~RFc7cb1d2.TMP" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Remove="ConsumeRabbitMQService.cs~RFc7cb1d2.TMP"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MailKit" Version="2.13.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-    <PackageReference Include="MimeKit" Version="2.13.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="RabbitMQ.Client" Version="6.2.2" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="MailKit" Version="2.13.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0"/>
+        <PackageReference Include="MimeKit" Version="2.13.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageReference Include="RabbitMQ.Client" Version="6.2.2"/>
+    </ItemGroup>
 </Project>

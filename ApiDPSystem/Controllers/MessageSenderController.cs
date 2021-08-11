@@ -23,9 +23,7 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendMessageAsync([FromForm]
-            string subject, [FromForm]
-            string message)
+        public async Task<IActionResult> SendMessageAsync([FromForm] string subject, [FromForm] string message)
         {
             try
             {

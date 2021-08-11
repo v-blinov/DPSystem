@@ -32,13 +32,12 @@ namespace ApiDPSystem
         public void ConfigureServices(IServiceCollection services)
         {
             #region DbContexts and Identity
-
             services.AddDbContext<IdentityContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
 
             services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<IdentityContext>()
-                .AddDefaultTokenProviders();
+                    .AddEntityFrameworkStores<IdentityContext>()
+                    .AddDefaultTokenProviders();
 
             services.AddDbContext<Context>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -46,45 +45,41 @@ namespace ApiDPSystem
             #endregion
 
             #region AuthenticationShemes
-
             services.AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddGoogle(googleOptions =>
-                {
-                    //IConfigurationSection googleAuthNSection =
-                    //    Configuration.GetSection("Authentication:Google");
-                    //googleOptions.ClientId = googleAuthNSection["ClientId"];
-                    //googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
-
-                    //Надо придумать, как вынести эти данные в docker secret
-                    googleOptions.ClientId = "1015102078067-mo5ds31rjrtocd7dfk4vt663946ijftq.apps.googleusercontent.com";
-                    googleOptions.ClientSecret = "19-tLf4MHfV13WoYlUN_HXNF";
-
-                    googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
-                })
-                .AddJwtBearer(jwtOptions =>
-                {
-                    jwtOptions.SaveToken = true;
-                    jwtOptions.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
+                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    })
+                    .AddGoogle(googleOptions =>
+                    {
+                        //IConfigurationSection googleAuthNSection =
+                        //    Configuration.GetSection("Authentication:Google");
+                        //googleOptions.ClientId = googleAuthNSection["ClientId"];
+                        //googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
 
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
-                        ClockSkew = TimeSpan.Zero
-                    };
-                });
+                        //Надо придумать, как вынести эти данные в docker secret
+                        googleOptions.ClientId = "1015102078067-mo5ds31rjrtocd7dfk4vt663946ijftq.apps.googleusercontent.com";
+                        googleOptions.ClientSecret = "19-tLf4MHfV13WoYlUN_HXNF";
 
+                        googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
+                    })
+                    .AddJwtBearer(jwtOptions =>
+                    {
+                        jwtOptions.SaveToken = true;
+                        jwtOptions.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = false,
+                            ValidateAudience = false,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+                            ClockSkew = TimeSpan.Zero
+                        };
+                    });
             #endregion
 
             #region RabbitMQ
-
             var rabbitHostName = Environment.GetEnvironmentVariable("RABBIT_HOSTNAME");
             var connectionFactory = new ConnectionFactory
             {
@@ -97,7 +92,6 @@ namespace ApiDPSystem
 
             services.AddSingleton(rabbitMqConnection);
             services.AddSingleton<RabbitMqService>();
-
             #endregion
 
             services.AddControllers()
@@ -106,7 +100,6 @@ namespace ApiDPSystem
             services.Configure<DataProtectionTokenProviderOptions>(p => p.TokenLifespan = TimeSpan.FromMinutes(30));
 
             #region Swagger
-
             services.AddSwaggerGen(c =>
             {
                 //SwaggerXmlComments
@@ -114,10 +107,9 @@ namespace ApiDPSystem
                 //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 //c.IncludeXmlComments(xmlPath);
 
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "DPSystemAPI", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "DPSystemAPI", Version = "v1" });
 
                 #region OAuthAuthentication
-
                 // addOAuthAuthentication
                 //var OauthSecurityScheme = new OpenApiSecurityScheme
                 //{
@@ -144,7 +136,6 @@ namespace ApiDPSystem
                 //};
                 //c.AddSecurityDefinition(OauthSecurityScheme.Reference.Id, OauthSecurityScheme);
                 //c.AddSecurityRequirement(new OpenApiSecurityRequirement { { OauthSecurityScheme, new List<string>() } });
-
                 #endregion
 
                 // add JWT Authentication
@@ -163,24 +154,20 @@ namespace ApiDPSystem
                     }
                 };
                 c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement {{jwtSecurityScheme, new List<string>()}});
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement { { jwtSecurityScheme, new List<string>() } });
             });
-
             #endregion
 
             #region AuthorizationByRoles
-
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("Admin", builder => { builder.RequireRole("Admin"); });
 
                 options.AddPolicy("User", builder => { builder.RequireRole("User"); });
             });
-
             #endregion
 
             #region DI
-
             services.AddSingleton<TokenValidationParameters>();
             services.AddScoped<AccountService>();
             services.AddScoped<EmailService>();
@@ -190,7 +177,6 @@ namespace ApiDPSystem
 
             services.AddScoped<AccountRepository>();
             services.AddScoped<MapperRepository>();
-
             #endregion
         }
 
@@ -208,6 +194,7 @@ namespace ApiDPSystem
             {
                 c.SwaggerEndpoint("swagger/v1/swagger.json", "ApiDPSystem v1");
                 c.RoutePrefix = string.Empty;
+
                 //c.OAuthClientId(Configuration.GetValue<string>("Authentication:Google:ClientId"));
                 //c.OAuthClientSecret(Configuration.GetValue<string>("Authentication:Google:ClientSecret"));
                 //c.OAuthAppName("OAuth-dpsystem");

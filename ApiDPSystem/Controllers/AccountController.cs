@@ -26,8 +26,7 @@ namespace ApiDPSystem.Controllers
 
         [HttpPost]
         [ActionName("LogIn")]
-        public async Task<ApiResponse<AuthenticationResult>> LogInAsync([FromForm]
-            LogInRecord logInModel)
+        public async Task<ApiResponse<AuthenticationResult>> LogInAsync([FromForm] LogInRecord logInModel)
         {
             if (!ModelState.IsValid)
             {
@@ -75,8 +74,7 @@ namespace ApiDPSystem.Controllers
 
         [HttpPost]
         [ActionName("RegisterUser")]
-        public async Task<ApiResponse> RegisterUserAsync([FromForm]
-            RegisterRecord registerModel)
+        public async Task<ApiResponse> RegisterUserAsync([FromForm] RegisterRecord registerModel)
         {
             if (!ModelState.IsValid)
             {
@@ -92,7 +90,7 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                var confirmEmailUrl = Url.Action("ConfirmEmail", "Account", new {userId = "userIdValue", code = "codeValue"}, HttpContext.Request.Scheme);
+                var confirmEmailUrl = Url.Action("ConfirmEmail", "Account", new { userId = "userIdValue", code = "codeValue" }, HttpContext.Request.Scheme);
 
                 var registerResult = await _accountService.RegisterAsync(registerModel, confirmEmailUrl);
                 if (registerResult.Succeeded)
@@ -124,9 +122,7 @@ namespace ApiDPSystem.Controllers
 
         [HttpGet]
         [ActionName("ConfirmEmail")]
-        public async Task<ApiResponse> ConfirmEmailAsync([FromQuery]
-            string userId, [FromQuery]
-            string code)
+        public async Task<ApiResponse> ConfirmEmailAsync([FromQuery] string userId, [FromQuery] string code)
         {
             try
             {
@@ -159,8 +155,7 @@ namespace ApiDPSystem.Controllers
 
         [HttpPost]
         [ActionName("ForgotPasswor")]
-        public async Task<ApiResponse> ForgotPasswordAsync([FromForm]
-            EmailRecord emailRecord)
+        public async Task<ApiResponse> ForgotPasswordAsync([FromForm] EmailRecord emailRecord)
         {
             if (!ModelState.IsValid)
             {
@@ -176,7 +171,7 @@ namespace ApiDPSystem.Controllers
 
             try
             {
-                var url = Url.Action("ResetPassword", "Account", new {userId = "userIdValue", code = "codeValue"}, HttpContext.Request.Scheme);
+                var url = Url.Action("ResetPassword", "Account", new { userId = "userIdValue", code = "codeValue" }, HttpContext.Request.Scheme);
                 await _accountService.ForgotPasswordAsync(emailRecord, url);
 
                 return new ApiResponse
@@ -199,8 +194,7 @@ namespace ApiDPSystem.Controllers
 
         [HttpPost]
         [ActionName("ResetPassword")]
-        public async Task<ApiResponse> ResetPasswordAsync([FromForm]
-            ResetPasswordRecord resetPassword)
+        public async Task<ApiResponse> ResetPasswordAsync([FromForm] ResetPasswordRecord resetPassword)
         {
             if (!ModelState.IsValid)
             {
@@ -247,8 +241,7 @@ namespace ApiDPSystem.Controllers
 
         [HttpPost]
         [ActionName("RefreshToken")]
-        public async Task<ApiResponse<AuthenticationResult>> RefreshTokenAsync([FromForm]
-            TokenRequest tokenRequest)
+        public async Task<ApiResponse<AuthenticationResult>> RefreshTokenAsync([FromForm] TokenRequest tokenRequest)
         {
             if (!ModelState.IsValid)
             {

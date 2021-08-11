@@ -27,10 +27,8 @@ namespace ApiDPSystem.Data
         public DbSet<CarHistory> CarHistories { get; set; }
         public DbSet<CarHistoryImage> CarHistoryImages { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
             optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
-        }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,36 +42,36 @@ namespace ApiDPSystem.Data
 
 
             modelBuilder.Entity<ConfigurationFeature>()
-                .HasKey(p => new {p.ConfigurationId, p.FeatureId});
+                        .HasKey(p => new { p.ConfigurationId, p.FeatureId });
 
             modelBuilder.Entity<CarImage>()
-                .HasKey(p => new {p.CarActualId, p.ImageId});
+                        .HasKey(p => new { p.CarActualId, p.ImageId });
 
             modelBuilder.Entity<CarHistoryImage>()
-                .HasKey(p => new {p.CarHistoryId, p.ImageId});
+                        .HasKey(p => new { p.CarHistoryId, p.ImageId });
 
             modelBuilder.Entity<Engine>()
-                .Property(p => p.Fuel)
-                .HasMaxLength(20);
+                        .Property(p => p.Fuel)
+                        .HasMaxLength(20);
 
             modelBuilder.Entity<Image>()
-                .Property(p => p.Url)
-                .IsRequired();
+                        .Property(p => p.Url)
+                        .IsRequired();
 
             modelBuilder.Entity<Producer>()
-                .Property(p => p.Name)
-                .HasMaxLength(250)
-                .IsRequired();
+                        .Property(p => p.Name)
+                        .HasMaxLength(250)
+                        .IsRequired();
 
             modelBuilder.Entity<Feature>()
-                .Property(p => p.Description)
-                .HasMaxLength(1000)
-                .IsRequired();
+                        .Property(p => p.Description)
+                        .HasMaxLength(1000)
+                        .IsRequired();
 
             modelBuilder.Entity<Dealer>()
-                .Property(p => p.Name)
-                .HasMaxLength(450)
-                .IsRequired();
+                        .Property(p => p.Name)
+                        .HasMaxLength(450)
+                        .IsRequired();
         }
 
         public class ConfigurationSettings : IEntityTypeConfiguration<Configuration>
@@ -81,21 +79,21 @@ namespace ApiDPSystem.Data
             public void Configure(EntityTypeBuilder<Configuration> builder)
             {
                 builder.Property(p => p.Year)
-                    .HasColumnType("smallint");
+                       .HasColumnType("smallint");
 
                 builder.Property(p => p.Model)
-                    .IsRequired()
-                    .HasMaxLength(100);
+                       .IsRequired()
+                       .HasMaxLength(100);
 
                 builder.Property(p => p.ModelTrim)
-                    .IsRequired()
-                    .HasMaxLength(20);
+                       .IsRequired()
+                       .HasMaxLength(20);
 
                 builder.Property(p => p.Transmission)
-                    .HasMaxLength(10);
+                       .HasMaxLength(10);
 
                 builder.Property(p => p.Drive)
-                    .HasMaxLength(10);
+                       .HasMaxLength(10);
             }
         }
 
@@ -103,23 +101,23 @@ namespace ApiDPSystem.Data
         {
             public void Configure(EntityTypeBuilder<CarActual> builder)
             {
-                builder.HasIndex(p => new {p.DealerId});
+                builder.HasIndex(p => new { p.DealerId });
 
-                builder.HasIndex(p => new {p.DealerId, p.Id}).IsUnique();
+                builder.HasIndex(p => new { p.DealerId, p.Id }).IsUnique();
 
                 builder.Property(p => p.VinCode)
-                    .IsRequired()
-                    .HasMaxLength(20)
-                    .HasColumnType("varchar");
+                       .IsRequired()
+                       .HasMaxLength(20)
+                       .HasColumnType("varchar");
 
                 builder.HasOne(s => s.ExteriorColor)
-                    .WithMany(x => x.ExteriorCarActual)
-                    .HasForeignKey(s => s.ExteriorColorId);
+                       .WithMany(x => x.ExteriorCarActual)
+                       .HasForeignKey(s => s.ExteriorColorId);
 
                 builder.HasOne(s => s.InteriorColor)
-                    .WithMany(x => x.InteriorCarActual)
-                    .HasForeignKey(s => s.InteriorColorId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                       .WithMany(x => x.InteriorCarActual)
+                       .HasForeignKey(s => s.InteriorColorId)
+                       .OnDelete(DeleteBehavior.Restrict);
             }
         }
 
@@ -127,24 +125,24 @@ namespace ApiDPSystem.Data
         {
             public void Configure(EntityTypeBuilder<CarHistory> builder)
             {
-                builder.HasIndex(p => new {p.VinCode, p.Version});
+                builder.HasIndex(p => new { p.VinCode, p.Version });
 
                 builder.Property(p => p.IsSold)
-                    .HasDefaultValue(false);
+                       .HasDefaultValue(false);
 
                 builder.Property(p => p.VinCode)
-                    .IsRequired()
-                    .HasMaxLength(20)
-                    .HasColumnType("varchar");
+                       .IsRequired()
+                       .HasMaxLength(20)
+                       .HasColumnType("varchar");
 
                 builder.HasOne(s => s.ExteriorColor)
-                    .WithMany(x => x.ExteriorCarHistory)
-                    .HasForeignKey(s => s.ExteriorColorId);
+                       .WithMany(x => x.ExteriorCarHistory)
+                       .HasForeignKey(s => s.ExteriorColorId);
 
                 builder.HasOne(s => s.InteriorColor)
-                    .WithMany(x => x.InteriorCarHistory)
-                    .HasForeignKey(s => s.InteriorColorId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                       .WithMany(x => x.InteriorCarHistory)
+                       .HasForeignKey(s => s.InteriorColorId)
+                       .OnDelete(DeleteBehavior.Restrict);
             }
         }
 
@@ -153,11 +151,11 @@ namespace ApiDPSystem.Data
             public void Configure(EntityTypeBuilder<Color> builder)
             {
                 builder.Property(p => p.HexCode)
-                    .HasMaxLength(6)
-                    .HasColumnType("varchar");
+                       .HasMaxLength(6)
+                       .HasColumnType("varchar");
 
                 builder.Property(p => p.Name)
-                    .HasMaxLength(30);
+                       .HasMaxLength(30);
             }
         }
 
@@ -166,12 +164,12 @@ namespace ApiDPSystem.Data
             public void Configure(EntityTypeBuilder<Feature> builder)
             {
                 builder.Property(p => p.Description)
-                    .HasMaxLength(1000)
-                    .IsRequired();
+                       .HasMaxLength(1000)
+                       .IsRequired();
 
                 builder.Property(p => p.Type)
-                    .HasMaxLength(100)
-                    .IsRequired();
+                       .HasMaxLength(100)
+                       .IsRequired();
             }
         }
 
@@ -180,14 +178,14 @@ namespace ApiDPSystem.Data
             public void Configure(EntityTypeBuilder<RefreshTokenInfo> builder)
             {
                 builder.Property(p => p.UserId)
-                    .HasMaxLength(450)
-                    .IsRequired();
+                       .HasMaxLength(450)
+                       .IsRequired();
 
                 builder.Property(p => p.RefreshToken)
-                    .IsRequired();
+                       .IsRequired();
 
                 builder.Property(p => p.JwtId)
-                    .IsRequired();
+                       .IsRequired();
             }
         }
     }

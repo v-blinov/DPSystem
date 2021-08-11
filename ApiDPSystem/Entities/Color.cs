@@ -25,10 +25,8 @@ namespace ApiDPSystem.Entities
                    color.Name == Name;
         }
 
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode() * 11
-                   + HexCode.GetHashCode() * 19;
-        }
+        public override int GetHashCode() =>
+            Name.GetHashCode() * 11
+            + HexCode.GetHashCode() * 19;
     }
 }

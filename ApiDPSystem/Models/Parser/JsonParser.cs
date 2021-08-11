@@ -21,9 +21,7 @@ namespace ApiDPSystem.Models.Parser
             return dbCars;
         }
 
-        private Version GetVersion(string file)
-        {
-            return JsonSerializer.Deserialize<Version>(file);
-        }
+        private Version GetVersion(string file) =>
+            JsonSerializer.Deserialize<Version>(file);
     }
 }

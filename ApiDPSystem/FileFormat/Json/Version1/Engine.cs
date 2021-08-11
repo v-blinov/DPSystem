@@ -14,10 +14,8 @@ namespace ApiDPSystem.FileFormat.Json.Version1
         public string Capacity { get; set; }
 
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+        public override int GetHashCode() =>
+            base.GetHashCode();
 
         public override bool Equals(object obj)
         {

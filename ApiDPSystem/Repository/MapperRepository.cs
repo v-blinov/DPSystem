@@ -24,10 +24,10 @@ namespace ApiDPSystem.Repository
                 return null;
 
             return _context.Configurations
-                .Include(p => p.Engine)
-                .Include(p => p.Producer)
-                .ToList()
-                .FirstOrDefault(p => configuration.Equals(p));
+                           .Include(p => p.Engine)
+                           .Include(p => p.Producer)
+                           .ToList()
+                           .FirstOrDefault(p => configuration.Equals(p));
         }
 
         public Producer ReturnProducerIfExist(Producer producer)
@@ -36,8 +36,8 @@ namespace ApiDPSystem.Repository
                 return null;
 
             return _context.Producers
-                .ToList()
-                .FirstOrDefault(p => producer.Equals(p));
+                           .ToList()
+                           .FirstOrDefault(p => producer.Equals(p));
         }
 
         public Engine ReturnEngineIfExist(Engine engine)
@@ -46,8 +46,8 @@ namespace ApiDPSystem.Repository
                 return null;
 
             return _context.Engines
-                .ToList()
-                .FirstOrDefault(p => engine.Equals(p));
+                           .ToList()
+                           .FirstOrDefault(p => engine.Equals(p));
         }
 
         public Feature ReturnFeatureIfExist(Feature feature)
@@ -56,8 +56,8 @@ namespace ApiDPSystem.Repository
                 return null;
 
             return _context.Features
-                .ToList()
-                .FirstOrDefault(p => feature.Equals(p));
+                           .ToList()
+                           .FirstOrDefault(p => feature.Equals(p));
         }
 
         public Color ReturnColorIfExist(Color color)
@@ -66,8 +66,8 @@ namespace ApiDPSystem.Repository
                 return null;
 
             return _context.Colors
-                .ToList()
-                .FirstOrDefault(p => color.Equals(p));
+                           .ToList()
+                           .FirstOrDefault(p => color.Equals(p));
         }
 
         public Image ReturnImageIfExist(Image image)
@@ -76,8 +76,8 @@ namespace ApiDPSystem.Repository
                 return null;
 
             return _context.Images
-                .ToList()
-                .FirstOrDefault(p => image.Equals(p));
+                           .ToList()
+                           .FirstOrDefault(p => image.Equals(p));
         }
 
         public Dealer ReturnDealerIfExist(Dealer dealer)
@@ -86,33 +86,33 @@ namespace ApiDPSystem.Repository
                 return null;
 
             return _context.Dealers
-                .ToList()
-                .FirstOrDefault(p => dealer.Equals(p));
+                           .ToList()
+                           .FirstOrDefault(p => dealer.Equals(p));
         }
 
         public void TransferSoldCars(List<CarActual> newListCars, string dealerName)
         {
             //распараллелить
             var currentListCarVinCodes = _context.CarActuals
-                .Include(p => p.Dealer)
-                .Where(p => p.Dealer.Name == dealerName)
-                .Select(p => p.VinCode)
-                .ToList();
+                                                 .Include(p => p.Dealer)
+                                                 .Where(p => p.Dealer.Name == dealerName)
+                                                 .Select(p => p.VinCode)
+                                                 .ToList();
 
             var newListCarVinCodes = newListCars
-                .Select(p => p.VinCode)
-                .ToList();
+                                     .Select(p => p.VinCode)
+                                     .ToList();
 
             var soldCarVinCodes = currentListCarVinCodes
-                .Except(newListCarVinCodes)
-                .ToList();
+                                  .Except(newListCarVinCodes)
+                                  .ToList();
 
             foreach (var vincode in soldCarVinCodes)
             {
                 var car = _context.CarActuals
-                    .Include(p => p.Dealer)
-                    .Include(p => p.CarImages)
-                    .FirstOrDefault(p => p.Dealer.Name == dealerName && p.VinCode == vincode);
+                                  .Include(p => p.Dealer)
+                                  .Include(p => p.CarImages)
+                                  .FirstOrDefault(p => p.Dealer.Name == dealerName && p.VinCode == vincode);
 
                 TransferOneCar(car, true);
             }
@@ -129,7 +129,7 @@ namespace ApiDPSystem.Repository
 
                 foreach (var carImage in car.CarImages)
                 {
-                    carHistoryModel.CarHistoryImages.Add(new CarHistoryImage {ImageId = carImage.ImageId});
+                    carHistoryModel.CarHistoryImages.Add(new CarHistoryImage { ImageId = carImage.ImageId });
                     _context.CarImages.RemoveRange(carImage);
                 }
 
@@ -148,18 +148,16 @@ namespace ApiDPSystem.Repository
             }
         }
 
-        public CarActual GetThatDealerCarIfExist(CarActual model)
-        {
-            return _context.CarActuals
-                .Include(p => p.CarImages)
-                .FirstOrDefault(p => p.VinCode == model.VinCode &&
-                                     (p.DealerId == model.DealerId || model.Dealer != null && p.Dealer == model.Dealer));
-        }
+        public CarActual GetThatDealerCarIfExist(CarActual model) =>
+            _context.CarActuals
+                    .Include(p => p.CarImages)
+                    .FirstOrDefault(p => p.VinCode == model.VinCode &&
+                                         (p.DealerId == model.DealerId || model.Dealer != null && p.Dealer == model.Dealer));
 
         public void AddCarToDb(CarActual model)
         {
             var maxVersion = GetMaxVersionByVincode(model.VinCode);
-            model.Version = maxVersion != null ? (int) maxVersion + 1 : 1;
+            model.Version = maxVersion != null ? (int)maxVersion + 1 : 1;
             _context.CarActuals.Add(model);
             _context.SaveChanges();
         }
@@ -174,23 +172,21 @@ namespace ApiDPSystem.Repository
 
             if (maxActualVersion != null)
                 if (maxHistoryVersion != null)
-                    return Math.Max((int) maxActualVersion, (int) maxHistoryVersion);
+                    return Math.Max((int)maxActualVersion, (int)maxHistoryVersion);
                 else
                     return maxActualVersion;
 
             return maxHistoryVersion;
         }
 
-        public List<CarImage> GetCarImagesListByCarId(Guid carId)
-        {
-            return _context.CarImages.Where(p => p.CarActualId == carId).ToList();
-        }
+        public List<CarImage> GetCarImagesListByCarId(Guid carId) =>
+            _context.CarImages.Where(p => p.CarActualId == carId).ToList();
 
         public async Task AddCarActualOrUpdateIfExist(CarActual model)
         {
             var existedCar = _context.CarActuals
-                .Include(p => p.CarImages)
-                .FirstOrDefault(p => p.VinCode == model.VinCode && (p.Dealer == model.Dealer || p.DealerId == model.DealerId));
+                                     .Include(p => p.CarImages)
+                                     .FirstOrDefault(p => p.VinCode == model.VinCode && (p.Dealer == model.Dealer || p.DealerId == model.DealerId));
 
 
             if (existedCar == null)

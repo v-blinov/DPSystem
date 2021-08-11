@@ -10,9 +10,7 @@ namespace ApiDPSystem.Controllers
     {
         [HttpGet]
         [Authorize(Policy = "User")]
-        public IActionResult CheckAuthentication()
-        {
-            return Ok("Success access");
-        }
+        public IActionResult CheckAuthentication() =>
+            Ok("Success access");
     }
 }

@@ -20,9 +20,7 @@ namespace ApiDPSystem.Entities
             return dealer.Name == Name;
         }
 
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode() * 31;
-        }
+        public override int GetHashCode() =>
+            Name.GetHashCode() * 31;
     }
 }

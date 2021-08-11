@@ -48,7 +48,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
 
             var carImages = new List<CarImage>();
             foreach (var image in Images)
-                carImages.Add(new CarImage {Image = new Image {Url = image}});
+                carImages.Add(new CarImage { Image = new Image { Url = image } });
 
             var dbConfiguration = new Configuration
             {
@@ -57,7 +57,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
                 ModelTrim = ModelTrim,
                 Transmission = TechnicalOptions.Transmission,
                 Drive = TechnicalOptions.Drive,
-                Producer = new Producer {Name = Make},
+                Producer = new Producer { Name = Make },
                 Engine = new Entities.Engine
                 {
                     Power = int.TryParse(TechnicalOptions.Engine.Power, out var power) ? power : null,
@@ -71,10 +71,10 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
             {
                 VinCode = Id,
                 Price = int.TryParse(Price, out var price) ? price : null,
-                Dealer = new Dealer {Name = dealerName},
+                Dealer = new Dealer { Name = dealerName },
                 CarImages = carImages,
-                InteriorColor = new Color {Name = Colors.Interior},
-                ExteriorColor = new Color {Name = Colors.Exterior},
+                InteriorColor = new Color { Name = Colors.Interior },
+                ExteriorColor = new Color { Name = Colors.Exterior },
                 Configuration = dbConfiguration
             };
 

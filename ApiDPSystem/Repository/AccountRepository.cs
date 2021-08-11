@@ -41,10 +41,8 @@ namespace ApiDPSystem.Repository
             return Convert.ToBase64String(randomNumber);
         }
 
-        public RefreshTokenInfo GetStoredRefreshToken(string requestRefreshToken)
-        {
-            return _context.RefreshTokenInfoTable.FirstOrDefault(x => x.RefreshToken == requestRefreshToken);
-        }
+        public RefreshTokenInfo GetStoredRefreshToken(string requestRefreshToken) =>
+            _context.RefreshTokenInfoTable.FirstOrDefault(x => x.RefreshToken == requestRefreshToken);
 
         public async Task UpdateStoredRefreshTokenAsync(RefreshTokenInfo storedRefreshToken)
         {
