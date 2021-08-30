@@ -25,8 +25,8 @@ namespace ApiDPSystem.Models.Parser
         public Version GetVersion(string fileContent)
         {
             var deserializer = new DeserializerBuilder()
-                .IgnoreUnmatchedProperties()
-                .Build();
+                               .IgnoreUnmatchedProperties()
+                               .Build();
 
             return deserializer.Deserialize<Version>(fileContent);
         }

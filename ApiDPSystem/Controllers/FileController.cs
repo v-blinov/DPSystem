@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
+using ApiDPSystem.Filters;
 using ApiDPSystem.Models;
 using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Http;
@@ -24,42 +23,9 @@ namespace ApiDPSystem.Controllers
 
 
         [HttpPost]
+        [FileSendParamsValidationFilter]
         public async Task<ApiResponse> SendFileAsync(IFormFile file, [FromForm] string dealer = "Izhevsk")
         {
-            var availableExtensions = new List<string> { ".json", ".xml", ".yaml", ".csv" };
-            if (!availableExtensions.Contains(Path.GetExtension(file.FileName)))
-            {
-                Log.Error($"Отправлен неподдерживаемый формат файла {Path.GetExtension(file.FileName)}");
-                return new ApiResponse
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = $"Неподдерживаемый формат файла {Path.GetExtension(file.FileName)}"
-                };
-            }
-
-            if (file.Length == 0)
-            {
-                Log.Error("Файл не отправлен, или он пустой");
-                return new ApiResponse
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Файл не отправлен, или он пустой."
-                };
-            }
-
-            if (string.IsNullOrEmpty(dealer))
-            {
-                Log.Error("Имя диллера пустое или не отправлено.");
-                return new ApiResponse
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Имя диллера пустое или не отправлено."
-                };
-            }
-
             try
             {
                 //Написать реализацию обратного вызова, возвращающего результат обработки файла для пользователя

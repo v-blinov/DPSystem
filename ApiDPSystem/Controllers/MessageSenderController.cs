@@ -23,7 +23,7 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendMessageAsync([FromForm] string subject, [FromForm] string message)
+        public async Task<ApiResponse> SendMessageAsync([FromForm] string subject, [FromForm] string message)
         {
             try
             {
@@ -37,12 +37,22 @@ namespace ApiDPSystem.Controllers
                 var jsonMessage = JsonConvert.SerializeObject(rabbitMessage);
 
                 _rabbitMqService.Publish(jsonMessage);
-                return Ok();
+
+                return new ApiResponse
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK
+                };
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "");
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return new ApiResponse<AuthenticationResult>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Ошибка на стороне сервера"
+                };
             }
         }
     }

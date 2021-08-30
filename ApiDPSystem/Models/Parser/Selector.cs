@@ -15,8 +15,8 @@ namespace ApiDPSystem.Models.Parser
             //Select all classes that implement IParser interface 
             var parserType = typeof(IParser);
             var parserTypeNames = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(p => p.GetTypes())
-                .Where(p => parserType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
+                                           .SelectMany(p => p.GetTypes())
+                                           .Where(p => parserType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
 
             ParserTypes = new Dictionary<string, Type>();
             foreach (var type in parserTypeNames)
@@ -28,8 +28,8 @@ namespace ApiDPSystem.Models.Parser
             //Select all classes that implement IRoot interface 
             var modelType = typeof(IRoot);
             var modelTypeNames = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(p => p.GetTypes())
-                .Where(p => modelType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
+                                          .SelectMany(p => p.GetTypes())
+                                          .Where(p => modelType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
 
             ModelTypes = new Dictionary<(string, int), Type>();
             foreach (var type in modelTypeNames)
