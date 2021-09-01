@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ApiDPSystem.Exceptions;
 using ApiDPSystem.Interfaces;
 
 namespace ApiDPSystem.Models.Parser
@@ -46,7 +47,12 @@ namespace ApiDPSystem.Models.Parser
             return Activator.CreateInstance(parserType) as IParser;
         }
 
-        public static Type GetResultType(string fileExtension, int version) =>
-            ModelTypes[(fileExtension, version)];
+        public static Type GetResultType(string fileExtension, int version)
+        {
+            if (ModelTypes.TryGetValue((fileExtension, version), out Type type))
+                return type;
+            else 
+                throw new InvalidFileVersionException($"Неподдерживаемый файл фомата {fileExtension} версии {version}", fileExtension, version);
+        } 
     }
 }

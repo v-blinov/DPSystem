@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using ApiDPSystem.Exceptions;
 using ApiDPSystem.Filters;
 using ApiDPSystem.Models;
 using ApiDPSystem.Services;
@@ -33,6 +34,15 @@ namespace ApiDPSystem.Controllers
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (InvalidFileVersionException ex) {
+                Log.Error(ex, "");
+                return new ApiResponse<AuthenticationResult>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message ?? "Неподдерживаемая версия файла данного формата"
                 };
             }
             catch (Exception ex)
