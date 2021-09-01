@@ -28,7 +28,6 @@ namespace ApiDPSystem.Controllers
         {
             try
             {
-                //Написать реализацию обратного вызова, возвращающего результат обработки файла для пользователя
                 await _fileService.ProcessFileAsync(file, dealer);
                 return new ApiResponse
                 {

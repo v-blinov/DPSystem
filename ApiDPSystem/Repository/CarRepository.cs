@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ApiDPSystem.Data;
+﻿using ApiDPSystem.Data;
 using ApiDPSystem.Entities;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ApiDPSystem.Repository
 {
-    public class MapperRepository
+    public class CarRepository
     {
         private readonly Context _context;
 
-        public MapperRepository(Context context)
+        public CarRepository(Context context)
         {
             _context = context;
         }
@@ -90,35 +89,28 @@ namespace ApiDPSystem.Repository
                            .FirstOrDefault(p => dealer.Equals(p));
         }
 
-        public void TransferSoldCars(List<CarActual> newListCars, string dealerName)
-        {
-            //распараллелить
-            var currentListCarVinCodes = _context.CarActuals
-                                                 .Include(p => p.Dealer)
-                                                 .Where(p => p.Dealer.Name == dealerName)
-                                                 .Select(p => p.VinCode)
-                                                 .ToList();
 
-            var newListCarVinCodes = newListCars
-                                     .Select(p => p.VinCode)
-                                     .ToList();
 
-            var soldCarVinCodes = currentListCarVinCodes
-                                  .Except(newListCarVinCodes)
-                                  .ToList();
+        public CarActual GetThatDealerCarIfExist(CarActual model) =>
+            _context.CarActuals
+            .Include(p => p.CarImages)
+            .FirstOrDefault(p => p.VinCode == model.VinCode && p.DealerId == model.DealerId);
 
-            foreach (var vincode in soldCarVinCodes)
-            {
-                var car = _context.CarActuals
-                                  .Include(p => p.Dealer)
-                                  .Include(p => p.CarImages)
-                                  .FirstOrDefault(p => p.Dealer.Name == dealerName && p.VinCode == vincode);
+        public List<string> GetActualCarsVinCodesForDealer(string dealerName) =>
+            _context.CarActuals
+            .Include(p => p.Dealer)
+            .Where(p => p.Dealer.Name == dealerName)
+            .Select(p => p.VinCode)
+            .ToList();
 
-                TransferOneCar(car, true);
-            }
-        }
+        public CarActual GetCar(string vincode, string dealerName) =>
+            _context.CarActuals
+            .Include(p => p.Dealer)
+            .Include(p => p.CarImages)
+            .FirstOrDefault(p => p.Dealer.Name == dealerName && p.VinCode == vincode);
 
-        public void TransferOneCar(CarActual car, bool isSold = false)
+
+        public void TransferOneCarFromActualToHistory(CarActual car, bool isSold = false)
         {
             var transaction = _context.Database.BeginTransaction();
 
@@ -148,12 +140,6 @@ namespace ApiDPSystem.Repository
             }
         }
 
-        public CarActual GetThatDealerCarIfExist(CarActual model) =>
-            _context.CarActuals
-                    .Include(p => p.CarImages)
-                    .FirstOrDefault(p => p.VinCode == model.VinCode &&
-                                         (p.DealerId == model.DealerId || model.Dealer != null && p.Dealer == model.Dealer));
-
         public void AddCarToDb(CarActual model)
         {
             var maxVersion = GetMaxVersionByVincode(model.VinCode);
@@ -181,20 +167,5 @@ namespace ApiDPSystem.Repository
 
         public List<CarImage> GetCarImagesListByCarId(Guid carId) =>
             _context.CarImages.Where(p => p.CarActualId == carId).ToList();
-
-        public async Task AddCarActualOrUpdateIfExist(CarActual model)
-        {
-            var existedCar = _context.CarActuals
-                                     .Include(p => p.CarImages)
-                                     .FirstOrDefault(p => p.VinCode == model.VinCode && (p.Dealer == model.Dealer || p.DealerId == model.DealerId));
-
-
-            if (existedCar == null)
-                _context.CarActuals.Add(model);
-            else
-                existedCar.Copy(model);
-
-            await _context.SaveChangesAsync();
-        }
     }
 }

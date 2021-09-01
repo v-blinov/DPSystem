@@ -25,6 +25,7 @@ namespace ApiDPSystem.Models.Parser
                 ParserTypes.Add(instance.ConvertableFileExtension, type);
             }
 
+
             //Select all classes that implement IRoot interface 
             var modelType = typeof(IRoot);
             var modelTypeNames = AppDomain.CurrentDomain.GetAssemblies()

@@ -7,7 +7,6 @@ namespace ApiDPSystem.Interfaces
     {
         public string ConvertableFileExtension { get; }
 
-        //public int GetVersion()
         public List<CarActual> Parse(string fileContent, string fileName, string dealer);
     }
 }

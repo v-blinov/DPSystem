@@ -174,9 +174,10 @@ namespace ApiDPSystem
             services.AddScoped<RoleService>();
             services.AddScoped<UserService>();
             services.AddScoped<FileService>();
+            services.AddScoped<DataCheckerService>();
 
             services.AddScoped<AccountRepository>();
-            services.AddScoped<MapperRepository>();
+            services.AddScoped<CarRepository>();
             #endregion
         }
 
