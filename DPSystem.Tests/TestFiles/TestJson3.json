@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "cars": [
+    {
+      "id": "CYCWUJQ53W52B74TI",
+      "year": "2019",
+      "make": "Mercedes-Benz",
+      "model": "180 IV",
+      "model trim": "W205 Рестайлинг",
+      "techincal options" : {
+          "engine": {
+            "fuel" : "Benzin",
+            "power" : "150",
+            "capacity" : "150"
+          },
+          "transmission" : "AT",
+          "drive" : "AWD"
+      },
+      "other options" : {
+          "comfort" : [
+            "Мультифункциональное рулевое колесо",
+            "Система автоматической парковки",
+            "Активный усилитель руля",
+            "Парктроник задний", 
+            "Электропривод крышки / багажника"
+          ],
+          "interior" : [
+            "Складывающееся заднее сиденье",
+            "Кожа (Материал салона)",
+            "Панорамная крыша"
+          ],
+          "safety" : [
+            "Система предотвращения столкновения",
+            "6 подушек безопасности",
+            "Система контроля слепых зон"
+          ],
+          "multimedia": [
+            "Навигационная система",
+            "Bluetooth",
+            "Премиальная аудиосистема"
+          ]
+      },
+      "colors" : {
+        "interior" : "Black",
+        "exterior" : "Grown"
+      },
+      "images" : [
+        "/media/images/flat/mercedes/180_IV_1.png",
+        "/media/images/flat/mercedes/180_IV_2.png",
+        "/media/images/flat/mercedes/180_IV_3.png",
+        "/media/images/flat/mercedes/180_IV_4.png"
+      ],
+      "price" : "2500000"
+    },
+    {
+      "id": "UBQJJAPWGNVY6U8FB",
+      "year": "2019",
+      "make": "Audi",
+      "model": "A5",
+      "model trim": "II (F5) Рестайлинг",
+      "techincal options" : {
+          "engine": {
+            "fuel" : "Benzin",
+            "power" : "140",
+            "capacity" : "150"
+          },
+          "transmission" : "AT",
+          "drive" : "FWD"
+      },
+      "other options" : {
+          "comfort" : [
+            "Круиз-контроль",
+            "Система автоматической парковки",
+            "Активный усилитель руля",
+            "Парктроник задний", 
+            "Электропривод крышки / багажника"
+          ],
+          "interior" : [
+            "Подогрев руля",
+            "Камера кругового обзора"
+          ],
+          "multimedia": [
+            "Навигационная система",
+            "Премиальная аудиосистема"
+          ]
+      },
+      "colors" : {
+        "interior" : "Blue",
+        "exterior" : "White"
+      },
+      "images" : [
+        "/media/images/flat/audi/a5_1.png",
+        "/media/images/flat/audi/a5_2.png",
+        "/media/images/flat/audi/a5_3.png"
+      ],
+      "price" : "3000000"
+    }
+  ]
+}
