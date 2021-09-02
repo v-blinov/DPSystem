@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ApiDPSystem.Entities;
+using ApiDPSystem.Exceptions;
 using ApiDPSystem.Interfaces;
 
 namespace ApiDPSystem.Models.Parser
@@ -18,7 +19,15 @@ namespace ApiDPSystem.Models.Parser
 
             var instance = Activator.CreateInstance(deserializedType) as ICsvRoot;
 
-            var deserializedModels = instance.Deserialize(fileContent);
+            IRoot deserializedModels;
+            try
+            {
+                deserializedModels = instance.Deserialize(fileContent);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidFileException("Невозможно обработать содержимое файла", ex);
+            }
 
             var dbCars = deserializedModels.ConvertToActualDbModel(dealer);
 

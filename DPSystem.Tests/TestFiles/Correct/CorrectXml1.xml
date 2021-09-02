@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+  <version>1</version>
+  <cars>
+    <id>3VV4B7AX3KM037206</id>
+    <year>2018</year>
+    <make>Volkswagen</make>
+    <model>Touareg</model>
+    <colors>
+      <interior>Черный</interior>
+      <exterior>Тёмно-красный металлик</exterior>
+    </colors>
+    <images>https://cdn.cloud.kodixauto.ru/upload/stable_cdn/images/volkswagen/touareg/touareg_cr/touareg_cr_respect/suv/L5L5/resize/480x0/1.png</images>
+    <images>https://cdn.cloud.kodixauto.ru/upload/stable_cdn/images/volkswagen/touareg/touareg_cr/touareg_cr_respect/suv/L5L5/resize/480x0/2.png</images>
+    <images>https://cdn.cloud.kodixauto.ru/upload/stable_cdn/images/volkswagen/touareg/touareg_cr/touareg_cr_respect/suv/L5L5/resize/480x0/3.png</images>
+    <images>https://cdn.cloud.kodixauto.ru/upload/stable_cdn/images/volkswagen/touareg/touareg_cr/touareg_cr_respect/suv/L5L5/resize/480x0/4.png</images>
+    <images>https://cdn.cloud.kodixauto.ru/upload/stable_cdn/images/volkswagen/touareg/touareg_cr/touareg_cr_respect/suv/L5L5/resize/480x0/5.png</images>
+    <images>https://cdn.cloud.kodixauto.ru/upload/stable_cdn/images/volkswagen/touareg/touareg_cr/touareg_cr_respect/suv/L5L5/resize/480x0/6.png</images>
+    <price>2670000</price>
+    <model_trim> TSI Respect</model_trim>
+    <techincal_options>
+      <engine>
+        <fuel>Benzin</fuel>
+        <power>249</power>
+        <capacity>2,5</capacity>
+      </engine>
+      <transmission>7AT</transmission>
+      <drive>4WD</drive>
+    </techincal_options>
+    <other_options>
+      <exterior>Легкосплавные колесные диски 8J x 18</exterior>
+      <exterior>Шины 235/65 R18</exterior>
+      <exterior>Колесные болты</exterior>
+      <exterior>Светодиодные фары ближнего и дальнего света, дневные ходовые огни</exterior>
+      <exterior>Динамический корректор фар</exterior>
+      <exterior>Автоматическое управление светом, дневные ходовые огни</exterior>
+      <interior>Обогреваемые форсунки омывателя лобового стекла</interior>
+      <interior>Кожаный мультируль с обогревом</interior>
+      <interior>Поясничная опора с пневматическими элементами спереди</interior>
+      <interior>Центральный подлокотник спереди</interior>
+      <interior>Декоративные вставки Cortina Silver на передней панели и в отделке дверей</interior>
+      <safety>ЭРА Глонасс</safety>
+      <safety>Крепления Isofix для установки 2 детских кресел сзади, также для кресел i-Size</safety>
+      <safety>Передние подголовники с механизмом травмобезопасного демпфирования</safety>
+      <safety>3-точечные ремни безопасности спереди с регулировкой высоты и преднатяжителями</safety>
+      <safety>3-точечные ремни безопасности сзади</safety>
+    </other_options>
+  </cars>
+</root>

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "cars": [
+    {
+      "id": "CYCWUJQ53W52B74TI",
+      "year": "2019"
+      "make": "Mercedes-Benz",
+      "model": "180 IV",
+      "model trim": "W205 Рестайлинг",
+      "techincal options" : {}
+    }
+  ]
+}

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ApiDPSystem.Entities;
+using ApiDPSystem.Exceptions;
 using ApiDPSystem.Interfaces;
 using YamlDotNet.Serialization;
 
@@ -15,7 +17,16 @@ namespace ApiDPSystem.Models.Parser
             var deserializedType = Selector.GetResultType(ConvertableFileExtension, version.Value);
 
             var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
-            var deserializedModels = deserializer.Deserialize(fileContent, deserializedType) as IRoot;
+
+            IRoot deserializedModels;
+            try
+            {
+                deserializedModels = deserializer.Deserialize(fileContent, deserializedType) as IRoot;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidFileException("Невозможно обработать содержимое файла", ex);
+            }
 
             var dbCars = deserializedModels.ConvertToActualDbModel(dealer);
 
@@ -27,8 +38,14 @@ namespace ApiDPSystem.Models.Parser
             var deserializer = new DeserializerBuilder()
                                .IgnoreUnmatchedProperties()
                                .Build();
-
-            return deserializer.Deserialize<Version>(fileContent);
+            try
+            {
+                return deserializer.Deserialize<Version>(fileContent);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidFileException("Невозможно обработать содержимое файла", ex);
+            }
         }
     }
 }
