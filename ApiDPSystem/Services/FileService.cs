@@ -1,15 +1,16 @@
 ﻿using ApiDPSystem.Models.Parser;
+using ApiDPSystem.Services.Interface;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace ApiDPSystem.Services
 {
-    public class FileService
+    public class FileService : IFileService
     {
-        private readonly DataCheckerService _dataChecker;
+        private readonly IDataCheckerService _dataChecker;
 
-        public FileService(DataCheckerService dataCheckerService)
+        public FileService(IDataCheckerService dataCheckerService)
         {
             _dataChecker = dataCheckerService;
         }

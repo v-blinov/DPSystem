@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Xml;
 using ApiDPSystem.Exceptions;
 using ApiDPSystem.Filters;
 using ApiDPSystem.Models;
 using ApiDPSystem.Services;
+using ApiDPSystem.Services.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Serilog;
 
 namespace ApiDPSystem.Controllers
@@ -15,9 +18,9 @@ namespace ApiDPSystem.Controllers
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class FileController : Controller
     {
-        private readonly FileService _fileService;
+        private readonly IFileService _fileService;
 
-        public FileController(FileService fileService)
+        public FileController(IFileService fileService)
         {
             _fileService = fileService;
         }
@@ -36,13 +39,24 @@ namespace ApiDPSystem.Controllers
                     StatusCode = StatusCodes.Status200OK
                 };
             }
-            catch (InvalidFileVersionException ex) {
+            catch (InvalidFileVersionException ex)
+            {
                 Log.Error(ex, "");
                 return new ApiResponse<AuthenticationResult>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message ?? "Неподдерживаемая версия файла данного формата"
+                };
+            }
+            catch (InvalidFileException ex)
+            {
+                Log.Error(ex, "");
+                return new ApiResponse<AuthenticationResult>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Некорректное содержимое файла"
                 };
             }
             catch (Exception ex)

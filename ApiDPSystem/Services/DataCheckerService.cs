@@ -1,11 +1,12 @@
 ﻿using ApiDPSystem.Entities;
 using ApiDPSystem.Repository;
+using ApiDPSystem.Services.Interface;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ApiDPSystem.Services
 {
-    public class DataCheckerService
+    public class DataCheckerService : IDataCheckerService
     {
         private readonly CarRepository _carRepository;
 

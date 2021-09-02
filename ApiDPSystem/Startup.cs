@@ -5,6 +5,7 @@ using ApiDPSystem.Data;
 using ApiDPSystem.Models;
 using ApiDPSystem.Repository;
 using ApiDPSystem.Services;
+using ApiDPSystem.Services.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -173,8 +174,8 @@ namespace ApiDPSystem
             services.AddScoped<EmailService>();
             services.AddScoped<RoleService>();
             services.AddScoped<UserService>();
-            services.AddScoped<FileService>();
-            services.AddScoped<DataCheckerService>();
+            services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IDataCheckerService, DataCheckerService>();
 
             services.AddScoped<AccountRepository>();
             services.AddScoped<CarRepository>();
