@@ -5,10 +5,11 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ApiDPSystem.Repository.Interfaces;
 
 namespace ApiDPSystem.Repository
 {
-    public class CarRepository
+    public class CarRepository : ICarRepository
     {
         private readonly Context _context;
 
