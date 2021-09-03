@@ -1,10 +1,7 @@
 using ApiDPSystem.Entities;
 using ApiDPSystem.Exceptions;
 using ApiDPSystem.Models.Parser;
-using AutoFixture;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
-using Moq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,17 +11,7 @@ namespace DPSystem.Tests
 {
     public class FileTests
     {
-        private readonly Fixture _fixture;
-        const string testJson =
-                " {" +
-                "   \"menuitem\": [" +
-                "      {\"value\": \"New\", \"onclick\": \"CreateNewDoc()\"}," +
-                "      {\"value\": \"Open\", \"onclick\": \"OpenDoc()\"}," +
-                "      {\"value\": \"Close\", \"onclick\": \"CloseDoc()\"}" +
-                "   ]" +
-                "}";
-
-        private const string defaultDealer = "defaultDealer";
+        private const string DefaultDealer = "defaultDealer";
 
 
         [InlineData(".json", typeof(JsonParser))]
@@ -51,13 +38,14 @@ namespace DPSystem.Tests
             var sut = new JsonParser();
 
             // Act
-            var parcingResult = sut.Parse(fileContent, fileName, defaultDealer);
+            var parsingResult = sut.Parse(fileContent, fileName, DefaultDealer);
 
             // Assert
-            parcingResult.Should().NotBeEmpty();
-            parcingResult.Should().HaveCount(resultCarsCount);
-            parcingResult.Should().BeOfType<List<CarActual>>();
+            parsingResult.Should().NotBeEmpty();
+            parsingResult.Should().HaveCount(resultCarsCount);
+            parsingResult.Should().BeOfType<List<CarActual>>();
         }
+        
 
         [InlineData("Correct/CorrectCsv1_v1.csv", 1)]
         [InlineData("Correct/CorrectCsv2_v2.csv", 2)]
@@ -69,13 +57,14 @@ namespace DPSystem.Tests
             var sut = new CsvParser();
 
             // Act
-            var parcingResult = sut.Parse(fileContent, fileName, defaultDealer);
+            var parsingResult = sut.Parse(fileContent, fileName, DefaultDealer);
 
             // Assert
-            parcingResult.Should().NotBeEmpty();
-            parcingResult.Should().HaveCount(resultCarsCount);
-            parcingResult.Should().BeOfType<List<CarActual>>();
+            parsingResult.Should().NotBeEmpty();
+            parsingResult.Should().HaveCount(resultCarsCount);
+            parsingResult.Should().BeOfType<List<CarActual>>();
         }
+
 
         [InlineData("Correct/CorrectYaml1.yaml", 1)]
         [Theory]
@@ -86,13 +75,14 @@ namespace DPSystem.Tests
             var sut = new YamlParser();
 
             // Act
-            var parcingResult = sut.Parse(fileContent, fileName, defaultDealer);
+            var parsingResult = sut.Parse(fileContent, fileName, DefaultDealer);
 
             // Assert
-            parcingResult.Should().NotBeEmpty();
-            parcingResult.Should().HaveCount(resultCarsCount);
-            parcingResult.Should().BeOfType<List<CarActual>>();
+            parsingResult.Should().NotBeEmpty();
+            parsingResult.Should().HaveCount(resultCarsCount);
+            parsingResult.Should().BeOfType<List<CarActual>>();
         }
+
 
         [InlineData("Correct/CorrectXml1.xml", 1)]
         [Theory]
@@ -103,12 +93,12 @@ namespace DPSystem.Tests
             var sut = new XmlParser();
 
             // Act
-            var parcingResult = sut.Parse(fileContent, fileName, defaultDealer);
+            var parsingResult = sut.Parse(fileContent, fileName, DefaultDealer);
 
             // Assert
-            parcingResult.Should().NotBeEmpty();
-            parcingResult.Should().HaveCount(resultCarsCount);
-            parcingResult.Should().BeOfType<List<CarActual>>();
+            parsingResult.Should().NotBeEmpty();
+            parsingResult.Should().HaveCount(resultCarsCount);
+            parsingResult.Should().BeOfType<List<CarActual>>();
         }
 
 
@@ -122,7 +112,7 @@ namespace DPSystem.Tests
             var sut = new JsonParser();
 
             // Assert
-            Assert.Throws<InvalidFileException>(() => sut.Parse(fileContent, fileName, defaultDealer));
+            Assert.Throws<InvalidFileException>(() => sut.Parse(fileContent, fileName, DefaultDealer));
         }
 
         [Fact]
@@ -134,7 +124,7 @@ namespace DPSystem.Tests
             var sut = new XmlParser();
 
             // Assert
-            Assert.Throws<InvalidFileException>(() => sut.Parse(fileContent, fileName, defaultDealer));
+            Assert.Throws<InvalidFileException>(() => sut.Parse(fileContent, fileName, DefaultDealer));
         }
 
         [Fact]
@@ -143,10 +133,10 @@ namespace DPSystem.Tests
             // Arrange
             var fileName = "Invalid/InvalidCsv1_v1.csv";
             var fileContent = ReadFileAsync(GetBasePath() + fileName);
-            var sut = new XmlParser();
+            var sut = new CsvParser();
 
             // Assert
-            Assert.Throws<InvalidFileException>(() => sut.Parse(fileContent, fileName, defaultDealer));
+            Assert.Throws<InvalidFileException>(() => sut.Parse(fileContent, fileName, DefaultDealer));
         }
 
         [Fact]
@@ -155,15 +145,11 @@ namespace DPSystem.Tests
             // Arrange
             var fileName = "Invalid/InvalidYaml1.yaml";
             var fileContent = ReadFileAsync(GetBasePath() + fileName);
-            var sut = new XmlParser();
+            var sut = new YamlParser();
 
             // Assert
-            Assert.Throws<InvalidFileException>(() => sut.Parse(fileContent, fileName, defaultDealer));
+            Assert.Throws<InvalidFileException>(() => sut.Parse(fileContent, fileName, DefaultDealer));
         }
-
-
-
-
 
 
         // Разобраться с проверкой слишком больших файлов
