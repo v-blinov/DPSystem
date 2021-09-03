@@ -1,9 +1,8 @@
 ﻿using ApiDPSystem.Entities;
-using ApiDPSystem.Repository;
+using ApiDPSystem.Repository.Interfaces;
 using ApiDPSystem.Services.Interface;
 using System.Collections.Generic;
 using System.Linq;
-using ApiDPSystem.Repository.Interfaces;
 
 namespace ApiDPSystem.Services
 {
@@ -16,11 +15,11 @@ namespace ApiDPSystem.Services
             _carRepository = carRepository;
         }
 
-        public void TransferSoldCars(List<CarActual> newListCars, string dealerName)
+        public void TransferSoldCars(List<CarActual> newCars, string dealerName)
         {
             var currentCarsVinCodes = _carRepository.GetActualCarsVinCodesForDealer(dealerName);
 
-            var newCarsVinCodes = newListCars.Select(p => p.VinCode).ToList();
+            var newCarsVinCodes = newCars.Select(p => p.VinCode).ToList();
 
             var soldCarVinCodes = currentCarsVinCodes
                                   .Except(newCarsVinCodes)
