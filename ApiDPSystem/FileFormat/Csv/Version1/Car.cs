@@ -45,6 +45,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
             configurationFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
             configurationFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
             configurationFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Multimedia, nameof(OtherOptions.Multimedia)));
+            configurationFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
 
             var carImages = new List<CarImage>();
             foreach (var image in Images)

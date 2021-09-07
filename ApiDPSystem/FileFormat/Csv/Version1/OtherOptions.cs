@@ -9,5 +9,6 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
         public List<string> Interior { get; set; }
 
         public List<string> Multimedia { get; set; }
+        public List<string> Safety { get; set; }
     }
 }

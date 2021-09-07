@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+  <version>1</version>
+  <cars>
+    <id>ABCDEFGH</id>
+    <year>2021</year>
+    <make>Test</make>
+    <model>TestModel</model>
+    <colors>
+      <interior>White</interior>
+      <exterior>Marina blue</exterior>
+    </colors>
+    <images>/test/url.png</images>
+    <price>1000000</price>
+    <model_trim>ABC</model_trim>
+    <techincal_options>
+      <engine>
+        <fuel>Benzin</fuel>
+        <power>500</power>
+        <capacity>500</capacity>
+      </engine>
+      <transmission>MT</transmission>
+      <drive>AWD</drive>
+    </techincal_options>
+    <other_options>
+      <safety>Система контроля слепых зон</safety>
+    </other_options>
+  </cars>
+</root>

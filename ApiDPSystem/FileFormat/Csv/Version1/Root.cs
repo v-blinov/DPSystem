@@ -57,6 +57,9 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
                 var exteriorFieldNames = headers.Where(p => p.StartsWith("other options/exterior/")).ToList();
                 car.OtherOptions.Exterior = exteriorFieldNames.Select(name => csv.GetField(name)).ToList();
 
+                var safetyFieldNames = headers.Where(p => p.StartsWith("other options/safety/")).ToList();
+                car.OtherOptions.Safety = safetyFieldNames.Select(name => csv.GetField(name)).ToList();
+
                 root.Cars.Add(car);
             }
 
