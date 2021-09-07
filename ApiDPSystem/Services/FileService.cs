@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ApiDPSystem.Services
 {
-    public class FileService : IFileService
+    public class FileService
     {
-        private readonly IDataCheckerService _dataChecker;
+        private readonly DataCheckerService _dataChecker;
 
-        public FileService(IDataCheckerService dataCheckerService)
+        public FileService(DataCheckerService dataCheckerService)
         {
             _dataChecker = dataCheckerService;
         }

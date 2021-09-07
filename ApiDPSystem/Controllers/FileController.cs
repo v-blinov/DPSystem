@@ -18,9 +18,9 @@ namespace ApiDPSystem.Controllers
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class FileController : Controller
     {
-        private readonly IFileService _fileService;
+        private readonly FileService _fileService;
 
-        public FileController(IFileService fileService)
+        public FileController(FileService fileService)
         {
             _fileService = fileService;
         }
