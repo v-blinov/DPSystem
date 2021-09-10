@@ -12,8 +12,6 @@ namespace ApiDPSystem.Entities
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
-                return false;
             if (obj is not Producer producer)
                 return false;
 
@@ -22,5 +20,11 @@ namespace ApiDPSystem.Entities
 
         public override int GetHashCode() =>
             Name.GetHashCode() * 22;
+
+        public Producer GetValuesCopy() =>
+             new()
+             {
+                 Name = Name
+             };
     }
 }

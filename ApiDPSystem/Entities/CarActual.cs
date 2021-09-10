@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace ApiDPSystem.Entities
 {
@@ -8,23 +9,27 @@ namespace ApiDPSystem.Entities
     {
         public ICollection<CarImage> CarImages { get; set; }
 
-        public void Copy(CarActual model)
+        public CarActual GetValuesCopy() =>
+            new ()
+            {
+                VinCode = VinCode,
+                Price = Price,
+                Dealer = Dealer,
+                Configuration = Configuration.GetValuesCopy(),
+                ExteriorColor = ExteriorColor.GetValuesCopy(),
+                InteriorColor = InteriorColor.GetValuesCopy(),
+                CarImages = CloneCarImagesList(),
+            };
+
+        private List<CarImage> CloneCarImagesList()
         {
-            VinCode = model.VinCode;
-            CarImages = model.CarImages;
-            Price = model.Price;
+            var ci_clone = new List<CarImage>();
 
-            if (model.Configuration != null) Configuration = model.Configuration;
-            else ConfigurationId = model.ConfigurationId;
+            CarImages
+                .ToList()
+                .ForEach(p => ci_clone.Add(p.GetValuesCopy()));
 
-            if (model.Dealer != null) Dealer = model.Dealer;
-            else DealerId = model.DealerId;
-
-            if (model.ExteriorColor != null) ExteriorColor = model.ExteriorColor;
-            else ExteriorColorId = model.ExteriorColorId;
-
-            if (model.InteriorColor != null) InteriorColor = model.InteriorColor;
-            else InteriorColorId = model.InteriorColorId;
+            return ci_clone;
         }
     }
 }

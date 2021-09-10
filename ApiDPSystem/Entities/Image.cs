@@ -24,5 +24,10 @@ namespace ApiDPSystem.Entities
 
         public override int GetHashCode() =>
             Url.GetHashCode() * 22;
+        public Image GetValuesCopy() =>
+             new()
+             {
+                 Url = Url
+             };
     }
 }

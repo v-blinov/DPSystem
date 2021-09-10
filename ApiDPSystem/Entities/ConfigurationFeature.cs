@@ -12,8 +12,6 @@ namespace ApiDPSystem.Entities
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
-                return false;
             if (obj is not ConfigurationFeature configurationFeature)
                 return false;
 
@@ -23,5 +21,11 @@ namespace ApiDPSystem.Entities
 
         public override int GetHashCode() =>
             Configuration.GetHashCode() * 31 + Feature.GetHashCode() * 17;
+
+        public ConfigurationFeature GetValuesCopy() =>
+            new()
+            {
+                Feature = Feature.GetValuesCopy()
+            };
     }
 }

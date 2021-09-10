@@ -16,8 +16,6 @@ namespace ApiDPSystem.Entities
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
-                return false;
             if (obj is not Color color)
                 return false;
 
@@ -28,5 +26,12 @@ namespace ApiDPSystem.Entities
         public override int GetHashCode() =>
             Name.GetHashCode() * 11
             + HexCode.GetHashCode() * 19;
+
+        public Color GetValuesCopy() =>
+             new ()
+             {
+                 Name = Name,
+                 HexCode = HexCode
+             };
     }
 }

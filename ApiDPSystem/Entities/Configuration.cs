@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace ApiDPSystem.Entities
 {
@@ -30,8 +31,6 @@ namespace ApiDPSystem.Entities
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
-                return false;
             if (obj is not Configuration conf)
                 return false;
 
@@ -50,5 +49,29 @@ namespace ApiDPSystem.Entities
             + Transmission.GetHashCode() * 7
             + Drive.GetHashCode() * 17
             + Year.GetHashCode();
+
+        public Configuration GetValuesCopy() =>
+            new()
+            {
+                Year = Year,
+                Model = Model,
+                ModelTrim = ModelTrim,
+                Transmission = Transmission,
+                Drive = Drive,
+                Producer = Producer.GetValuesCopy(),
+                Engine = Engine.GetValuesCopy(),
+                ConfigurationFeatures = CloneConfigurationFeaturesList()
+            };
+
+        private List<ConfigurationFeature> CloneConfigurationFeaturesList()
+        {
+            var clone_cf = new List<ConfigurationFeature>();
+
+            ConfigurationFeatures
+                .ToList()
+                .ForEach(p => clone_cf.Add(p.GetValuesCopy()));
+
+            return clone_cf;
+        }
     }
 }

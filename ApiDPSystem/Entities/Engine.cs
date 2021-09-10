@@ -14,8 +14,6 @@ namespace ApiDPSystem.Entities
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
-                return false;
             if (obj is not Engine engine)
                 return false;
 
@@ -26,5 +24,13 @@ namespace ApiDPSystem.Entities
 
         public override int GetHashCode() =>
             Fuel.GetHashCode() * 22 + Capacity.GetHashCode() * 13 + Power.GetHashCode() * 7;
+
+        public Engine GetValuesCopy() =>
+             new()
+             {
+                 Fuel = Fuel,
+                 Power = Power,
+                 Capacity = Capacity
+             };
     }
 }

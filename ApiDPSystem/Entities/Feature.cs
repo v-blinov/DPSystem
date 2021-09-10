@@ -13,8 +13,6 @@ namespace ApiDPSystem.Entities
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
-                return false;
             if (obj is not Feature feature)
                 return false;
 
@@ -23,5 +21,12 @@ namespace ApiDPSystem.Entities
 
         public override int GetHashCode() =>
             Type.GetHashCode() * 22 + Description.GetHashCode() * 13;
+
+        public Feature GetValuesCopy() =>
+            new()
+            {
+                Description = Description,
+                Type = Type
+            };
     }
 }

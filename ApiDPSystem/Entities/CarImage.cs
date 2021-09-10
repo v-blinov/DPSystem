@@ -9,5 +9,11 @@ namespace ApiDPSystem.Entities
 
         public CarActual CarActual { get; set; }
         public Image Image { get; set; }
+
+        public CarImage GetValuesCopy() =>
+             new()
+             {
+                 Image = Image.GetValuesCopy()
+             };
     }
 }
