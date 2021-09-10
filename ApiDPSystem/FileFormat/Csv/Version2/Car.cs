@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using ApiDPSystem.Entities;
 using ApiDPSystem.Interfaces;
 using CsvHelper.Configuration.Attributes;
@@ -40,16 +41,16 @@ namespace ApiDPSystem.FileFormat.Csv.Version2
         public string Price { get; set; }
 
 
-        public CarActual ConvertToCarActualDbModel(string dealerName)
+        public Entities.Car ConvertToCarActualDbModel(string dealerName)
         {
-            var configurationFeatures = new List<ConfigurationFeature>();
+            var carFeatures = new List<CarFeature>();
 
-            configurationFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
-            configurationFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
+            carFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
+            carFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
 
-            var carImages = new List<CarImage>();
-            foreach (var image in Images)
-                carImages.Add(new CarImage { Image = new Image { Url = image } });
+            var carImages = Images
+                            .Select(image => new CarImage {Image = new Image {Url = image}})
+                            .ToList();
 
             var dbConfiguration = new Configuration
             {
@@ -64,11 +65,10 @@ namespace ApiDPSystem.FileFormat.Csv.Version2
                     Power = int.TryParse(TechnicalOptions.Engine.Power, out var power) ? power : null,
                     Fuel = TechnicalOptions.Engine.Fuel,
                     Capacity = double.TryParse(TechnicalOptions.Engine.Capacity, out var capacity) ? capacity : null
-                },
-                ConfigurationFeatures = configurationFeatures
+                }
             };
 
-            var dbCarActual = new CarActual
+            var dbCar = new Entities.Car()
             {
                 VinCode = Id,
                 Price = int.TryParse(Price, out var price) ? price : null,
@@ -76,10 +76,10 @@ namespace ApiDPSystem.FileFormat.Csv.Version2
                 CarImages = carImages,
                 InteriorColor = new Color { Name = Colors.Interior },
                 ExteriorColor = new Color { Name = Colors.Exterior },
-                Configuration = dbConfiguration
+                Configuration = dbConfiguration,
+                CarFeatures = carFeatures,
             };
-
-            return dbCarActual;
+            return dbCar;
         }
     }
 }
