@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ApiDPSystem.Entities
 {
@@ -22,5 +23,7 @@ namespace ApiDPSystem.Entities
         public Configuration Configuration { get; set; }
         public Color ExteriorColor { get; set; }
         public Color InteriorColor { get; set; }
+        public IEnumerable<CarFeature> CarFeatures { get; set; }
+        public IEnumerable<CarImage> CarImages { get; set; }
     }
 }
