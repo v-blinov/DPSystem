@@ -13,30 +13,29 @@ namespace DPSystem.Tests
     public class ParserTests
     {
         private const string DefaultDealer = "defaultDealer";
-        private readonly List<CarActual> _expectedContentResult = new ()
+        private readonly List<Car> _expectedContentResult = new()
         {
             new()
             {
                 VinCode = "ABCDEFGH",
-                Dealer = new Dealer {Name = DefaultDealer},
+                Dealer = new Dealer { Name = DefaultDealer },
                 Configuration = new Configuration
                 {
                     Year = 2021,
-                    Producer = new Producer {Name = "Test"},
+                    Producer = new Producer { Name = "Test" },
                     Model = "TestModel",
                     ModelTrim = "ABC",
-                    Engine = new Engine {Fuel = "Benzin", Power = 500, Capacity = 500},
+                    Engine = new Engine { Fuel = "Benzin", Power = 500, Capacity = 500 },
                     Transmission = "MT",
                     Drive = "AWD",
-                    ConfigurationFeatures = new List<ConfigurationFeature>
-                    {
-                        new ConfigurationFeature
-                            {Feature = new Feature {Type = "Safety", Description = "Система контроля слепых зон"}}
-                    }
                 },
-                ExteriorColor = new Color {Name = "Marina blue"},
-                InteriorColor = new Color {Name = "White"},
-                CarImages = new List<CarImage> {new CarImage {Image = new Image {Url = "/test/url.png"}}},
+                CarFeatures = new List<CarFeature>
+                {
+                    new CarFeature() {Feature = new Feature {Type = "Safety", Description = "Система контроля слепых зон"}}
+                },
+                ExteriorColor = new Color { Name = "Marina blue" },
+                InteriorColor = new Color { Name = "White" },
+                CarImages = new List<CarImage> { new CarImage { Image = new Image { Url = "/test/url.png" } } },
                 Price = 1000000
             }
         };
@@ -55,7 +54,7 @@ namespace DPSystem.Tests
         }
 
 
-        
+
 
         [InlineData("Correct/CorrectJson2.json", 5)]
         [InlineData("Correct/CorrectJson3.json", 2)]
@@ -71,9 +70,9 @@ namespace DPSystem.Tests
 
             // Assert
             parsingResult.Should().HaveCount(resultCarsCount);
-            parsingResult.Should().BeOfType<List<CarActual>>();
+            parsingResult.Should().BeOfType<List<Car>>();
         }
-        
+
         [InlineData("Correct/CorrectCsv1_v1.csv", 1)]
         [InlineData("Correct/CorrectCsv2_v2.csv", 2)]
         [Theory]
@@ -88,7 +87,7 @@ namespace DPSystem.Tests
 
             // Assert
             parsingResult.Should().HaveCount(resultCarsCount);
-            parsingResult.Should().BeOfType<List<CarActual>>();
+            parsingResult.Should().BeOfType<List<Car>>();
         }
 
         [InlineData("Correct/CorrectYaml1.yaml", 1)]
@@ -104,7 +103,7 @@ namespace DPSystem.Tests
 
             // Assert
             parsingResult.Should().HaveCount(resultCarsCount);
-            parsingResult.Should().BeOfType<List<CarActual>>();
+            parsingResult.Should().BeOfType<List<Car>>();
         }
 
         [InlineData("Correct/CorrectXml1.xml", 1)]
@@ -120,7 +119,7 @@ namespace DPSystem.Tests
 
             // Assert
             parsingResult.Should().HaveCount(resultCarsCount);
-            parsingResult.Should().BeOfType<List<CarActual>>();
+            parsingResult.Should().BeOfType<List<Car>>();
         }
 
 
@@ -133,12 +132,12 @@ namespace DPSystem.Tests
             const string fileName = "Correct/DefaultJson.json";
             var fileContent = ReadFile((GetBasePath() + fileName));
             var sut = new JsonParser();
-            
+
             // Act
             var parsingResult = sut.Parse(fileContent, fileName, DefaultDealer);
-            
+
             //Assert
-            parsingResult.Should().BeOfType<List<CarActual>>();
+            parsingResult.Should().BeOfType<List<Car>>();
             IsModelsEqual(_expectedContentResult, parsingResult).Should().BeTrue();
         }
 
@@ -154,7 +153,7 @@ namespace DPSystem.Tests
             var parsingResult = sut.Parse(fileContent, fileName, DefaultDealer);
 
             //Assert
-            parsingResult.Should().BeOfType<List<CarActual>>();
+            parsingResult.Should().BeOfType<List<Car>>();
             IsModelsEqual(_expectedContentResult, parsingResult).Should().BeTrue();
         }
 
@@ -170,7 +169,7 @@ namespace DPSystem.Tests
             var parsingResult = sut.Parse(fileContent, fileName, DefaultDealer);
 
             //Assert
-            parsingResult.Should().BeOfType<List<CarActual>>();
+            parsingResult.Should().BeOfType<List<Car>>();
             IsModelsEqual(_expectedContentResult, parsingResult).Should().BeTrue();
         }
 
@@ -186,10 +185,10 @@ namespace DPSystem.Tests
             var parsingResult = sut.Parse(fileContent, fileName, DefaultDealer);
 
             //Assert
-            parsingResult.Should().BeOfType<List<CarActual>>();
+            parsingResult.Should().BeOfType<List<Car>>();
             IsModelsEqual(_expectedContentResult, parsingResult).Should().BeTrue();
         }
-        
+
 
 
 
@@ -216,7 +215,7 @@ namespace DPSystem.Tests
             // Assert
             Assert.Throws<InvalidFileException>(() => sut.Parse(fileContent, fileName, DefaultDealer));
         }
-        
+
         [Fact]
         public void Try_parse_invalid_yaml_file()
         {
@@ -230,8 +229,8 @@ namespace DPSystem.Tests
         }
 
 
-        
-        
+
+
         private static string GetBasePath()
         {
             return @"..\..\..\TestFiles\";
@@ -241,7 +240,7 @@ namespace DPSystem.Tests
             using var reader = new StreamReader(path);
             return reader.ReadToEnd();
         }
-        private static bool IsModelsEqual(List<CarActual> expectedCarActuals, List<CarActual> testCarActuals)
+        private static bool IsModelsEqual(List<Car> expectedCarActuals, List<Car> testCarActuals)
         {
             for (var i = 0; i < expectedCarActuals.Count; i++)
             {
@@ -250,12 +249,11 @@ namespace DPSystem.Tests
 
                 if (expectedCar.VinCode != testCar.VinCode) return false;
                 if (!expectedCar.Configuration.Equals(testCar.Configuration)) return false;
-                
-                if (expectedCar.Configuration.ConfigurationFeatures.Count !=
-                    testCar.Configuration.ConfigurationFeatures.Count) return false;
 
-                var expectedFeatures = expectedCar.Configuration.ConfigurationFeatures.ToList();
-                var testResultFeatures = testCar.Configuration.ConfigurationFeatures.ToList();
+                if (expectedCar.CarFeatures.Count() != testCar.CarFeatures.Count()) return false;
+
+                var expectedFeatures = expectedCar.CarFeatures.ToList();
+                var testResultFeatures = testCar.CarFeatures.ToList();
 
                 for (var j = 0; j < expectedFeatures.Count; j++)
                 {
@@ -266,7 +264,7 @@ namespace DPSystem.Tests
 
                 if (!expectedCar.ExteriorColor.Equals(testCar.ExteriorColor)) return false;
                 if (!expectedCar.InteriorColor.Equals(testCar.InteriorColor)) return false;
-                if (expectedCar.CarImages.Count != testCar.CarImages.Count) return false;
+                if (expectedCar.CarImages.Count() != testCar.CarImages.Count()) return false;
 
                 var expectedImages = expectedCar.CarImages.ToList();
                 var testResultImages = testCar.CarImages.ToList();
