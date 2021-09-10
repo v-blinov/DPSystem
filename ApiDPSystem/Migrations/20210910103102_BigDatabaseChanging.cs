@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ApiDPSystem.Migrations
 {
-    public partial class CreateNewStructureForDB : Migration
+    public partial class BigDatabaseChanging : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -136,10 +136,11 @@ namespace ApiDPSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CarEntities",
+                name: "Cars",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Version = table.Column<int>(type: "int", nullable: false),
                     VinCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     IsSold = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
@@ -150,27 +151,27 @@ namespace ApiDPSystem.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CarEntities", x => x.Id);
+                    table.PrimaryKey("PK_Cars", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CarEntities_Colors_ExteriorColorId",
+                        name: "FK_Cars_Colors_ExteriorColorId",
                         column: x => x.ExteriorColorId,
                         principalTable: "Colors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CarEntities_Colors_InteriorColorId",
+                        name: "FK_Cars_Colors_InteriorColorId",
                         column: x => x.InteriorColorId,
                         principalTable: "Colors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_CarEntities_Configurations_ConfigurationId",
+                        name: "FK_Cars_Configurations_ConfigurationId",
                         column: x => x.ConfigurationId,
                         principalTable: "Configurations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CarEntities_Dealers_DealerId",
+                        name: "FK_Cars_Dealers_DealerId",
                         column: x => x.DealerId,
                         principalTable: "Dealers",
                         principalColumn: "Id",
@@ -178,23 +179,23 @@ namespace ApiDPSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ConfigurationFeatures",
+                name: "CarFeatures",
                 columns: table => new
                 {
-                    ConfigurationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FeatureId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ConfigurationFeatures", x => new { x.ConfigurationId, x.FeatureId });
+                    table.PrimaryKey("PK_CarFeatures", x => new { x.CarId, x.FeatureId });
                     table.ForeignKey(
-                        name: "FK_ConfigurationFeatures_Configurations_ConfigurationId",
-                        column: x => x.ConfigurationId,
-                        principalTable: "Configurations",
+                        name: "FK_CarFeatures_Cars_CarId",
+                        column: x => x.CarId,
+                        principalTable: "Cars",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ConfigurationFeatures_Features_FeatureId",
+                        name: "FK_CarFeatures_Features_FeatureId",
                         column: x => x.FeatureId,
                         principalTable: "Features",
                         principalColumn: "Id",
@@ -205,16 +206,16 @@ namespace ApiDPSystem.Migrations
                 name: "CarImages",
                 columns: table => new
                 {
-                    CarEntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ImageId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CarImages", x => new { x.CarEntityId, x.ImageId });
+                    table.PrimaryKey("PK_CarImages", x => new { x.CarId, x.ImageId });
                     table.ForeignKey(
-                        name: "FK_CarImages_CarEntities_CarEntityId",
-                        column: x => x.CarEntityId,
-                        principalTable: "CarEntities",
+                        name: "FK_CarImages_Cars_CarId",
+                        column: x => x.CarId,
+                        principalTable: "Cars",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -226,24 +227,9 @@ namespace ApiDPSystem.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CarEntities_ConfigurationId",
-                table: "CarEntities",
-                column: "ConfigurationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CarEntities_DealerId",
-                table: "CarEntities",
-                column: "DealerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CarEntities_ExteriorColorId",
-                table: "CarEntities",
-                column: "ExteriorColorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CarEntities_InteriorColorId",
-                table: "CarEntities",
-                column: "InteriorColorId");
+                name: "IX_CarFeatures_FeatureId",
+                table: "CarFeatures",
+                column: "FeatureId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CarImages_ImageId",
@@ -251,9 +237,35 @@ namespace ApiDPSystem.Migrations
                 column: "ImageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConfigurationFeatures_FeatureId",
-                table: "ConfigurationFeatures",
-                column: "FeatureId");
+                name: "IX_Cars_ConfigurationId",
+                table: "Cars",
+                column: "ConfigurationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cars_DealerId",
+                table: "Cars",
+                column: "DealerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cars_ExteriorColorId",
+                table: "Cars",
+                column: "ExteriorColorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cars_InteriorColorId",
+                table: "Cars",
+                column: "InteriorColorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cars_VinCode",
+                table: "Cars",
+                column: "VinCode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cars_VinCode_Version",
+                table: "Cars",
+                columns: new[] { "VinCode", "Version" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Configurations_EngineId",
@@ -264,27 +276,32 @@ namespace ApiDPSystem.Migrations
                 name: "IX_Configurations_ProducerId",
                 table: "Configurations",
                 column: "ProducerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Features_Type",
+                table: "Features",
+                column: "Type");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CarImages");
+                name: "CarFeatures");
 
             migrationBuilder.DropTable(
-                name: "ConfigurationFeatures");
+                name: "CarImages");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokenInfoTable");
 
             migrationBuilder.DropTable(
-                name: "CarEntities");
+                name: "Features");
+
+            migrationBuilder.DropTable(
+                name: "Cars");
 
             migrationBuilder.DropTable(
                 name: "Images");
-
-            migrationBuilder.DropTable(
-                name: "Features");
 
             migrationBuilder.DropTable(
                 name: "Colors");

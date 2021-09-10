@@ -8,11 +8,9 @@ namespace ApiDPSystem.Entities
         public string Name { get; set; }
         public string HexCode { get; set; }
 
-        public ICollection<CarActual> InteriorCarActual { get; set; }
-        public ICollection<CarActual> ExteriorCarActual { get; set; }
+        public ICollection<Car> InteriorCar { get; set; }
+        public ICollection<Car> ExteriorCar { get; set; }
 
-        public ICollection<CarHistory> InteriorCarHistory { get; set; }
-        public ICollection<CarHistory> ExteriorCarHistory { get; set; }
 
         public override bool Equals(object obj)
         {

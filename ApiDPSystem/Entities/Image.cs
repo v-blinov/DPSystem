@@ -11,7 +11,6 @@ namespace ApiDPSystem.Entities
         public string Url { get; set; }
 
         public ICollection<CarImage> CarImages { get; set; }
-        public ICollection<CarHistoryImage> CarHistoryImages { get; set; }
 
 
         public override bool Equals(object obj)
@@ -24,6 +23,7 @@ namespace ApiDPSystem.Entities
 
         public override int GetHashCode() =>
             Url.GetHashCode() * 22;
+
         public Image GetValuesCopy() =>
              new()
              {

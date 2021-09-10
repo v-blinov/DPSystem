@@ -8,7 +8,7 @@ namespace ApiDPSystem.Entities
         public string Type { get; set; }
         public string Description { get; set; }
 
-        public ICollection<ConfigurationFeature> ConfigurationFeature { get; set; }
+        public ICollection<CarFeature> CarFeatures { get; set; }
 
 
         public override bool Equals(object obj)

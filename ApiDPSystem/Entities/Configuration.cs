@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace ApiDPSystem.Entities
 {
@@ -22,9 +21,7 @@ namespace ApiDPSystem.Entities
         public int EngineId { get; set; }
 
 
-        public ICollection<CarActual> CarActuals { get; set; }
-        public ICollection<CarHistory> CarHistories { get; set; }
-        public ICollection<ConfigurationFeature> ConfigurationFeatures { get; set; }
+        public ICollection<Car> Cars { get; set; }
         public Producer Producer { get; set; }
         public Engine Engine { get; set; }
 
@@ -60,18 +57,6 @@ namespace ApiDPSystem.Entities
                 Drive = Drive,
                 Producer = Producer.GetValuesCopy(),
                 Engine = Engine.GetValuesCopy(),
-                ConfigurationFeatures = CloneConfigurationFeaturesList()
             };
-
-        private List<ConfigurationFeature> CloneConfigurationFeaturesList()
-        {
-            var clone_cf = new List<ConfigurationFeature>();
-
-            ConfigurationFeatures
-                .ToList()
-                .ForEach(p => clone_cf.Add(p.GetValuesCopy()));
-
-            return clone_cf;
-        }
     }
 }

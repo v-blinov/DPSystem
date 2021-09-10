@@ -1,8 +1,8 @@
-﻿using System;
-using ApiDPSystem.Entities;
+﻿using ApiDPSystem.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace ApiDPSystem.Data
 {
@@ -10,45 +10,38 @@ namespace ApiDPSystem.Data
     {
         public Context(DbContextOptions<Context> options) : base(options)
         {
-            Database.EnsureCreated();
+            //Database.EnsureCreated();
         }
 
         public DbSet<RefreshTokenInfo> RefreshTokenInfoTable { get; set; }
-        public DbSet<CarActual> CarActuals { get; set; }
+        public DbSet<Car> Cars { get; set; }
         public DbSet<CarImage> CarImages { get; set; }
         public DbSet<Color> Colors { get; set; }
         public DbSet<Configuration> Configurations { get; set; }
-        public DbSet<ConfigurationFeature> ConfigurationFeatures { get; set; }
+        public DbSet<CarFeature> CarFeatures { get; set; }
         public DbSet<Dealer> Dealers { get; set; }
         public DbSet<Engine> Engines { get; set; }
         public DbSet<Feature> Features { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Producer> Producers { get; set; }
-        public DbSet<CarHistory> CarHistories { get; set; }
-        public DbSet<CarHistoryImage> CarHistoryImages { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
             optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new RefreshTokenInfoSettings());
             modelBuilder.ApplyConfiguration(new ConfigurationSettings());
-            modelBuilder.ApplyConfiguration(new CarActualSettings());
-            modelBuilder.ApplyConfiguration(new CarHistorySettings());
+            modelBuilder.ApplyConfiguration(new CarSettings());
             modelBuilder.ApplyConfiguration(new ColorSettings());
             modelBuilder.ApplyConfiguration(new FeatureSettings());
 
 
-            modelBuilder.Entity<ConfigurationFeature>()
-                        .HasKey(p => new { p.ConfigurationId, p.FeatureId });
+            modelBuilder.Entity<CarFeature>()
+                        .HasKey(p => new { p.CarId, p.FeatureId });
 
             modelBuilder.Entity<CarImage>()
-                        .HasKey(p => new { p.CarActualId, p.ImageId });
-
-            modelBuilder.Entity<CarHistoryImage>()
-                        .HasKey(p => new { p.CarHistoryId, p.ImageId });
+                        .HasKey(p => new { p.CarId, p.ImageId });
 
             modelBuilder.Entity<Engine>()
                         .Property(p => p.Fuel)
@@ -97,35 +90,14 @@ namespace ApiDPSystem.Data
             }
         }
 
-        public class CarActualSettings : IEntityTypeConfiguration<CarActual>
+        public class CarSettings : IEntityTypeConfiguration<Car>
         {
-            public void Configure(EntityTypeBuilder<CarActual> builder)
+            public void Configure(EntityTypeBuilder<Car> builder)
             {
+                builder.HasIndex(p => new { p.VinCode });
                 builder.HasIndex(p => new { p.DealerId });
 
-                builder.HasIndex(p => new { p.DealerId, p.Id }).IsUnique();
-
-                builder.Property(p => p.VinCode)
-                       .IsRequired()
-                       .HasMaxLength(20)
-                       .HasColumnType("varchar");
-
-                builder.HasOne(s => s.ExteriorColor)
-                       .WithMany(x => x.ExteriorCarActual)
-                       .HasForeignKey(s => s.ExteriorColorId);
-
-                builder.HasOne(s => s.InteriorColor)
-                       .WithMany(x => x.InteriorCarActual)
-                       .HasForeignKey(s => s.InteriorColorId)
-                       .OnDelete(DeleteBehavior.Restrict);
-            }
-        }
-
-        public class CarHistorySettings : IEntityTypeConfiguration<CarHistory>
-        {
-            public void Configure(EntityTypeBuilder<CarHistory> builder)
-            {
-                builder.HasIndex(p => new { p.VinCode, p.Version });
+                builder.HasIndex(p => new { p.VinCode, p.Version }).IsUnique();
 
                 builder.Property(p => p.IsSold)
                        .HasDefaultValue(false);
@@ -136,11 +108,11 @@ namespace ApiDPSystem.Data
                        .HasColumnType("varchar");
 
                 builder.HasOne(s => s.ExteriorColor)
-                       .WithMany(x => x.ExteriorCarHistory)
+                       .WithMany(x => x.ExteriorCar)
                        .HasForeignKey(s => s.ExteriorColorId);
 
                 builder.HasOne(s => s.InteriorColor)
-                       .WithMany(x => x.InteriorCarHistory)
+                       .WithMany(x => x.InteriorCar)
                        .HasForeignKey(s => s.InteriorColorId)
                        .OnDelete(DeleteBehavior.Restrict);
             }
@@ -170,6 +142,8 @@ namespace ApiDPSystem.Data
                 builder.Property(p => p.Type)
                        .HasMaxLength(100)
                        .IsRequired();
+
+                builder.HasIndex(p => new { p.Type });
             }
         }
 
