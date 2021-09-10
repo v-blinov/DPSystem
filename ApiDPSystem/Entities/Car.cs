@@ -9,6 +9,7 @@ namespace ApiDPSystem.Entities
         public string VinCode { get; set; }
         public decimal? Price { get; set; }
         public bool IsSold { get; set; }
+        public bool IsActual { get; set; }
 
 
         public int DealerId { get; set; }
