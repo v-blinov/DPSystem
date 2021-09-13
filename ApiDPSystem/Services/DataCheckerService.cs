@@ -1,116 +1,72 @@
 ﻿using ApiDPSystem.Entities;
-using ApiDPSystem.Repository.Interfaces;
-using ApiDPSystem.Services.Interface;
 using System.Collections.Generic;
 using System.Linq;
+using ApiDPSystem.Repository;
 
 namespace ApiDPSystem.Services
 {
-    public class DataCheckerService : IDataCheckerService
+    public class DataCheckerService
     {
-        private readonly ICarRepository _carRepository;
+        private readonly CarRepository _carRepository;
 
-        public DataCheckerService(ICarRepository carRepository)
+        public DataCheckerService(CarRepository carRepository)
         {
             _carRepository = carRepository;
         }
 
-        public void TransferSoldCars(List<CarActual> newCars, string dealerName)
+        public void MarkSoldCars(List<Car> newCars, string dealerName)
         {
             var currentCarsVinCodes = _carRepository.GetActualCarsVinCodesForDealer(dealerName);
-
             var newCarsVinCodes = newCars.Select(p => p.VinCode).ToList();
+            var soldCarVinCodes = currentCarsVinCodes.Except(newCarsVinCodes).ToList();
 
-            var soldCarVinCodes = currentCarsVinCodes
-                                  .Except(newCarsVinCodes)
-                                  .ToList();
-
-            foreach (var vincode in soldCarVinCodes)
-            {
-                var car = _carRepository.GetCar(vincode, dealerName);
-                _carRepository.TransferOneCarFromActualToHistory(car, true);
-            }
+            _carRepository.MarkSoldCars(soldCarVinCodes);
         }
 
-        public void SetToDatabase(List<CarActual> models)
+        public void SetToDatabase(List<Car> models)
         {
-            foreach (var model in models)
+            //foreach (var model in models)
+            for(var i = 0; i < models.Count; i++)
             {
-                SetConfigurationIdIfExist(model);
+                var model = models[i];
                 
-                // If configuration exists in DB
-                if (model.Configuration != null)
-                    SetConfigurationFeatureIdsIfExist(model);
-
+                var dealerName = model.Dealer.Name;
+                
                 SetColorIdIfExist(model);
                 SetCarImageIdsIfExist(model);
                 SetDealerIdIfExist(model);
+                SetCarFeatureIdsIfExist(model);
+                SetEngineIdIfExist(model);
+                SetProducerIdIfExist(model);
+                SetConfigurationIdIfExist(model);
 
-                // if dealer exists in DB
-                if (model.Dealer == null)
+                var existedCar = _carRepository.GetLastVersionCarWithVincodeAndDealerName(model.VinCode, dealerName);
+                if (existedCar is not null)
                 {
-                    var existedCar = _carRepository.GetThatDealerCarIfExist(model);
-                    if (existedCar != null)
+                    if (existedCar.IsSold)
+                        model.Version = existedCar.Version + 1;
+                    else if (IsCarModified(model, existedCar))
                     {
-                        if (!IsCarModified(model, existedCar))
-                            continue;
-                        else
-                            _carRepository.TransferOneCarFromActualToHistory(existedCar);
+                        _carRepository.SetAsNotActual(existedCar);
+                        model.Version = existedCar.Version + 1;
                     }
                 }
-
-                _carRepository.AddCarToDb(model);
+                else
+                    model.Version = 1;
             }
+            _carRepository.AddCarRangeToDb(models);
         }
 
-        private void SetConfigurationIdIfExist(CarActual model)
+        private void SetColorIdIfExist(Car model)
         {
-            var exitedConfiguration = _carRepository.ReturnConfigurationIfExist(model.Configuration);
-            if (exitedConfiguration != null)
-            {
-                model.Configuration = null;
-                model.ConfigurationId = exitedConfiguration.Id;
-                return;
-            }
-
-            var existedProducer = _carRepository.ReturnProducerIfExist(model.Configuration.Producer);
-            if (existedProducer != null)
-            {
-                model.Configuration.Producer = null;
-                model.Configuration.ProducerId = existedProducer.Id;
-            }
-
-            var existedEngine = _carRepository.ReturnEngineIfExist(model.Configuration.Engine);
-            if (existedEngine != null)
-            {
-                model.Configuration.Engine = null;
-                model.Configuration.EngineId = existedEngine.Id;
-            }
-        }
-
-        private void SetConfigurationFeatureIdsIfExist(CarActual model)
-        {
-            foreach (var configurationFeature in model.Configuration.ConfigurationFeatures)
-            {
-                var existedFeature = _carRepository.ReturnFeatureIfExist(configurationFeature.Feature);
-                if (existedFeature != null)
-                {
-                    configurationFeature.Feature = null;
-                    configurationFeature.FeatureId = existedFeature.Id;
-                }
-            }
-        }
-
-        private void SetColorIdIfExist(CarActual model)
-        {
-            var existedInteriorColor = _carRepository.ReturnColorIfExist(model.InteriorColor);
+            var existedInteriorColor = _carRepository.GetColorIfExist(model.InteriorColor);
             if (existedInteriorColor != null)
             {
                 model.InteriorColor = null;
                 model.InteriorColorId = existedInteriorColor.Id;
             }
 
-            var existedExteriorColor = _carRepository.ReturnColorIfExist(model.ExteriorColor);
+            var existedExteriorColor = _carRepository.GetColorIfExist(model.ExteriorColor);
             if (existedExteriorColor != null)
             {
                 model.ExteriorColor = null;
@@ -121,11 +77,11 @@ namespace ApiDPSystem.Services
                 model.ExteriorColor = model.InteriorColor;
         }
 
-        private void SetCarImageIdsIfExist(CarActual model)
+        private void SetCarImageIdsIfExist(Car model)
         {
             foreach (var carImage in model.CarImages)
             {
-                var existedImage = _carRepository.ReturnImageIfExist(carImage.Image);
+                var existedImage = _carRepository.GetImageIfExist(carImage.Image);
                 if (existedImage != null)
                 {
                     carImage.Image = null;
@@ -134,9 +90,9 @@ namespace ApiDPSystem.Services
             }
         }
 
-        private void SetDealerIdIfExist(CarActual model)
+        private void SetDealerIdIfExist(Car model)
         {
-            var existedDealer = _carRepository.ReturnDealerIfExist(model.Dealer);
+            var existedDealer = _carRepository.GetDealerIfExist(model.Dealer);
             if (existedDealer != null)
             {
                 model.Dealer = null;
@@ -144,16 +100,68 @@ namespace ApiDPSystem.Services
             }
         }
 
-        private bool IsCarModified(CarActual newCar, CarActual existedCar)
+        private void SetConfigurationIdIfExist(Car model)
+        {
+            var existedConfiguration = _carRepository.GetConfigurationId(model.Configuration);
+
+            if (existedConfiguration != null)
+            {
+                model.Configuration = null;
+                model.ConfigurationId = existedConfiguration.Id;
+            }
+        }
+
+        private void SetEngineIdIfExist(Car model)
+        {
+            var existedEngine = _carRepository.GetEngine(model.Configuration.Engine);
+
+            if (existedEngine != null)
+            {
+                model.Configuration.Engine = null;
+                model.Configuration.EngineId = existedEngine.Id;
+            }
+        }
+
+        private void SetProducerIdIfExist(Car model)
+        {
+            var existProducer = _carRepository.GetProducer(model.Configuration.Producer);
+
+            if (existProducer != null)
+            {
+                model.Configuration.Producer = null;
+                model.Configuration.ProducerId = existProducer.Id;
+            }
+        }
+
+        private void SetCarFeatureIdsIfExist(Car model)
+        {
+            foreach (var carFeature in model.CarFeatures)
+            {
+                var existedFeature = _carRepository.GetFeatureIfExist(carFeature.Feature);
+                if (existedFeature != null)
+                {
+                    carFeature.Feature = null;
+                    carFeature.FeatureId = existedFeature.Id;
+                }
+            }
+        }
+
+        private bool IsCarModified(Car newCar, Car existedCar)
         {
             if (newCar.ConfigurationId != existedCar.ConfigurationId) return true;
             if (newCar.ExteriorColorId != existedCar.ExteriorColorId) return true;
             if (newCar.InteriorColorId != existedCar.InteriorColorId) return true;
+            if (newCar.DealerId != existedCar.DealerId) return true;
             if (newCar.Price != existedCar.Price) return true;
 
+            var existedCarFeatures = _carRepository.GetCarFeaturesByCarId(existedCar.Id);
+            if (newCar.CarFeatures.Count() != existedCarFeatures.Count()) return true;
+            var existedCarFeaturesIds = existedCarFeatures.OrderBy(p => p.FeatureId).Select(p => p.FeatureId).ToList();
+            var newCarFeaturesIds = newCar.CarFeatures.OrderBy(p => p.FeatureId).Select(p => p.FeatureId).ToList();
+            if (!existedCarFeaturesIds.SequenceEqual(newCarFeaturesIds)) return true;
+            
             var existedCarImages = _carRepository.GetCarImagesListByCarId(existedCar.Id);
-            if (newCar.CarImages.Count != existedCarImages.Count) return true;
-
+            if (newCar.CarImages.Count() != existedCarImages.Count()) return true;
             var existedCarImagesIds = existedCarImages.OrderBy(p => p.ImageId).Select(p => p.ImageId).ToList();
             var newCarImagesIds = newCar.CarImages.OrderBy(p => p.ImageId).Select(p => p.ImageId).ToList();
             if (!existedCarImagesIds.SequenceEqual(newCarImagesIds)) return true;

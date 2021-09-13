@@ -8,6 +8,6 @@ namespace ApiDPSystem.Interfaces
         public int Version { get; }
         public string FileFormat { get; }
 
-        public List<CarActual> ConvertToActualDbModel(string dealerName);
+        public List<Car> ConvertToActualDbModel(string dealerName);
     }
 }

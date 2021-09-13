@@ -1,8 +1,8 @@
 ﻿using ApiDPSystem.Models.Parser;
-using ApiDPSystem.Services.Interface;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace ApiDPSystem.Services
 {
@@ -23,10 +23,15 @@ namespace ApiDPSystem.Services
             var parser = Selector.GetParser(fileExtension);
 
             var fileContent = await fileReadTask;
-            var dDbModels = parser.Parse(fileContent, file.FileName, dealer);
+            var dbModels = parser.Parse(fileContent, file.FileName, dealer);
 
-            _dataChecker.TransferSoldCars(dDbModels, dealer);
-            _dataChecker.SetToDatabase(dDbModels);
+            using (var transaction = new TransactionScope())
+            {
+                _dataChecker.MarkSoldCars(dbModels, dealer);
+                _dataChecker.SetToDatabase(dbModels);
+
+                transaction.Complete();
+            }
         }
 
         private static async Task<string> ReadFileAsync(IFormFile file)

@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using ApiDPSystem.Entities;
+﻿using ApiDPSystem.Entities;
+using System.Collections.Generic;
 
 namespace ApiDPSystem.Interfaces
 {
     public interface IParser
     {
         public string ConvertableFileExtension { get; }
-
-        public List<CarActual> Parse(string fileContent, string fileName, string dealer);
+        public List<Car> Parse(string fileContent, string fileName, string dealer);
     }
 }
