@@ -350,7 +350,7 @@ namespace DPSystem.Tests
             {
                 Assert.Equal(2, context.Cars.Count());
                 Assert.Equal(3, context.Colors.Count());
-                Assert.Equal(2, context.Configurations.Count());
+                Assert.Equal(1, context.Configurations.Count());
                 Assert.Equal(1, context.Features.Count());
                 Assert.Equal(1, context.Dealers.Count());
                 Assert.Equal(1, context.Engines.Count());
