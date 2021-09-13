@@ -1,15 +1,13 @@
 ﻿using ApiDPSystem.Data;
 using ApiDPSystem.Entities;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ApiDPSystem.Repository.Interfaces;
 
 namespace ApiDPSystem.Repository
 {
-    public class CarRepository : ICarRepository
+    public class CarRepository
     {
         private readonly Context _context;
 
@@ -17,60 +15,72 @@ namespace ApiDPSystem.Repository
         {
             _context = context;
         }
+        
+        public List<string> GetActualCarsVinCodesForDealer(string dealerName) =>
+            _context.Cars
+            .Include(p => p.Dealer)
+            .Where(p => p.Dealer.Name == dealerName && p.IsActual)
+            .Select(p => p.VinCode)
+            .ToList();
 
-        public Configuration ReturnConfigurationIfExist(Configuration configuration)
+        public Car GetLastVersionCarWithVincodeAndDealerName(string vincode, string dealer)
+        {
+            var ChoosenCars = _context.Cars.Include(p => p.Dealer)
+                                      .Where(p => p.Dealer.Name == dealer && p.VinCode == vincode)
+                                      .ToList();
+            return ChoosenCars.FirstOrDefault(p => p.Version == ChoosenCars.Max(s => s.Version));
+        }
+
+        public void MarkSoldCars(List<string> soldCarVincodes)
+        {
+            foreach (var vincode in soldCarVincodes)
+            {
+                var car = _context.Cars.FirstOrDefault(s => s.VinCode == vincode);
+                if (car != null)
+                {
+                    car.IsSold = true;
+                    car.IsActual = false;
+
+                    _context.SaveChanges();
+                }
+            }
+        }
+
+        public Configuration GetConfigurationId(Configuration configuration)
         {
             if (configuration == null)
                 return null;
-
             return _context.Configurations
                            .Include(p => p.Engine)
                            .Include(p => p.Producer)
                            .ToList()
                            .FirstOrDefault(p => configuration.Equals(p));
         }
-
-        public Producer ReturnProducerIfExist(Producer producer)
-        {
-            if (producer == null)
-                return null;
-
-            return _context.Producers
-                           .ToList()
-                           .FirstOrDefault(p => producer.Equals(p));
-        }
-
-        public Engine ReturnEngineIfExist(Engine engine)
+        public Engine GetEngine(Engine engine)
         {
             if (engine == null)
                 return null;
-
             return _context.Engines
                            .ToList()
                            .FirstOrDefault(p => engine.Equals(p));
         }
-
-        public Feature ReturnFeatureIfExist(Feature feature)
+        public Producer GetProducer(Producer producer)
         {
-            if (feature == null)
+            if (producer == null)
                 return null;
-
-            return _context.Features
+            return _context.Producers
                            .ToList()
-                           .FirstOrDefault(p => feature.Equals(p));
+                           .FirstOrDefault(p => producer.Equals(p));
         }
-
-        public Color ReturnColorIfExist(Color color)
+        public Color GetColorIfExist(Color color)
         {
             if (color == null)
                 return null;
-
             return _context.Colors
                            .ToList()
                            .FirstOrDefault(p => color.Equals(p));
         }
-
-        public Image ReturnImageIfExist(Image image)
+        public Image GetImageIfExist(Image image)
         {
             if (image == null)
                 return null;
@@ -79,94 +89,46 @@ namespace ApiDPSystem.Repository
                            .ToList()
                            .FirstOrDefault(p => image.Equals(p));
         }
-
-        public Dealer ReturnDealerIfExist(Dealer dealer)
+        public Dealer GetDealerIfExist(Dealer dealer)
         {
             if (dealer == null)
                 return null;
-
             return _context.Dealers
                            .ToList()
                            .FirstOrDefault(p => dealer.Equals(p));
         }
-
-
-
-        public CarActual GetThatDealerCarIfExist(CarActual model) =>
-            _context.CarActuals
-            .Include(p => p.CarImages)
-            .FirstOrDefault(p => p.VinCode == model.VinCode && p.DealerId == model.DealerId);
-
-        public List<string> GetActualCarsVinCodesForDealer(string dealerName) =>
-            _context.CarActuals
-            .Include(p => p.Dealer)
-            .Where(p => p.Dealer.Name == dealerName)
-            .Select(p => p.VinCode)
-            .ToList();
-
-        public CarActual GetCar(string vincode, string dealerName) =>
-            _context.CarActuals
-            .Include(p => p.Dealer)
-            .Include(p => p.CarImages)
-            .FirstOrDefault(p => p.Dealer.Name == dealerName && p.VinCode == vincode);
-
-
-        public void TransferOneCarFromActualToHistory(CarActual car, bool isSold = false)
+        public Feature GetFeatureIfExist(Feature feature)
         {
-            var transaction = _context.Database.BeginTransaction();
-
-            try
-            {
-                var carHistoryModel = new CarHistory();
-                carHistoryModel.Copy(car);
-
-                foreach (var carImage in car.CarImages)
-                {
-                    carHistoryModel.CarHistoryImages.Add(new CarHistoryImage { ImageId = carImage.ImageId });
-                    _context.CarImages.RemoveRange(carImage);
-                }
-
-                _context.CarActuals.Remove(car);
-                carHistoryModel.IsSold = isSold;
-                _context.CarHistories.Add(carHistoryModel);
-                _context.SaveChanges();
-
-                transaction.Commit();
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Ошибка при переносе данных из таблицы CarEntities в таблицу SoldCars");
-                transaction.Rollback();
-                throw new Exception(ex.Message);
-            }
+            if (feature == null)
+                return null;
+            return _context.Features
+                           .ToList()
+                           .FirstOrDefault(p => feature.Equals(p));
         }
-
-        public void AddCarToDb(CarActual model)
+        
+        public void AddCarToDb(Car model)
         {
-            var maxVersion = GetMaxVersionByVincode(model.VinCode);
-            model.Version = maxVersion != null ? (int)maxVersion + 1 : 1;
-            _context.CarActuals.Add(model);
+            _context.Cars.Add(model);
             _context.SaveChanges();
         }
 
-        private int? GetMaxVersionByVincode(string vinCode)
+        public void AddCarRangeToDb(List<Car> models)
         {
-            var actualVersions = _context.CarActuals.Where(p => p.VinCode == vinCode).ToList();
-            var historyVersions = _context.CarHistories.Where(p => p.VinCode == vinCode).ToList();
-
-            int? maxActualVersion = actualVersions.Count > 0 ? actualVersions.Max(p => p.Version) : null;
-            int? maxHistoryVersion = historyVersions.Count > 0 ? historyVersions.Max(p => p.Version) : null;
-
-            if (maxActualVersion != null)
-                if (maxHistoryVersion != null)
-                    return Math.Max((int)maxActualVersion, (int)maxHistoryVersion);
-                else
-                    return maxActualVersion;
-
-            return maxHistoryVersion;
+            _context.Cars.AddRange(models);
+            _context.SaveChanges();
         }
 
         public List<CarImage> GetCarImagesListByCarId(Guid carId) =>
-            _context.CarImages.Where(p => p.CarActualId == carId).ToList();
+            _context.CarImages.Where(p => p.CarId == carId).ToList();
+
+        public List<CarFeature> GetCarFeaturesByCarId(Guid carId) =>
+            _context.CarFeatures.Where(p => p.CarId == carId).ToList();
+        public void SetAsNotActual(Car existedCar)
+        {
+            var car = _context.Cars.FirstOrDefault(p => p.Id == existedCar.Id);
+            if (car != null) car.IsActual = false;
+            _context.SaveChanges();
+        }
+
     }
 }
