@@ -17,9 +17,11 @@ namespace ApiDPSystem.Entities
             if (obj is not Engine engine)
                 return false;
 
-            return engine.Fuel == Fuel &&
+            var existedEngine = engine.Fuel == Fuel &&
                    engine.Capacity == Capacity &&
                    engine.Power == Power;
+
+            return existedEngine;
         }
 
         public override int GetHashCode() =>

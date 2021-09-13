@@ -36,8 +36,8 @@ namespace ApiDPSystem.Entities
                    conf.ModelTrim == ModelTrim &&
                    conf.Transmission == Transmission &&
                    conf.Drive == Drive &&
-                   conf.Producer.Equals(Producer) &&
-                   conf.Engine.Equals(Engine);
+                   (conf.Producer.Equals(Producer) || conf.ProducerId == ProducerId) &&
+                   (conf.Engine.Equals(Engine) || conf.EngineId == EngineId);
         }
 
         public override int GetHashCode() =>

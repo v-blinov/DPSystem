@@ -20,5 +20,10 @@ namespace ApiDPSystem.Entities
 
         public override int GetHashCode() =>
             Name.GetHashCode() * 31;
+        public Dealer GetValuesCopy() =>
+            new()
+            {
+                Name = Name
+            };
     }
 }
