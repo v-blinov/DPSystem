@@ -103,6 +103,8 @@ namespace ApiDPSystem.Data
                        .HasDefaultValue(false);
                 builder.Property(p => p.IsActual)
                        .HasDefaultValue(true);
+                builder.Property(p => p.Version)
+                       .HasDefaultValue(1);
 
                 builder.Property(p => p.VinCode)
                        .IsRequired()
