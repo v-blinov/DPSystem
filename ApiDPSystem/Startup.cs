@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using ApiDPSystem.Data;
 using ApiDPSystem.Models;
 using ApiDPSystem.Repository;
-using ApiDPSystem.Repository.Interfaces;
 using ApiDPSystem.Services;
-using ApiDPSystem.Services.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,6 +14,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace ApiDPSystem
 {
@@ -175,12 +173,10 @@ namespace ApiDPSystem
             services.AddScoped<EmailService>();
             services.AddScoped<RoleService>();
             services.AddScoped<UserService>();
-            // services.AddScoped<IFileService, FileService>();            
             services.AddScoped<FileService>();
-            // services.AddScoped<IDataCheckerService, DataCheckerService>();
             services.AddScoped<DataCheckerService>();
             services.AddScoped<AccountRepository>();
-            services.AddScoped<ICarRepository, CarRepository>();
+            services.AddScoped<CarRepository>();
             #endregion
         }
 

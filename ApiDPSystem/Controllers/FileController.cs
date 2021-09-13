@@ -1,15 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Xml;
-using ApiDPSystem.Exceptions;
+﻿using ApiDPSystem.Exceptions;
 using ApiDPSystem.Filters;
 using ApiDPSystem.Models;
 using ApiDPSystem.Services;
-using ApiDPSystem.Services.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Serilog;
+using System;
+using System.Threading.Tasks;
 
 namespace ApiDPSystem.Controllers
 {
