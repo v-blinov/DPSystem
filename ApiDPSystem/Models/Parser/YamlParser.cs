@@ -11,7 +11,7 @@ namespace ApiDPSystem.Models.Parser
     {
         public string ConvertableFileExtension => ".yaml";
 
-        public List<CarActual> Parse(string fileContent, string fileName, string dealer)
+        public List<Car> Parse(string fileContent, string fileName, string dealer)
         {
             var version = GetVersion(fileContent);
             var deserializedType = Selector.GetResultType(ConvertableFileExtension, version.Value);

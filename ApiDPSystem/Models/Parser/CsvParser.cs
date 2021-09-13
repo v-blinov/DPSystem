@@ -12,7 +12,7 @@ namespace ApiDPSystem.Models.Parser
     {
         public string ConvertableFileExtension => ".csv";
 
-        public List<CarActual> Parse(string fileContent, string fileName, string dealer)
+        public List<Car> Parse(string fileContent, string fileName, string dealer)
         {
             var version = GetVersion(fileName);
             var deserializedType = Selector.GetResultType(ConvertableFileExtension, version.Value);
