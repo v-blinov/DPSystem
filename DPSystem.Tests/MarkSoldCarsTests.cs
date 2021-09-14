@@ -366,8 +366,8 @@ namespace DPSystem.Tests
             CreateDatabase();
             SetDefaultCarToDatabase();
 
-            var theSameCar = CreateDefaultCarNewWithVincode("new_Vincode1");
-            theSameCar.CarFeatures = new List<CarFeature>()
+            var carWithNewFeature = CreateDefaultCarNewWithVincode("new_Vincode1");
+            carWithNewFeature.CarFeatures = new List<CarFeature>()
             {
                 new CarFeature()
                     {Feature = new Feature() {Type = "Safety", Description = "New Safety feature"}},
@@ -381,7 +381,7 @@ namespace DPSystem.Tests
                 var carRepository = new CarRepository(context);
                 var sut = new DataCheckerService(carRepository);
 
-                sut.SetToDatabase(new List<Car> { theSameCar });
+                sut.SetToDatabase(new List<Car> { carWithNewFeature });
             }
 
             //Assert
@@ -394,6 +394,44 @@ namespace DPSystem.Tests
                 Assert.Equal(1, context.Dealers.Count());
                 Assert.Equal(1, context.Engines.Count());
                 Assert.Equal(1, context.Images.Count());
+                Assert.Equal(1, context.Producers.Count());
+            }
+        }
+
+        [Fact]
+        public void Set_car_with_new_pictures()
+        {
+            //Arrange
+            CreateDatabase();
+            SetDefaultCarToDatabase();
+
+            var carWithNewPictures = _defaultExistedCar.Copy();
+            carWithNewPictures.CarImages = new List<CarImage>()
+            {
+                new CarImage()
+                    {Image = new Image() {Url = "new/Image/Url/1"}},
+            };
+
+            //Act
+            using (var context = new Context(_testContextOptions))
+            {
+                var carRepository = new CarRepository(context);
+                var sut = new DataCheckerService(carRepository);
+            
+                sut.MarkSoldCars(new List<Car>() { carWithNewPictures }, DefaultDealer);
+                sut.SetToDatabase(new List<Car> { carWithNewPictures });
+            }
+            
+            //Assert
+            using (var context = new Context(_testContextOptions))
+            {
+                Assert.Equal(2, context.Cars.Count());
+                Assert.Equal(2, context.Colors.Count());
+                Assert.Equal(1, context.Configurations.Count());
+                Assert.Equal(1, context.Features.Count());
+                Assert.Equal(1, context.Dealers.Count());
+                Assert.Equal(1, context.Engines.Count());
+                Assert.Equal(2, context.Images.Count());
                 Assert.Equal(1, context.Producers.Count());
             }
         }
