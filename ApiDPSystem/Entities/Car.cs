@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ApiDPSystem.Entities
 {
@@ -25,7 +26,33 @@ namespace ApiDPSystem.Entities
         public Color InteriorColor { get; set; }
         public IEnumerable<CarFeature> CarFeatures { get; set; }
         public IEnumerable<CarImage> CarImages { get; set; }
-        
+
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not Car car)
+                return false;
+
+            return car.VinCode == VinCode &&
+                   car.Price == Price &&
+                   car.IsSold == IsSold &&
+                   car.IsActual == IsActual &&
+                   car.Dealer.Equals(Dealer) &&
+                   car.Configuration.Equals(Configuration) &&
+                   car.InteriorColor.Equals(InteriorColor) &&
+                   car.ExteriorColor.Equals(ExteriorColor) &&
+                   car.CarImages.Count() == CarImages.Count() &&
+                   car.CarImages.Intersect(CarImages).Count() == CarImages.Count() &&
+                   car.CarFeatures.Count() == CarFeatures.Count() &&
+                   car.CarFeatures.Intersect(CarFeatures).Count() == CarFeatures.Count();
+        }
+
+        public override int GetHashCode() =>
+            VinCode.GetHashCode() * 11
+            + IsSold.GetHashCode() * 19
+            + IsActual.GetHashCode() * 7
+            + Version * 88;
+
         public Car Copy() =>
             new()
             {
