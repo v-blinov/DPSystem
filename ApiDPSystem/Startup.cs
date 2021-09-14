@@ -17,6 +17,7 @@ using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ApiDPSystem.Services.Interfaces;
 
 namespace ApiDPSystem
 {
@@ -174,7 +175,7 @@ namespace ApiDPSystem
             services.AddScoped<RoleService>();
             services.AddScoped<UserService>();
             services.AddScoped<FileService>();
-            services.AddScoped<DataCheckerService>();
+            services.AddScoped<IDataCheckerService, DataCheckerService>();
             services.AddScoped<AccountRepository>();
             services.AddScoped<CarRepository>();
             #endregion

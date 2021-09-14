@@ -3,14 +3,15 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Threading.Tasks;
 using System.Transactions;
+using ApiDPSystem.Services.Interfaces;
 
 namespace ApiDPSystem.Services
 {
     public class FileService
     {
-        private readonly DataCheckerService _dataChecker;
+        private readonly IDataCheckerService _dataChecker;
 
-        public FileService(DataCheckerService dataCheckerService)
+        public FileService(IDataCheckerService dataCheckerService)
         {
             _dataChecker = dataCheckerService;
         }
