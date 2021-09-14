@@ -22,9 +22,9 @@ namespace ApiDPSystem.Entities
             Name.GetHashCode() * 22;
 
         public Producer GetValuesCopy() =>
-             new()
-             {
-                 Name = Name
-             };
+            new()
+            {
+                Name = Name
+            };
     }
 }

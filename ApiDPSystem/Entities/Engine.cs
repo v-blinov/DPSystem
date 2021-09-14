@@ -18,8 +18,8 @@ namespace ApiDPSystem.Entities
                 return false;
 
             var existedEngine = engine.Fuel == Fuel &&
-                   engine.Capacity == Capacity &&
-                   engine.Power == Power;
+                                engine.Capacity == Capacity &&
+                                engine.Power == Power;
 
             return existedEngine;
         }
@@ -28,11 +28,11 @@ namespace ApiDPSystem.Entities
             Fuel.GetHashCode() * 22 + Capacity.GetHashCode() * 13 + Power.GetHashCode() * 7;
 
         public Engine GetValuesCopy() =>
-             new()
-             {
-                 Fuel = Fuel,
-                 Power = Power,
-                 Capacity = Capacity
-             };
+            new()
+            {
+                Fuel = Fuel,
+                Power = Power,
+                Capacity = Capacity
+            };
     }
 }

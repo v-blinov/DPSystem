@@ -56,7 +56,7 @@ namespace ApiDPSystem.Entities
                 Transmission = Transmission,
                 Drive = Drive,
                 Producer = Producer.GetValuesCopy(),
-                Engine = Engine.GetValuesCopy(),
+                Engine = Engine.GetValuesCopy()
             };
     }
 }

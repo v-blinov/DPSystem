@@ -1,12 +1,12 @@
-﻿using ApiDPSystem.Exceptions;
+﻿using System;
+using System.Threading.Tasks;
+using ApiDPSystem.Exceptions;
 using ApiDPSystem.Filters;
 using ApiDPSystem.Models;
 using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using System;
-using System.Threading.Tasks;
 
 namespace ApiDPSystem.Controllers
 {
@@ -43,7 +43,7 @@ namespace ApiDPSystem.Controllers
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Message = ex.Message ?? "Неподдерживаемая версия файла данного формата"
+                    Message = ex.Message
                 };
             }
             catch (InvalidFileException ex)

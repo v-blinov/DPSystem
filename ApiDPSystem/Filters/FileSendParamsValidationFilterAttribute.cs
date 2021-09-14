@@ -12,7 +12,7 @@ namespace ApiDPSystem.Filters
 {
     public class FileSendParamsValidationFilterAttribute : Attribute, IActionFilter
     {
-        private readonly List<string> availableExtensions = new() { ".json", ".xml", ".yaml", ".csv" };
+        private readonly List<string> _availableExtensions = new() { ".json", ".xml", ".yaml", ".csv" };
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
@@ -31,7 +31,7 @@ namespace ApiDPSystem.Filters
                 return;
             }
 
-            if (!availableExtensions.Contains(Path.GetExtension(file.FileName)))
+            if (!_availableExtensions.Contains(Path.GetExtension(file.FileName)))
             {
                 Log.Error($"Отправлен неподдерживаемый формат файла {Path.GetExtension(file.FileName)}");
                 context.Result = new ObjectResult(

@@ -26,10 +26,10 @@ namespace ApiDPSystem.Entities
             + HexCode.GetHashCode() * 19;
 
         public Color GetValuesCopy() =>
-             new ()
-             {
-                 Name = Name,
-                 HexCode = HexCode
-             };
+            new()
+            {
+                Name = Name,
+                HexCode = HexCode
+            };
     }
 }

@@ -1,8 +1,8 @@
-﻿using ApiDPSystem.Entities;
+﻿using System;
+using ApiDPSystem.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace ApiDPSystem.Data
 {

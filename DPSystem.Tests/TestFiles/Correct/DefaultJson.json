@@ -7,28 +7,28 @@
       "make": "Test",
       "model": "TestModel",
       "model trim": "ABC",
-      "techincal options" : {
-          "engine": {
-            "fuel" : "Benzin",
-            "power" : "500",
-            "capacity" : "500"
-          },
-          "transmission" : "MT",
-          "drive" : "AWD"
+      "techincal options": {
+        "engine": {
+          "fuel": "Benzin",
+          "power": "500",
+          "capacity": "500"
+        },
+        "transmission": "MT",
+        "drive": "AWD"
       },
-      "other options" : {
-          "safety" : [
-            "Система контроля слепых зон"
-          ]
+      "other options": {
+        "safety": [
+          "Система контроля слепых зон"
+        ]
       },
-      "colors" : {
-        "interior" : "White",
-        "exterior" : "Marina blue"
+      "colors": {
+        "interior": "White",
+        "exterior": "Marina blue"
       },
-      "images" : [
+      "images": [
         "/test/url.png"
       ],
-      "price" : "1000000"
+      "price": "1000000"
     }
   ]
 }

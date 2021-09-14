@@ -1,3 +1,3 @@
 version: 1
 cars:
-    - { id: ABCDEFGH, year: '2021', make: Test, model: TestModel, 'model trim': 'ABC', 'techincal options': {engine: {fuel: Benzin, power: '500', capacity: '500' }, transmission: MT, drive: AWD}, 'other options': {safety: ['Система контроля слепых зон']}, colors: {interior: 'White', exterior: 'Marina blue'}, images: ['/test/url.png'], price: '1000000'}
+  - { id: ABCDEFGH, year: '2021', make: Test, model: TestModel, 'model trim': 'ABC', 'techincal options': { engine: { fuel: Benzin, power: '500', capacity: '500' }, transmission: MT, drive: AWD }, 'other options': { safety: [ 'Система контроля слепых зон' ] }, colors: { interior: 'White', exterior: 'Marina blue' }, images: [ '/test/url.png' ], price: '1000000' }

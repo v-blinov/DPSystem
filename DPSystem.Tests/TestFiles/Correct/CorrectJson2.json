@@ -7,47 +7,47 @@
       "make": "Tesla",
       "model": "Model S",
       "model trim": "P85 I",
-      "techincal options" : {
-          "engine": {
-            "fuel" : "Electricity",
-            "power" : "422",
-            "capacity" : null
-          },
-          "transmission" : "MT",
-          "drive" : "AWD"
+      "techincal options": {
+        "engine": {
+          "fuel": "Electricity",
+          "power": "422",
+          "capacity": null
+        },
+        "transmission": "MT",
+        "drive": "AWD"
       },
-      "other options" : {
-          "comfort" : [
-            "Круиз-контроль",
-            "Система автоматической парковки",
-            "Электропривод зеркал",
-            "Бортовой компьютер",
-            "Запуск двигателя с кнопки"
-          ],
-          "interior" : [
-            "Спортивные передние сиденья",
-            "Подогрев задних сидений",
-            "Отделка кожей рулевого колеса",
-            "Центральный подлокотник спереди"
-          ],
-          "safety" : [
-            "Антиблокировочная система (ABS)",
-            "Крепление детского кресла (задний ряд) ISOFIX",
-            "Датчик давления в шинах",
-            "3-точечные ремни безопасности спереди с регулировкой высоты и преднатяжителями"
-          ]
+      "other options": {
+        "comfort": [
+          "Круиз-контроль",
+          "Система автоматической парковки",
+          "Электропривод зеркал",
+          "Бортовой компьютер",
+          "Запуск двигателя с кнопки"
+        ],
+        "interior": [
+          "Спортивные передние сиденья",
+          "Подогрев задних сидений",
+          "Отделка кожей рулевого колеса",
+          "Центральный подлокотник спереди"
+        ],
+        "safety": [
+          "Антиблокировочная система (ABS)",
+          "Крепление детского кресла (задний ряд) ISOFIX",
+          "Датчик давления в шинах",
+          "3-точечные ремни безопасности спереди с регулировкой высоты и преднатяжителями"
+        ]
       },
-      "colors" : {
-        "interior" : "White",
-        "exterior" : "Marina blue"
+      "colors": {
+        "interior": "White",
+        "exterior": "Marina blue"
       },
-      "images" : [
+      "images": [
         "/media/images/flat/SL2017/360/tesla/model_s_1.png",
         "/media/images/flat/SL2017/360/tesla/model_s_2.png",
         "/media/images/flat/SL2017/360/tesla/model_s_3.png",
         "/media/images/flat/SL2017/360/tesla/model_s_4.png"
       ],
-      "price" : "3400000"
+      "price": "3400000"
     },
     {
       "id": "0VJHVU92TAOA4XVUF",
@@ -55,47 +55,47 @@
       "make": "Tesla",
       "model": "Model S",
       "model trim": "P85 I",
-      "techincal options" : {
-          "engine": {
-            "fuel" : "Electricity",
-            "power" : "422",
-            "capacity" : null
-          },
-          "transmission" : "MT",
-          "drive" : "AWD"
+      "techincal options": {
+        "engine": {
+          "fuel": "Electricity",
+          "power": "422",
+          "capacity": null
+        },
+        "transmission": "MT",
+        "drive": "AWD"
       },
-      "other options" : {
-          "comfort" : [
-            "Круиз-контроль",
-            "Система автоматической парковки",
-            "Электропривод зеркал",
-            "Бортовой компьютер",
-            "Запуск двигателя с кнопки"
-          ],
-          "interior" : [
-            "Спортивные передние сиденья",
-            "Подогрев задних сидений",
-            "Отделка кожей рулевого колеса",
-            "Центральный подлокотник спереди"
-          ],
-          "safety" : [
-            "Антиблокировочная система (ABS)",
-            "Крепление детского кресла (задний ряд) ISOFIX",
-            "Датчик давления в шинах",
-            "3-точечные ремни безопасности спереди с регулировкой высоты и преднатяжителями"
-          ]
+      "other options": {
+        "comfort": [
+          "Круиз-контроль",
+          "Система автоматической парковки",
+          "Электропривод зеркал",
+          "Бортовой компьютер",
+          "Запуск двигателя с кнопки"
+        ],
+        "interior": [
+          "Спортивные передние сиденья",
+          "Подогрев задних сидений",
+          "Отделка кожей рулевого колеса",
+          "Центральный подлокотник спереди"
+        ],
+        "safety": [
+          "Антиблокировочная система (ABS)",
+          "Крепление детского кресла (задний ряд) ISOFIX",
+          "Датчик давления в шинах",
+          "3-точечные ремни безопасности спереди с регулировкой высоты и преднатяжителями"
+        ]
       },
-      "colors" : {
-        "interior" : "White",
-        "exterior" : "Marina blue"
+      "colors": {
+        "interior": "White",
+        "exterior": "Marina blue"
       },
-      "images" : [
+      "images": [
         "/media/images/flat/SL2017/360/tesla/model_s_1.png",
         "/media/images/flat/SL2017/360/tesla/model_s_2.png",
         "/media/images/flat/SL2017/360/tesla/model_s_3.png",
         "/media/images/flat/SL2017/360/tesla/model_s_4.png"
       ],
-      "price" : "3400000"
+      "price": "3400000"
     },
     {
       "id": "FSZSESRG7I1TIDC0K",
@@ -103,47 +103,47 @@
       "make": "Tesla",
       "model": "Model S",
       "model trim": "P85 I",
-      "techincal options" : {
-          "engine": {
-            "fuel" : "Electricity",
-            "power" : "422",
-            "capacity" : null
-          },
-          "transmission" : "MT",
-          "drive" : "AWD"
+      "techincal options": {
+        "engine": {
+          "fuel": "Electricity",
+          "power": "422",
+          "capacity": null
+        },
+        "transmission": "MT",
+        "drive": "AWD"
       },
-      "other options" : {
-          "comfort" : [
-            "Круиз-контроль",
-            "Система автоматической парковки",
-            "Электропривод зеркал",
-            "Бортовой компьютер",
-            "Запуск двигателя с кнопки"
-          ],
-          "interior" : [
-            "Спортивные передние сиденья",
-            "Подогрев задних сидений",
-            "Отделка кожей рулевого колеса",
-            "Центральный подлокотник спереди"
-          ],
-          "safety" : [
-            "Антиблокировочная система (ABS)",
-            "Крепление детского кресла (задний ряд) ISOFIX",
-            "Датчик давления в шинах",
-            "3-точечные ремни безопасности спереди с регулировкой высоты и преднатяжителями"
-          ]
+      "other options": {
+        "comfort": [
+          "Круиз-контроль",
+          "Система автоматической парковки",
+          "Электропривод зеркал",
+          "Бортовой компьютер",
+          "Запуск двигателя с кнопки"
+        ],
+        "interior": [
+          "Спортивные передние сиденья",
+          "Подогрев задних сидений",
+          "Отделка кожей рулевого колеса",
+          "Центральный подлокотник спереди"
+        ],
+        "safety": [
+          "Антиблокировочная система (ABS)",
+          "Крепление детского кресла (задний ряд) ISOFIX",
+          "Датчик давления в шинах",
+          "3-точечные ремни безопасности спереди с регулировкой высоты и преднатяжителями"
+        ]
       },
-      "colors" : {
-        "interior" : "White",
-        "exterior" : "Marina blue"
+      "colors": {
+        "interior": "White",
+        "exterior": "Marina blue"
       },
-      "images" : [
+      "images": [
         "/media/images/flat/SL2017/360/tesla/model_s_1.png",
         "/media/images/flat/SL2017/360/tesla/model_s_2.png",
         "/media/images/flat/SL2017/360/tesla/model_s_3.png",
         "/media/images/flat/SL2017/360/tesla/model_s_4.png"
       ],
-      "price" : "3400000"
+      "price": "3400000"
     },
     {
       "id": "TZSVS1L3ULLXI8VUZ",
@@ -151,47 +151,47 @@
       "make": "Tesla",
       "model": "Model S",
       "model trim": "P85 I",
-      "techincal options" : {
-          "engine": {
-            "fuel" : "Electricity",
-            "power" : "422",
-            "capacity" : null
-          },
-          "transmission" : "MT",
-          "drive" : "AWD"
+      "techincal options": {
+        "engine": {
+          "fuel": "Electricity",
+          "power": "422",
+          "capacity": null
+        },
+        "transmission": "MT",
+        "drive": "AWD"
       },
-      "other options" : {
-          "comfort" : [
-            "Круиз-контроль",
-            "Система автоматической парковки",
-            "Электропривод зеркал",
-            "Бортовой компьютер",
-            "Запуск двигателя с кнопки"
-          ],
-          "interior" : [
-            "Спортивные передние сиденья",
-            "Подогрев задних сидений",
-            "Отделка кожей рулевого колеса",
-            "Центральный подлокотник спереди"
-          ],
-          "safety" : [
-            "Антиблокировочная система (ABS)",
-            "Крепление детского кресла (задний ряд) ISOFIX",
-            "Датчик давления в шинах",
-            "3-точечные ремни безопасности спереди с регулировкой высоты и преднатяжителями"
-          ]
+      "other options": {
+        "comfort": [
+          "Круиз-контроль",
+          "Система автоматической парковки",
+          "Электропривод зеркал",
+          "Бортовой компьютер",
+          "Запуск двигателя с кнопки"
+        ],
+        "interior": [
+          "Спортивные передние сиденья",
+          "Подогрев задних сидений",
+          "Отделка кожей рулевого колеса",
+          "Центральный подлокотник спереди"
+        ],
+        "safety": [
+          "Антиблокировочная система (ABS)",
+          "Крепление детского кресла (задний ряд) ISOFIX",
+          "Датчик давления в шинах",
+          "3-точечные ремни безопасности спереди с регулировкой высоты и преднатяжителями"
+        ]
       },
-      "colors" : {
-        "interior" : "White",
-        "exterior" : "Marina blue"
+      "colors": {
+        "interior": "White",
+        "exterior": "Marina blue"
       },
-      "images" : [
+      "images": [
         "/media/images/flat/SL2017/360/tesla/model_s_1.png",
         "/media/images/flat/SL2017/360/tesla/model_s_2.png",
         "/media/images/flat/SL2017/360/tesla/model_s_3.png",
         "/media/images/flat/SL2017/360/tesla/model_s_4.png"
       ],
-      "price" : "3400000"
+      "price": "3400000"
     },
     {
       "id": "LRUPMNBHAR9EHAOH8",
@@ -199,47 +199,47 @@
       "make": "Tesla",
       "model": "Model S",
       "model trim": "P85 I",
-      "techincal options" : {
-          "engine": {
-            "fuel" : "Electricity",
-            "power" : "422",
-            "capacity" : null
-          },
-          "transmission" : "MT",
-          "drive" : "AWD"
+      "techincal options": {
+        "engine": {
+          "fuel": "Electricity",
+          "power": "422",
+          "capacity": null
+        },
+        "transmission": "MT",
+        "drive": "AWD"
       },
-      "other options" : {
-          "comfort" : [
-            "Круиз-контроль",
-            "Система автоматической парковки",
-            "Электропривод зеркал",
-            "Бортовой компьютер",
-            "Запуск двигателя с кнопки"
-          ],
-          "interior" : [
-            "Спортивные передние сиденья",
-            "Подогрев задних сидений",
-            "Отделка кожей рулевого колеса",
-            "Центральный подлокотник спереди"
-          ],
-          "safety" : [
-            "Антиблокировочная система (ABS)",
-            "Крепление детского кресла (задний ряд) ISOFIX",
-            "Датчик давления в шинах",
-            "3-точечные ремни безопасности спереди с регулировкой высоты и преднатяжителями"
-          ]
+      "other options": {
+        "comfort": [
+          "Круиз-контроль",
+          "Система автоматической парковки",
+          "Электропривод зеркал",
+          "Бортовой компьютер",
+          "Запуск двигателя с кнопки"
+        ],
+        "interior": [
+          "Спортивные передние сиденья",
+          "Подогрев задних сидений",
+          "Отделка кожей рулевого колеса",
+          "Центральный подлокотник спереди"
+        ],
+        "safety": [
+          "Антиблокировочная система (ABS)",
+          "Крепление детского кресла (задний ряд) ISOFIX",
+          "Датчик давления в шинах",
+          "3-точечные ремни безопасности спереди с регулировкой высоты и преднатяжителями"
+        ]
       },
-      "colors" : {
-        "interior" : "White",
-        "exterior" : "Marina blue"
+      "colors": {
+        "interior": "White",
+        "exterior": "Marina blue"
       },
-      "images" : [
+      "images": [
         "/media/images/flat/SL2017/360/tesla/model_s_1.png",
         "/media/images/flat/SL2017/360/tesla/model_s_2.png",
         "/media/images/flat/SL2017/360/tesla/model_s_3.png",
         "/media/images/flat/SL2017/360/tesla/model_s_4.png"
       ],
-      "price" : "3400000"
+      "price": "3400000"
     }
   ]
 }

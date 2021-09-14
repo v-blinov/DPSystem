@@ -25,9 +25,9 @@ namespace ApiDPSystem.Entities
             Url.GetHashCode() * 22;
 
         public Image GetValuesCopy() =>
-             new()
-             {
-                 Url = Url
-             };
+            new()
+            {
+                Url = Url
+            };
     }
 }

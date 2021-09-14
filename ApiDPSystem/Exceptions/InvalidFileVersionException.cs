@@ -2,13 +2,10 @@
 
 namespace ApiDPSystem.Exceptions
 {
-    [System.Serializable]
+    [Serializable]
     public class InvalidFileVersionException : Exception
     {
-        public int InvalidVersion { get; set; }
-        public string FileFormat { get; set; }
-        
-        public InvalidFileVersionException() : this($"Файл не поддерживается.") { }
+        public InvalidFileVersionException() : this("Файл не поддерживается.") { }
         public InvalidFileVersionException(string message) : base(message) { }
         public InvalidFileVersionException(string message, Exception inner) : base(message, inner) { }
         public InvalidFileVersionException(string message, string fileFormat, int invalidVersion) : base(message)
@@ -16,5 +13,7 @@ namespace ApiDPSystem.Exceptions
             FileFormat = fileFormat;
             InvalidVersion = invalidVersion;
         }
+        public int InvalidVersion { get; set; }
+        public string FileFormat { get; set; }
     }
 }

@@ -11,9 +11,9 @@ namespace ApiDPSystem.Entities
         public Image Image { get; set; }
 
         public CarImage GetValuesCopy() =>
-             new()
-             {
-                 Image = Image.GetValuesCopy()
-             };
+            new()
+            {
+                Image = Image.GetValuesCopy()
+            };
     }
 }

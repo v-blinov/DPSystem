@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
-using ApiDPSystem.Entities;
 using ApiDPSystem.Interfaces;
 
 namespace ApiDPSystem.FileFormat.Xml.Version1

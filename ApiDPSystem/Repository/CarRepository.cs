@@ -25,10 +25,10 @@ namespace ApiDPSystem.Repository
 
         public Car GetLastVersionCarWithVincodeAndDealerName(string vincode, string dealer)
         {
-            var ChoosenCars = _context.Cars.Include(p => p.Dealer)
+            var chosenCars = _context.Cars.Include(p => p.Dealer)
                                       .Where(p => p.Dealer.Name == dealer && p.VinCode == vincode)
                                       .ToList();
-            return ChoosenCars.FirstOrDefault(p => p.Version == ChoosenCars.Max(s => s.Version));
+            return chosenCars.FirstOrDefault(p => p.Version == chosenCars.Max(s => s.Version));
         }
 
         public void MarkSoldCars(List<string> soldCarVincodes)
