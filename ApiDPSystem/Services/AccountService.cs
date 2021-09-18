@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using System.Web;
 using ApiDPSystem.Models;
 using ApiDPSystem.Records;
@@ -78,31 +79,22 @@ namespace ApiDPSystem.Services
                 LastName = registerModel.LastName
             };
 
-            var createUserOperationResult = await _userManager.CreateAsync(user, registerModel.Password);
-            if (!createUserOperationResult.Succeeded)
-                return createUserOperationResult;
-
-            var addRoleOperationResult = await _userService.AddRoleToUser(user, UserRole);
-            if (!addRoleOperationResult.Succeeded)
+            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                await _userService.RemoveUser(user.Email);
-                return addRoleOperationResult;
+                var createUserOperationResult = await _userManager.CreateAsync(user, registerModel.Password);
+                if (!createUserOperationResult.Succeeded)
+                    return createUserOperationResult;
+                
+                var addRoleOperationResult = await _userService.AddRoleToUser(user, UserRole);
+                if (!addRoleOperationResult.Succeeded)
+                    return addRoleOperationResult;
+
+                var url = await GenerateRegisterUrlAsync(urlTemplate, user);
+                await SendRegistrationEmailAsync(user, url);
+                
+                transaction.Complete();
+                return IdentityResult.Success;
             }
-
-            SendMessage += _emailService.SendEmailAsync;
-            await SendRegistrationEmailAsync(user, url);
-
-            return IdentityResult.Success;
-        }
-
-        private async Task SendRegistrationEmailAsync(User user, string url)
-        {
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-            url = url.Replace("userIdValue", user.Id);
-            url = url.Replace("codeValue", HttpUtility.UrlEncode(code));
-
-            await SendMessage?.Invoke(user, "Confirm your account", $"Подтвердите регистрацию, перейдя по ссылке: <a href='{url}'>Confirm your email</a>");
         }
 
         public async Task<bool> ConfirmEmailAsync(string userId, string code)
