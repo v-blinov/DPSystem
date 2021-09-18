@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -50,9 +50,6 @@ namespace ApiDPSystem.Services
             _accountRepository = accountRepository;
         }
 
-        public event RegisterHandler SendMessage;
-
-
         public async Task<IdentityResult> LogInAsync(LogInRecord logInModel)
         {
             var checkResult = await IsEmailConfirmedAsync(logInModel.Email);
@@ -69,7 +66,7 @@ namespace ApiDPSystem.Services
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> RegisterAsync(RegisterRecord registerModel, string url)
+        public async Task<IdentityResult> RegisterAsync(RegisterRecord registerModel, string urlTemplate)
         {
             var user = new User
             {
@@ -110,27 +107,17 @@ namespace ApiDPSystem.Services
             return result.Succeeded;
         }
 
-        public async Task ForgotPasswordAsync(EmailRecord emailRecord, string url)
+        public async Task ForgotPasswordAsync(EmailRecord emailRecord, string urlTemplate)
         {
             var result = await IsEmailConfirmedAsync(emailRecord.Email);
 
             if (result.Succeeded)
             {
-                SendMessage += _emailService.SendEmailAsync;
-
                 var user = await _userManager.FindByEmailAsync(emailRecord.Email);
+
+                var url = await GenerateResetPasswordUrlAsync(urlTemplate, user);
                 await SendForgotPasswordEmailAsync(user, url);
             }
-        }
-
-        private async Task SendForgotPasswordEmailAsync(User user, string url)
-        {
-            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-            url = url.Replace("userIdValue", user.Id);
-            url = url.Replace("codeValue", code);
-
-            await SendMessage?.Invoke(user, "Reset password", $"Для сброса пароля пройдите по ссылке: <a href='{url}'>link</a>");
         }
 
         public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordRecord resetPassword)
@@ -144,25 +131,6 @@ namespace ApiDPSystem.Services
                 });
 
             return await _userManager.ResetPasswordAsync(user, resetPassword.Code, resetPassword.Password);
-        }
-
-        private async Task<IdentityResult> IsEmailConfirmedAsync(string email)
-        {
-            var user = await _userManager.FindByEmailAsync(email);
-
-            if (user == null)
-                return IdentityResult.Failed(new IdentityError
-                {
-                    Description = $"Пользователь с email {email} не найден."
-                });
-
-            if (!await _userManager.IsEmailConfirmedAsync(user))
-                return IdentityResult.Failed(new IdentityError
-                {
-                    Description = $"Email {email} не подтвержден."
-                });
-
-            return IdentityResult.Success;
         }
 
         public async Task<User> FindUserByEmailAsync(string email) =>
@@ -258,5 +226,53 @@ namespace ApiDPSystem.Services
 
         public async Task<IdentityResult> RegisterExternalUser(User user) =>
             await _userManager.CreateAsync(user);
+        
+        private async Task<string> GenerateRegisterUrlAsync(string url, User user)
+        {
+            var code = _userManager.GenerateEmailConfirmationTokenAsync(user); 
+
+            url = url.Replace("userIdValue", user.Id);
+            url = url.Replace("codeValue", HttpUtility.UrlEncode(await code));
+            
+            return url;
+        }
+        
+        private async Task SendRegistrationEmailAsync(User user, string url)
+        {
+            await _emailService.SendEmailAsync(user, "Confirm your account", $"Подтвердите регистрацию, перейдя по ссылке: <a href='{url}'>Confirm your email</a>");
+        }
+        
+        private async Task<string> GenerateResetPasswordUrlAsync(string url, User user)
+        {
+            var code = _userManager.GeneratePasswordResetTokenAsync(user); 
+
+            url = url.Replace("userIdValue", user.Id);
+            url = url.Replace("codeValue", await code);
+            
+            return url;
+        }
+        private async Task SendForgotPasswordEmailAsync(User user, string url)
+        {
+            await _emailService.SendEmailAsync(user, "Reset password", $"Для сброса пароля пройдите по ссылке: <a href='{url}'>link</a>");
+        }
+        
+        private async Task<IdentityResult> IsEmailConfirmedAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Description = $"Пользователь с email {email} не найден."
+                });
+
+            if (!await _userManager.IsEmailConfirmedAsync(user))
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Description = $"Email {email} не подтвержден."
+                });
+
+            return IdentityResult.Success;
+        }
     }
 }
