@@ -102,7 +102,7 @@ namespace DPSystem.Tests
                 var soldCars = context.Cars.Where(p => p.IsSold).Select(p => new {p.VinCode, p.Version, p.IsActual, p.IsSold}).ToList();
                
                 Assert.Equal(3, actualCars.Count());                
-                Assert.Equal(0, soldCars.Count());
+                Assert.Empty(soldCars);
                 Assert.Empty(actualCars.Intersect(soldCars));
             }
         }
