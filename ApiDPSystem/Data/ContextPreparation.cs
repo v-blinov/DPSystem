@@ -15,7 +15,9 @@ namespace ApiDPSystem.Data
             try
             {
                 using (var serviceScope = app.ApplicationServices.CreateScope())
+                {
                     SeedData(serviceScope.ServiceProvider.GetService<Context>());
+                }
             }
             catch (Exception ex)
             {
@@ -57,7 +59,7 @@ namespace ApiDPSystem.Data
                 Price = 1000000,
                 Version = 1
             };
-            
+
             context.Cars.Add(testCar);
             context.SaveChanges();
         }

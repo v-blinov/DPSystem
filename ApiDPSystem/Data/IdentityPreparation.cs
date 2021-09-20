@@ -17,9 +17,11 @@ namespace ApiDPSystem.Data
             try
             {
                 using (var serviceScope = app.ApplicationServices.CreateScope())
+                {
                     SeedData(serviceScope.ServiceProvider.GetService<IdentityContext>(), serviceScope.ServiceProvider.GetService<UserManager<User>>())
                         .GetAwaiter()
                         .GetResult();
+                }
             }
             catch (Exception ex)
             {
@@ -31,11 +33,11 @@ namespace ApiDPSystem.Data
         {
             if (identityContext.Users.Any())
             {
-                Console.WriteLine("--> We already have data");
+                Console.WriteLine("--> We already have users data");
                 return;
             }
 
-            Console.WriteLine("--> Seeding data...");
+            Console.WriteLine("--> Seeding users data...");
 
             var user = new User
             {
