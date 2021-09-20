@@ -209,6 +209,8 @@ namespace ApiDPSystem
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+
+            IdentityPreparation.PreparationUserAccounts(app);
         }
     }
 }
