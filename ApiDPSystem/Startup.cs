@@ -211,6 +211,7 @@ namespace ApiDPSystem
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
             IdentityPreparation.PreparationUserAccounts(app);
+            ContextPreparation.PreparationCarsInfo(app);
         }
     }
 }
