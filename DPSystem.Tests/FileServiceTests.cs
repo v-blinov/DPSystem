@@ -15,10 +15,10 @@ namespace DPSystem.Tests
     public class FileServiceTest
     {
         private const string DefaultDealer = "DefaultDealer";
-        
+
         private const string TestConnectionString = "Server=mssql,8083;Database=DPSystem.Tests;User=sa;Password=Qwerty123!;";
         private readonly DbContextOptions<Context> _testContextOptions = new DbContextOptionsBuilder<Context>().UseSqlServer(TestConnectionString).Options;
-        
+
         private void CreateDatabase()
         {
             using var context = new Context(_testContextOptions);
@@ -26,7 +26,7 @@ namespace DPSystem.Tests
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
         }
-        
+
         [InlineData("Correct/DefaultJson.json")]
         [InlineData("Correct/DefaultXml.xml")]
         [InlineData("Correct/DefaultCsv_v1.csv")]
@@ -48,11 +48,9 @@ namespace DPSystem.Tests
             dcsMock.Verify(p => p.MarkSoldCars(It.IsAny<List<Car>>(), DefaultDealer), Times.Once);
             dcsMock.Verify(p => p.SetToDatabase(It.IsAny<List<Car>>()), Times.Once);
         }
-        
-        private static string GetBasePath()
-        {
-            return @"..\..\..\TestFiles\";
-        }
+
+        private static string GetBasePath() =>
+            @"..\..\..\TestFiles\";
         private static string ReadFile(string path)
         {
             using var reader = new StreamReader(path);
@@ -62,7 +60,7 @@ namespace DPSystem.Tests
         {
             var fileMock = new Mock<IFormFile>();
 
-            
+
             var fileName = name;
             var content = ReadFile(GetBasePath() + name);
             var ms = new MemoryStream();

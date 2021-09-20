@@ -1,25 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using ApiDPSystem.Data;
-using ApiDPSystem.Models;
-using ApiDPSystem.Records;
-using ApiDPSystem.Repository;
-using ApiDPSystem.Services;
-using AutoFixture;
-using AutoFixture.Kernel;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Moq;
-using Xunit;
-
-
-namespace DPSystem.Tests
+﻿namespace DPSystem.Tests
 {
     public class AccountTests
     {

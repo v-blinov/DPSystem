@@ -49,10 +49,9 @@ namespace ApiDPSystem.Models.Parser
 
         public static Type GetResultType(string fileExtension, int version)
         {
-            if (ModelTypes.TryGetValue((fileExtension, version), out Type type))
+            if (ModelTypes.TryGetValue((fileExtension, version), out var type))
                 return type;
-            else 
-                throw new InvalidFileVersionException($"Неподдерживаемый файл фомата {fileExtension} версии {version}", fileExtension, version);
-        } 
+            throw new InvalidFileVersionException($"Неподдерживаемый файл фомата {fileExtension} версии {version}", fileExtension, version);
+        }
     }
 }

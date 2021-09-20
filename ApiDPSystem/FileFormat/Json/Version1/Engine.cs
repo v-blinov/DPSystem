@@ -16,7 +16,7 @@ namespace ApiDPSystem.FileFormat.Json.Version1
 
         public override int GetHashCode() =>
             Fuel.GetHashCode() * 13
-            + Power.GetHashCode() * 77 
+            + Power.GetHashCode() * 77
             + Capacity.GetHashCode() * 17;
 
         public override bool Equals(object obj)

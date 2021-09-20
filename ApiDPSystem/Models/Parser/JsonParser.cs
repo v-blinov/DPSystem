@@ -1,9 +1,9 @@
-﻿using ApiDPSystem.Entities;
-using ApiDPSystem.Exceptions;
-using ApiDPSystem.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using ApiDPSystem.Entities;
+using ApiDPSystem.Exceptions;
+using ApiDPSystem.Interfaces;
 
 namespace ApiDPSystem.Models.Parser
 {

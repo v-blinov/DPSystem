@@ -1,11 +1,11 @@
-using ApiDPSystem.Entities;
-using ApiDPSystem.Exceptions;
-using ApiDPSystem.Models.Parser;
-using FluentAssertions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ApiDPSystem.Entities;
+using ApiDPSystem.Exceptions;
+using ApiDPSystem.Models.Parser;
+using FluentAssertions;
 using Xunit;
 
 namespace DPSystem.Tests
@@ -13,9 +13,10 @@ namespace DPSystem.Tests
     public class ParserTests
     {
         private const string DefaultDealer = "defaultDealer";
+
         private readonly List<Car> _expectedContentResult = new()
         {
-            new()
+            new Car
             {
                 VinCode = "ABCDEFGH",
                 Dealer = new Dealer { Name = DefaultDealer },
@@ -27,15 +28,15 @@ namespace DPSystem.Tests
                     ModelTrim = "ABC",
                     Engine = new Engine { Fuel = "Benzin", Power = 500, Capacity = 500 },
                     Transmission = "MT",
-                    Drive = "AWD",
+                    Drive = "AWD"
                 },
                 CarFeatures = new List<CarFeature>
                 {
-                    new CarFeature() {Feature = new Feature {Type = "Safety", Description = "Система контроля слепых зон"}}
+                    new() { Feature = new Feature { Type = "Safety", Description = "РЎРёСЃС‚РµРјР° РєРѕРЅС‚СЂРѕР»СЏ СЃР»РµРїС‹С… Р·РѕРЅ" } }
                 },
                 ExteriorColor = new Color { Name = "Marina blue" },
                 InteriorColor = new Color { Name = "White" },
-                CarImages = new List<CarImage> { new CarImage { Image = new Image { Url = "/test/url.png" } } },
+                CarImages = new List<CarImage> { new() { Image = new Image { Url = "/test/url.png" } } },
                 Price = 1000000
             }
         };
@@ -52,8 +53,6 @@ namespace DPSystem.Tests
 
             parser.Should().BeOfType(parserType);
         }
-
-
 
 
         [InlineData("Correct/CorrectJson2.json", 5)]
@@ -123,14 +122,12 @@ namespace DPSystem.Tests
         }
 
 
-
-
         [Fact]
         public void Check_correct_json_content()
         {
             // Arrange
             const string fileName = "Correct/DefaultJson.json";
-            var fileContent = ReadFile((GetBasePath() + fileName));
+            var fileContent = ReadFile(GetBasePath() + fileName);
             var sut = new JsonParser();
 
             // Act
@@ -146,7 +143,7 @@ namespace DPSystem.Tests
         {
             // Arrange
             const string fileName = "Correct/DefaultXml.xml";
-            var fileContent = ReadFile((GetBasePath() + fileName));
+            var fileContent = ReadFile(GetBasePath() + fileName);
             var sut = new XmlParser();
 
             // Act
@@ -162,7 +159,7 @@ namespace DPSystem.Tests
         {
             // Arrange
             const string fileName = "Correct/DefaultYaml.yaml";
-            var fileContent = ReadFile((GetBasePath() + fileName));
+            var fileContent = ReadFile(GetBasePath() + fileName);
             var sut = new YamlParser();
 
             // Act
@@ -178,7 +175,7 @@ namespace DPSystem.Tests
         {
             // Arrange
             const string fileName = "Correct/DefaultCsv_v1.csv";
-            var fileContent = ReadFile((GetBasePath() + fileName));
+            var fileContent = ReadFile(GetBasePath() + fileName);
             var sut = new CsvParser();
 
             // Act
@@ -188,8 +185,6 @@ namespace DPSystem.Tests
             parsingResult.Should().BeOfType<List<Car>>();
             IsModelsEqual(_expectedContentResult, parsingResult).Should().BeTrue();
         }
-
-
 
 
         [Fact]
@@ -229,12 +224,8 @@ namespace DPSystem.Tests
         }
 
 
-
-
-        private static string GetBasePath()
-        {
-            return @"..\..\..\TestFiles\";
-        }
+        private static string GetBasePath() =>
+            @"..\..\..\TestFiles\";
         private static string ReadFile(string path)
         {
             using var reader = new StreamReader(path);
@@ -256,11 +247,9 @@ namespace DPSystem.Tests
                 var testResultFeatures = testCar.CarFeatures.ToList();
 
                 for (var j = 0; j < expectedFeatures.Count; j++)
-                {
                     if (expectedFeatures[j].Feature.Description != testResultFeatures[j].Feature.Description &&
                         expectedFeatures[j].Feature.Type != testResultFeatures[j].Feature.Type)
                         return false;
-                }
 
                 if (!expectedCar.ExteriorColor.Equals(testCar.ExteriorColor)) return false;
                 if (!expectedCar.InteriorColor.Equals(testCar.InteriorColor)) return false;
@@ -270,7 +259,8 @@ namespace DPSystem.Tests
                 var testResultImages = testCar.CarImages.ToList();
 
                 for (var j = 0; j < expectedImages.Count; j++)
-                    if (expectedImages[j].Image.Url != testResultImages[j].Image.Url) return false;
+                    if (expectedImages[j].Image.Url != testResultImages[j].Image.Url)
+                        return false;
 
                 if (expectedCar.Price != testCar.Price) return false;
             }

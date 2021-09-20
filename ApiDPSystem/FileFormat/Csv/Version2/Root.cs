@@ -1,10 +1,10 @@
-﻿using ApiDPSystem.Interfaces;
-using CsvHelper;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
+using ApiDPSystem.Interfaces;
+using CsvHelper;
 
 namespace ApiDPSystem.FileFormat.Csv.Version2
 {

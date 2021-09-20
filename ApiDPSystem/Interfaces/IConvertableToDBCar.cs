@@ -10,10 +10,10 @@ namespace ApiDPSystem.Interfaces
 
         public static List<CarFeature> GetFeaturesCollection(List<string> collection, string type)
         {
-            if (collection == null) 
+            if (collection == null)
                 return new List<CarFeature>();
 
-            return collection.Select(feature => new CarFeature {Feature = new Feature {Type = type, Description = feature}}).ToList();
+            return collection.Select(feature => new CarFeature { Feature = new Feature { Type = type, Description = feature } }).ToList();
         }
     }
 }

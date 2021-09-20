@@ -1,5 +1,5 @@
-﻿using ApiDPSystem.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using ApiDPSystem.Entities;
 
 namespace ApiDPSystem.Interfaces
 {

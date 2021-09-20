@@ -1,7 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
 using ApiDPSystem.Data;
 using ApiDPSystem.Models;
 using ApiDPSystem.Repository;
 using ApiDPSystem.Services;
+using ApiDPSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,10 +18,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using ApiDPSystem.Services.Interfaces;
 
 namespace ApiDPSystem
 {
@@ -34,15 +34,14 @@ namespace ApiDPSystem
         {
             #region DbContexts and Identity
             services.AddDbContext<IdentityContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
+                                                       options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
 
             services.AddIdentity<User, IdentityRole>()
                     .AddEntityFrameworkStores<IdentityContext>()
                     .AddDefaultTokenProviders();
 
             services.AddDbContext<Context>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
+                                               options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             #endregion
 
             #region AuthenticationShemes
@@ -96,7 +95,7 @@ namespace ApiDPSystem
             #endregion
 
             services.AddControllers()
-                .ConfigureApiBehaviorOptions(options => { options.SuppressModelStateInvalidFilter = true; });
+                    .ConfigureApiBehaviorOptions(options => { options.SuppressModelStateInvalidFilter = true; });
 
             services.Configure<DataProtectionTokenProviderOptions>(p => p.TokenLifespan = TimeSpan.FromMinutes(30));
 

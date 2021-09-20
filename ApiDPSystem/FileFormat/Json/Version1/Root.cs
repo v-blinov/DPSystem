@@ -1,7 +1,7 @@
-﻿using ApiDPSystem.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using ApiDPSystem.Interfaces;
 
 namespace ApiDPSystem.FileFormat.Json.Version1
 {
@@ -18,7 +18,7 @@ namespace ApiDPSystem.FileFormat.Json.Version1
         public string FileFormat => ".json";
         public int Version => 1;
 
-        public List<Entities.Car> ConvertToActualDbModel(string dealerName) => 
+        public List<Entities.Car> ConvertToActualDbModel(string dealerName) =>
             Cars.Select(car => car.ConvertToCarActualDbModel(dealerName)).ToList();
     }
 }

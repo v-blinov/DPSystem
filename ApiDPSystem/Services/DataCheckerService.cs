@@ -1,6 +1,6 @@
-﻿using ApiDPSystem.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using ApiDPSystem.Entities;
 using ApiDPSystem.Repository;
 using ApiDPSystem.Services.Interfaces;
 
@@ -27,12 +27,12 @@ namespace ApiDPSystem.Services
         public void SetToDatabase(List<Car> models)
         {
             //foreach (var model in models)
-            for(var i = 0; i < models.Count; i++)
+            for (var i = 0; i < models.Count; i++)
             {
                 var model = models[i];
-                
+
                 var dealerName = model.Dealer.Name;
-                
+
                 SetColorIdIfExist(model);
                 SetCarImageIdsIfExist(model);
                 SetDealerIdIfExist(model);
@@ -45,7 +45,9 @@ namespace ApiDPSystem.Services
                 if (existedCar is not null)
                 {
                     if (existedCar.IsSold)
+                    {
                         model.Version = existedCar.Version + 1;
+                    }
                     else if (IsCarModified(model, existedCar))
                     {
                         _carRepository.SetAsNotActual(existedCar);
@@ -53,7 +55,9 @@ namespace ApiDPSystem.Services
                     }
                 }
                 else
+                {
                     model.Version = 1;
+                }
             }
             _carRepository.AddCarRangeToDb(models);
         }
@@ -160,7 +164,7 @@ namespace ApiDPSystem.Services
             var existedCarFeaturesIds = existedCarFeatures.OrderBy(p => p.FeatureId).Select(p => p.FeatureId).ToList();
             var newCarFeaturesIds = newCar.CarFeatures.OrderBy(p => p.FeatureId).Select(p => p.FeatureId).ToList();
             if (!existedCarFeaturesIds.SequenceEqual(newCarFeaturesIds)) return true;
-            
+
             var existedCarImages = _carRepository.GetCarImagesListByCarId(existedCar.Id);
             if (newCar.CarImages.Count() != existedCarImages.Count()) return true;
             var existedCarImagesIds = existedCarImages.OrderBy(p => p.ImageId).Select(p => p.ImageId).ToList();

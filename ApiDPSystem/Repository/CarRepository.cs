@@ -1,9 +1,9 @@
-﻿using ApiDPSystem.Data;
-using ApiDPSystem.Entities;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ApiDPSystem.Data;
+using ApiDPSystem.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiDPSystem.Repository
 {
@@ -15,19 +15,19 @@ namespace ApiDPSystem.Repository
         {
             _context = context;
         }
-        
+
         public List<string> GetActualCarsVinCodesForDealer(string dealerName) =>
             _context.Cars
-            .Include(p => p.Dealer)
-            .Where(p => p.Dealer.Name == dealerName && p.IsActual)
-            .Select(p => p.VinCode)
-            .ToList();
+                    .Include(p => p.Dealer)
+                    .Where(p => p.Dealer.Name == dealerName && p.IsActual)
+                    .Select(p => p.VinCode)
+                    .ToList();
 
         public Car GetLastVersionCarWithVincodeAndDealerName(string vincode, string dealer)
         {
             var chosenCars = _context.Cars.Include(p => p.Dealer)
-                                      .Where(p => p.Dealer.Name == dealer && p.VinCode == vincode)
-                                      .ToList();
+                                     .Where(p => p.Dealer.Name == dealer && p.VinCode == vincode)
+                                     .ToList();
             return chosenCars.FirstOrDefault(p => p.Version == chosenCars.Max(s => s.Version));
         }
 
@@ -105,7 +105,7 @@ namespace ApiDPSystem.Repository
                            .ToList()
                            .FirstOrDefault(p => feature.Equals(p));
         }
-        
+
         public void AddCarToDb(Car model)
         {
             _context.Cars.Add(model);
@@ -129,6 +129,5 @@ namespace ApiDPSystem.Repository
             if (car != null) car.IsActual = false;
             _context.SaveChanges();
         }
-
     }
 }

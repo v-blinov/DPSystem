@@ -49,7 +49,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version2
             carFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
 
             var carImages = Images
-                            .Select(image => new CarImage {Image = new Image {Url = image}})
+                            .Select(image => new CarImage { Image = new Image { Url = image } })
                             .ToList();
 
             var dbConfiguration = new Configuration
@@ -68,7 +68,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version2
                 }
             };
 
-            var dbCar = new Entities.Car()
+            var dbCar = new Entities.Car
             {
                 VinCode = Id,
                 Price = int.TryParse(Price, out var price) ? price : null,
@@ -77,7 +77,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version2
                 InteriorColor = new Color { Name = Colors.Interior },
                 ExteriorColor = new Color { Name = Colors.Exterior },
                 Configuration = dbConfiguration,
-                CarFeatures = carFeatures,
+                CarFeatures = carFeatures
             };
             return dbCar;
         }

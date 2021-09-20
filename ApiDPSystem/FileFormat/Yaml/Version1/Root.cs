@@ -1,6 +1,6 @@
-﻿using ApiDPSystem.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using ApiDPSystem.Interfaces;
 using YamlDotNet.Serialization;
 
 namespace ApiDPSystem.FileFormat.Yaml.Version1

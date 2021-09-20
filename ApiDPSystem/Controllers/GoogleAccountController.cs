@@ -55,6 +55,7 @@ namespace ApiDPSystem.Controllers
                         StatusCode = StatusCodes.Status400BadRequest,
                         Message = "Данные пользователя не обнаружены."
                     };
+
                 //возможно стоит редиректнуть на страницу входа
 
                 //Если внешний пользователь уже сохранен в нашей базе, то генерируем токены

@@ -81,14 +81,14 @@ namespace ApiDPSystem.Services
                 var createUserOperationResult = await _userManager.CreateAsync(user, registerModel.Password);
                 if (!createUserOperationResult.Succeeded)
                     return createUserOperationResult;
-                
+
                 var addRoleOperationResult = await _userService.AddRoleToUser(user, UserRole);
                 if (!addRoleOperationResult.Succeeded)
                     return addRoleOperationResult;
 
                 var url = await GenerateRegisterUrlAsync(urlTemplate, user);
                 await SendRegistrationEmailAsync(user, url);
-                
+
                 transaction.Complete();
                 return IdentityResult.Success;
             }
@@ -226,36 +226,32 @@ namespace ApiDPSystem.Services
 
         public async Task<IdentityResult> RegisterExternalUser(User user) =>
             await _userManager.CreateAsync(user);
-        
+
         private async Task<string> GenerateRegisterUrlAsync(string url, User user)
         {
-            var code = _userManager.GenerateEmailConfirmationTokenAsync(user); 
+            var code = _userManager.GenerateEmailConfirmationTokenAsync(user);
 
             url = url.Replace("userIdValue", user.Id);
             url = url.Replace("codeValue", HttpUtility.UrlEncode(await code));
-            
+
             return url;
         }
-        
-        private async Task SendRegistrationEmailAsync(User user, string url)
-        {
+
+        private async Task SendRegistrationEmailAsync(User user, string url) =>
             await _emailService.SendEmailAsync(user, "Confirm your account", $"Подтвердите регистрацию, перейдя по ссылке: <a href='{url}'>Confirm your email</a>");
-        }
-        
+
         private async Task<string> GenerateResetPasswordUrlAsync(string url, User user)
         {
-            var code = _userManager.GeneratePasswordResetTokenAsync(user); 
+            var code = _userManager.GeneratePasswordResetTokenAsync(user);
 
             url = url.Replace("userIdValue", user.Id);
             url = url.Replace("codeValue", await code);
-            
+
             return url;
         }
-        private async Task SendForgotPasswordEmailAsync(User user, string url)
-        {
+        private async Task SendForgotPasswordEmailAsync(User user, string url) =>
             await _emailService.SendEmailAsync(user, "Reset password", $"Для сброса пароля пройдите по ссылке: <a href='{url}'>link</a>");
-        }
-        
+
         private async Task<IdentityResult> IsEmailConfirmedAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
