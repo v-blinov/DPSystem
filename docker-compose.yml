@@ -63,5 +63,21 @@ services:
         ports:
             - 8083:1433
 
+    seq:
+      image: datalust/seq:latest
+      container_name: seq
+      restart: always
+      environment:
+        - ACCEPT_EULA=Y
+      volumes:
+        - seq:/data
+      ports:
+        - 5380:80
+        - 5341:5341
+
+volumes:
+  seq:
+
+
 networks:
     default:

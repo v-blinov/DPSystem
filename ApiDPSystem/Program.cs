@@ -17,6 +17,7 @@ namespace ApiDPSystem
                          .Build();
 
             Log.Logger = new LoggerConfiguration()
+                         .Enrich.WithProperty("ApplicationName", typeof(Program).Namespace)
                          .ReadFrom.Configuration(config)
                          .CreateLogger();
             #endregion
