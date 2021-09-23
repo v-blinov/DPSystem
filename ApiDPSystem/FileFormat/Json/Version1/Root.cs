@@ -19,6 +19,6 @@ namespace ApiDPSystem.FileFormat.Json.Version1
         public int Version => 1;
 
         public List<Entities.Car> ConvertToActualDbModel(string dealerName) =>
-            Cars.Select(car => car.ConvertToCarActualDbModel(dealerName)).ToList();
+            Cars.Select(car => car.ConvertCarToDbModel(dealerName)).ToList();
     }
 }

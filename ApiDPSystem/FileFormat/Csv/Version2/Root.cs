@@ -22,7 +22,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version2
         public int Version => 2;
 
         public List<Entities.Car> ConvertToActualDbModel(string dealerName) =>
-            Cars.Select(car => car.ConvertToCarActualDbModel(dealerName)).ToList();
+            Cars.Select(car => car.ConvertCarToDbModel(dealerName)).ToList();
 
         public IRoot Deserialize(string fileContent)
         {

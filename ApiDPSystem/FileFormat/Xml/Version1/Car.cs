@@ -40,7 +40,7 @@ namespace ApiDPSystem.FileFormat.Xml.Version1
         public string Price { get; set; }
 
 
-        public Entities.Car ConvertToCarActualDbModel(string dealerName)
+        public Entities.Car ConvertCarToDbModel(string dealerName)
         {
             var carFeatures = new List<CarFeature>();
 

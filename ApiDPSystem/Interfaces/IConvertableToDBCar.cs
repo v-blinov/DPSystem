@@ -6,7 +6,7 @@ namespace ApiDPSystem.Interfaces
 {
     public interface IConvertableToDbCar
     {
-        public Car ConvertToCarActualDbModel(string dealerName);
+        public Car ConvertCarToDbModel(string dealerName);
 
         public static List<CarFeature> GetFeaturesCollection(List<string> collection, string type)
         {

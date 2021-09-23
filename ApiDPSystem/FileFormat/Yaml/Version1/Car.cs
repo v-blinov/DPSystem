@@ -38,7 +38,7 @@ namespace ApiDPSystem.FileFormat.Yaml.Version1
         [YamlMember(Alias = "price")]
         public string Price { get; set; }
 
-        public Entities.Car ConvertToCarActualDbModel(string dealerName)
+        public Entities.Car ConvertCarToDbModel(string dealerName)
         {
             var carFeatures = new List<CarFeature>();
 
