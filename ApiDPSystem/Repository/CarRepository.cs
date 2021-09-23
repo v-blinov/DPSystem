@@ -130,6 +130,8 @@ namespace ApiDPSystem.Repository
             _context.SaveChanges();
         }
         
+        
+        // TODO: Сделать один общий запрос на вытягивание всех данных о модели, после INNERJOIN-ить его с запросом на нужную нам выборку
         public List<Car> GetFullActualCarsInfoForDealer(string dealerName)
         {
             return _context.Cars
@@ -143,7 +145,7 @@ namespace ApiDPSystem.Repository
                     .Where(p => p.Dealer.Name == dealerName && p.IsActual)
                     .ToList();
         }
-        public IEnumerable<Car> GetFullSoldCarsInfoForDealer(string dealerName)
+        public List<Car> GetFullSoldCarsInfoForDealer(string dealerName)
         {
             return _context.Cars
                            .Include(p => p.Dealer)
@@ -154,6 +156,19 @@ namespace ApiDPSystem.Repository
                            .Include(p => p.InteriorColor)
                            .Include(p => p.CarImages).ThenInclude(p => p.Image)
                            .Where(p => p.Dealer.Name == dealerName && p.IsSold)
+                           .ToList();
+        }
+        public List<Car> GetFullHistoryInfoForDealer(string dealerName)
+        {
+            return _context.Cars
+                           .Include(p => p.Dealer)
+                           .Include(p => p.Configuration).ThenInclude(p => p.Engine)
+                           .Include(p => p.Configuration).ThenInclude(p => p.Producer)
+                           .Include(p => p.CarFeatures).ThenInclude(p => p.Feature)
+                           .Include(p => p.ExteriorColor)
+                           .Include(p => p.InteriorColor)
+                           .Include(p => p.CarImages).ThenInclude(p => p.Image)
+                           .Where(p => p.Dealer.Name == dealerName)
                            .ToList();
         }
     }
