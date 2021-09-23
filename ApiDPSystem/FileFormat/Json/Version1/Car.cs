@@ -77,5 +77,41 @@ namespace ApiDPSystem.FileFormat.Json.Version1
             };
             return dbCar;
         }
+
+        public IConvertableToDbCar ConvertFromDbModel(Entities.Car dbModel)
+        {
+            return new Car()
+            {
+                Id = dbModel.VinCode,
+                Price = dbModel.Price.ToString(),
+                Year = dbModel.Configuration.Year.ToString(),
+                Model = dbModel.Configuration.Model,
+                ModelTrim = dbModel.Configuration.ModelTrim,
+                Make = dbModel.Configuration.Producer.Name,
+                Images = dbModel.CarImages.Select(p => p.Image.Url).ToList(),
+                Colors = new Colors()
+                {
+                    Exterior = dbModel.ExteriorColor.Name,
+                    Interior = dbModel.InteriorColor.Name,
+                },
+                TechnicalOptions = new TechnicalOptions()
+                {
+                    Drive = dbModel.Configuration.Drive,
+                    Engine = new Engine()
+                    {
+                        Fuel = dbModel.Configuration.Engine.Fuel,
+                        Power = dbModel.Configuration.Engine.Power.ToString(),
+                        Capacity = dbModel.Configuration.Engine.Capacity.ToString(),
+                    },
+                    Transmission = dbModel.Configuration.Transmission,
+                },
+                OtherOptions = new OtherOptions()
+                {
+                    Exterior = dbModel.CarFeatures.Select(p => p.Feature).Where(p => p.Type == "Exterior").Select(p => p.Description).ToList(),
+                    Interior = dbModel.CarFeatures.Select(p => p.Feature).Where(p => p.Type == "Interior").Select(p => p.Description).ToList(),
+                    Safety = dbModel.CarFeatures.Select(p => p.Feature).Where(p => p.Type == "Safety").Select(p => p.Description).ToList(),
+                }
+            };
+        }
     }
 }

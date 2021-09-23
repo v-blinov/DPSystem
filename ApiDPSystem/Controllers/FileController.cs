@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using ApiDPSystem.Exceptions;
 using ApiDPSystem.Filters;
@@ -65,6 +66,55 @@ namespace ApiDPSystem.Controllers
                     StatusCode = StatusCodes.Status500InternalServerError,
                     Message = "Ошибка на стороне сервера"
                 };
+            }
+        }
+
+        [HttpPost]
+        public ActionResult GetActualCarsInJsonFile([FromForm] string dealerName)
+        {
+            try
+            {
+                var fileInfo = "Actual";
+                var fileExtension = ".json";
+        
+                var fileContentInString = _fileService.GetActualCarsInStringAsJson(dealerName);
+        
+                var byteArray = Encoding.UTF8.GetBytes(fileContentInString);
+                var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
+                {
+                    FileDownloadName = $"{dealerName}_{fileInfo}{fileExtension}"
+
+                };
+                return fileContentResult;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        
+        [HttpPost]
+        public ActionResult GetSoldCarsInJsonFile([FromForm] string dealerName)
+        {
+            try
+            {
+                var fileInfo = "Sold";
+                var fileExtension = ".json";
+        
+                var fileContentInString = _fileService.GetSoldCarsInStringAsJson(dealerName);
+        
+                var byteArray = Encoding.UTF8.GetBytes(fileContentInString);
+                var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
+                {
+                    FileDownloadName = $"{dealerName}_{fileInfo}{fileExtension}"
+                };
+                return fileContentResult;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "");
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
     }

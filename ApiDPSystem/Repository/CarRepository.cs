@@ -129,5 +129,32 @@ namespace ApiDPSystem.Repository
             if (car != null) car.IsActual = false;
             _context.SaveChanges();
         }
+        
+        public List<Car> GetFullActualCarsInfoForDealer(string dealerName)
+        {
+            return _context.Cars
+                    .Include(p => p.Dealer)
+                    .Include(p => p.Configuration).ThenInclude(p => p.Engine)
+                    .Include(p => p.Configuration).ThenInclude(p => p.Producer)
+                    .Include(p => p.CarFeatures).ThenInclude(p => p.Feature)
+                    .Include(p => p.ExteriorColor)
+                    .Include(p => p.InteriorColor)
+                    .Include(p => p.CarImages).ThenInclude(p => p.Image)
+                    .Where(p => p.Dealer.Name == dealerName && p.IsActual)
+                    .ToList();
+        }
+        public IEnumerable<Car> GetFullSoldCarsInfoForDealer(string dealerName)
+        {
+            return _context.Cars
+                           .Include(p => p.Dealer)
+                           .Include(p => p.Configuration).ThenInclude(p => p.Engine)
+                           .Include(p => p.Configuration).ThenInclude(p => p.Producer)
+                           .Include(p => p.CarFeatures).ThenInclude(p => p.Feature)
+                           .Include(p => p.ExteriorColor)
+                           .Include(p => p.InteriorColor)
+                           .Include(p => p.CarImages).ThenInclude(p => p.Image)
+                           .Where(p => p.Dealer.Name == dealerName && p.IsSold)
+                           .ToList();
+        }
     }
 }
