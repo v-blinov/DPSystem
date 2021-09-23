@@ -45,6 +45,8 @@ namespace ApiDPSystem.FileFormat.Json.Version1
             carFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Exterior, nameof(OtherOptions.Exterior)));
             carFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Interior, nameof(OtherOptions.Interior)));
             carFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Safety, nameof(OtherOptions.Safety)));
+            carFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Multimedia, nameof(OtherOptions.Multimedia)));
+            carFeatures.AddRange(IConvertableToDbCar.GetFeaturesCollection(OtherOptions.Comfort, nameof(OtherOptions.Comfort)));
 
             var carImages = Images.Select(image => new CarImage { Image = new Image { Url = image } }).ToList();
 
@@ -76,42 +78,6 @@ namespace ApiDPSystem.FileFormat.Json.Version1
                 CarFeatures = carFeatures
             };
             return dbCar;
-        }
-
-        public IConvertableToDbCar ConvertFromDbModel(Entities.Car dbModel)
-        {
-            return new Car()
-            {
-                Id = dbModel.VinCode,
-                Price = dbModel.Price.ToString(),
-                Year = dbModel.Configuration.Year.ToString(),
-                Model = dbModel.Configuration.Model,
-                ModelTrim = dbModel.Configuration.ModelTrim,
-                Make = dbModel.Configuration.Producer.Name,
-                Images = dbModel.CarImages.Select(p => p.Image.Url).ToList(),
-                Colors = new Colors()
-                {
-                    Exterior = dbModel.ExteriorColor.Name,
-                    Interior = dbModel.InteriorColor.Name,
-                },
-                TechnicalOptions = new TechnicalOptions()
-                {
-                    Drive = dbModel.Configuration.Drive,
-                    Engine = new Engine()
-                    {
-                        Fuel = dbModel.Configuration.Engine.Fuel,
-                        Power = dbModel.Configuration.Engine.Power.ToString(),
-                        Capacity = dbModel.Configuration.Engine.Capacity.ToString(),
-                    },
-                    Transmission = dbModel.Configuration.Transmission,
-                },
-                OtherOptions = new OtherOptions()
-                {
-                    Exterior = dbModel.CarFeatures.Select(p => p.Feature).Where(p => p.Type == "Exterior").Select(p => p.Description).ToList(),
-                    Interior = dbModel.CarFeatures.Select(p => p.Feature).Where(p => p.Type == "Interior").Select(p => p.Description).ToList(),
-                    Safety = dbModel.CarFeatures.Select(p => p.Feature).Where(p => p.Type == "Safety").Select(p => p.Description).ToList(),
-                }
-            };
         }
     }
 }
