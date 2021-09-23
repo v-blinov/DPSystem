@@ -15,7 +15,5 @@ namespace ApiDPSystem.Interfaces
 
             return collection.Select(feature => new CarFeature { Feature = new Feature { Type = type, Description = feature } }).ToList();
         }
-
-        public IConvertableToDbCar ConvertFromDbModel(Entities.Car dbModel);
     }
 }
