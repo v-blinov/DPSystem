@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -9,6 +12,7 @@ using ApiDPSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using System.Text.Unicode;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ApiDPSystem.Services
 {
@@ -54,26 +58,46 @@ namespace ApiDPSystem.Services
             return await reader.ReadToEndAsync();
         }
         
+        
+        
         public string GetActualCarsInStringAsJson(string dealerName)
         {
-            var jsonV1Cars = new List<FileFormat.Json.Version1.Car>();
-
-            var actualCars = _carRepository.GetFullActualCarsInfoForDealer(dealerName);
-            foreach (var dbModelCar in actualCars)
-                jsonV1Cars.Add(new FileFormat.Json.Version1.Car().ConvertFromDbModel(dbModelCar) as FileFormat.Json.Version1.Car);
-            
-            return JsonSerializer.Serialize(jsonV1Cars, _jsonSerializerOptions);
+            Func<string, List<Entities.Car>> repositoryCarChoosingMethod = _carRepository.GetFullActualCarsInfoForDealer;
+            return ConvertToJsonString(repositoryCarChoosingMethod, dealerName);
         }
         
         public string GetSoldCarsInStringAsJson(string dealerName)
         {
-            var jsonV1Cars = new List<FileFormat.Json.Version1.Car>();
-
-            var actualCars = _carRepository.GetFullSoldCarsInfoForDealer(dealerName);
-            foreach (var dbModelCar in actualCars)
-                jsonV1Cars.Add(new FileFormat.Json.Version1.Car().ConvertFromDbModel(dbModelCar) as FileFormat.Json.Version1.Car);
+            Func<string, List<Entities.Car>> repositoryCarChoosingMethod = _carRepository.GetFullSoldCarsInfoForDealer;
+            return ConvertToJsonString(repositoryCarChoosingMethod, dealerName);
+        }
+        
+        public string GetAllHistoryInStringAsJson(string dealerName)
+        {
+            Func<string, List<Entities.Car>> repositoryCarChoosingMethod = _carRepository.GetFullHistoryInfoForDealer;
+            return ConvertToJsonString(repositoryCarChoosingMethod, dealerName);
+        }
+        
+        
+        
+        public ActionResult CreateJsonFile(Func<string, string> getCarsMethod, string fileName, string dealerName)
+        {
+            var fileContentInString = getCarsMethod(dealerName);
+            var byteArray = Encoding.UTF8.GetBytes(fileContentInString);
+            var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
+            {
+                FileDownloadName = fileName
+            };
+            return fileContentResult;
+        }
+        
+        private string ConvertToJsonString(Func<string, List<Entities.Car>> repositoryCarChoosingMethod, string dealerName)
+        {
+            var actualCars = repositoryCarChoosingMethod(dealerName);
             
-            return JsonSerializer.Serialize(jsonV1Cars, _jsonSerializerOptions);
+            var jsonUniversalVersion = actualCars.Select(FileFormat.Json.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
+
+            return JsonSerializer.Serialize(jsonUniversalVersion, _jsonSerializerOptions);
         }
     }
 }
