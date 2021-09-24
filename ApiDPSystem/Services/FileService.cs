@@ -12,6 +12,7 @@ using ApiDPSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using System.Text.Unicode;
+using ApiDPSystem.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiDPSystem.Services
@@ -57,33 +58,12 @@ namespace ApiDPSystem.Services
             using var reader = new StreamReader(file.OpenReadStream());
             return await reader.ReadToEndAsync();
         }
-        
-        
-        
-        public string GetActualCarsInStringAsJson(string dealerName)
+
+        public ActionResult CreateJsonFile(string fileName, Filter filter)
         {
-            Func<string, List<Entities.Car>> repositoryCarChoosingMethod = _carRepository.GetFullActualCarsInfoForDealer;
-            return ConvertToJsonString(repositoryCarChoosingMethod, dealerName);
-        }
-        
-        public string GetSoldCarsInStringAsJson(string dealerName)
-        {
-            Func<string, List<Entities.Car>> repositoryCarChoosingMethod = _carRepository.GetFullSoldCarsInfoForDealer;
-            return ConvertToJsonString(repositoryCarChoosingMethod, dealerName);
-        }
-        
-        public string GetAllHistoryInStringAsJson(string dealerName)
-        {
-            Func<string, List<Entities.Car>> repositoryCarChoosingMethod = _carRepository.GetFullHistoryInfoForDealer;
-            return ConvertToJsonString(repositoryCarChoosingMethod, dealerName);
-        }
-        
-        
-        
-        public ActionResult CreateJsonFile(Func<string, string> getCarsMethod, string fileName, string dealerName)
-        {
-            var fileContentInString = getCarsMethod(dealerName);
-            var byteArray = Encoding.UTF8.GetBytes(fileContentInString);
+            var carEntities = _carRepository.GetFullCarsInfoWithFilter(filter);
+            var carsInfoInStringAsJson = ConvertToJsonString(carEntities);
+            var byteArray = Encoding.UTF8.GetBytes(carsInfoInStringAsJson);
             var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
             {
                 FileDownloadName = fileName
@@ -91,12 +71,9 @@ namespace ApiDPSystem.Services
             return fileContentResult;
         }
         
-        private string ConvertToJsonString(Func<string, List<Entities.Car>> repositoryCarChoosingMethod, string dealerName)
+        private string ConvertToJsonString(List<Entities.Car> carEntities)
         {
-            var actualCars = repositoryCarChoosingMethod(dealerName);
-            
-            var jsonUniversalVersion = actualCars.Select(FileFormat.Json.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
-
+            var jsonUniversalVersion = carEntities.Select(FileFormat.Json.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
             return JsonSerializer.Serialize(jsonUniversalVersion, _jsonSerializerOptions);
         }
     }

@@ -69,66 +69,23 @@ namespace ApiDPSystem.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetActualCarsInJsonFile([FromForm] string dealerName= "Izhevsk")
+        public ActionResult GetCarsByFilterInJson([FromForm] Filter filter)
         {
-            if (string.IsNullOrEmpty(dealerName))
+            if (filter is null)
             {
-                Log.Warning("При обращении к методу GetActualCarsInJsonFile не отправлен обязательный параметр dealerName");
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                Log.Error("При обращении к методу GetCarsByFilterInJson filter - null");
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+            if (string.IsNullOrEmpty(filter.DealerName))
+            {
+                Log.Warning("При обращении к методу GetCarsByFilterInJson не отправлен обязательный параметр dealerName");
+                return StatusCode(StatusCodes.Status400BadRequest);
             }
             
             try
             {
-                var fileName = $"{dealerName}_Actual.json";
-                Func<string, string> getCarsMethod = _fileService.GetActualCarsInStringAsJson;
-
-                return _fileService.CreateJsonFile(getCarsMethod, fileName, dealerName);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-        
-        [HttpPost]
-        public ActionResult GetSoldCarsInJsonFile([FromForm] string dealerName = "Izhevsk")
-        {
-            if (string.IsNullOrEmpty(dealerName))
-            {
-                Log.Warning("При обращении к методу GetSoldCarsInJsonFile не отправлен обязательный параметр dealerName");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-            
-            try
-            {
-                var fileName = $"{dealerName}_Sold.json";
-                Func<string, string> getCarsMethod = _fileService.GetSoldCarsInStringAsJson;
-
-                return _fileService.CreateJsonFile(getCarsMethod, fileName, dealerName);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-        
-        [HttpPost]
-        public ActionResult GetAllHistoryInJsonFile([FromForm] string dealerName= "Izhevsk")
-        {
-            if (string.IsNullOrEmpty(dealerName))
-            {
-                Log.Warning("При обращении к методу GetAllHistoryInJsonFile не отправлен обязательный параметр dealerName");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-            
-            try
-            {
-                var fileName = $"{dealerName}_History.json";
-                Func<string, string> getCarsMethod = _fileService.GetAllHistoryInStringAsJson;
-
-                return _fileService.CreateJsonFile(getCarsMethod, fileName, dealerName);
+                var fileName = $"{filter.DealerName}_Actual.json";
+                return _fileService.CreateJsonFile(fileName, filter);
             }
             catch (Exception ex)
             {
