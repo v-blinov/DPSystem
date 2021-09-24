@@ -76,7 +76,12 @@ namespace ApiDPSystem.Services
         private string ConvertToJsonString(IEnumerable<Entities.Car> carEntities)
         {
             var jsonUniversalVersion = carEntities.Select(FileFormat.Json.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
-            return JsonSerializer.Serialize(jsonUniversalVersion, _jsonSerializerOptions);
+            var root = new FileFormat.Json.UniversalReadVersion.Root()
+            {
+                Cars = jsonUniversalVersion
+            };
+
+            return  System.Text.Json.JsonSerializer.Serialize(root, _jsonSerializerOptions);
         }
         
         

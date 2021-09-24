@@ -6,16 +6,16 @@ namespace ApiDPSystem.FileFormat.Json.UniversalReadVersion
 {
     public record Car()
     {
-        [JsonPropertyName("id")]
-        public string Id { get; set; }
-        
         [JsonPropertyName("is actual")]
         public bool IsActual { get; set; }
 
         [JsonPropertyName("is sold")]
         public bool IsSold { get; set; }
-        
-       [JsonPropertyName("year")]
+
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [JsonPropertyName("year")]
         public string Year { get; set; }
 
         [JsonPropertyName("make")]
@@ -41,7 +41,7 @@ namespace ApiDPSystem.FileFormat.Json.UniversalReadVersion
 
         [JsonPropertyName("price")]
         public string Price { get; set; }
-        
+
         public static Car ConvertFromDbModel(Entities.Car dbModel)
         {
             return new Car()
@@ -55,7 +55,7 @@ namespace ApiDPSystem.FileFormat.Json.UniversalReadVersion
                 ModelTrim = dbModel.Configuration.ModelTrim,
                 Make = dbModel.Configuration.Producer.Name,
                 Images = dbModel.CarImages.Select(p => p.Image.Url).ToList(),
-                
+
                 Colors = new Colors()
                 {
                     Exterior = dbModel.ExteriorColor.Name,
@@ -90,7 +90,7 @@ namespace ApiDPSystem.FileFormat.Json.UniversalReadVersion
                                 .Where(p => p.Type == optionsTypeName)
                                 .Select(p => p.Description)
                                 .ToList();
-            
+
             return features.Count > 0 ? features : null;
         }
     };
