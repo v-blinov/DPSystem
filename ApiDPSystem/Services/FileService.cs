@@ -12,6 +12,8 @@ using ApiDPSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using System.Text.Unicode;
+using System.Xml.Serialization;
+using ApiDPSystem.Interfaces;
 using ApiDPSystem.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -71,10 +73,38 @@ namespace ApiDPSystem.Services
             return fileContentResult;
         }
         
-        private string ConvertToJsonString(List<Entities.Car> carEntities)
+        private string ConvertToJsonString(IEnumerable<Entities.Car> carEntities)
         {
             var jsonUniversalVersion = carEntities.Select(FileFormat.Json.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
             return JsonSerializer.Serialize(jsonUniversalVersion, _jsonSerializerOptions);
+        }
+        
+        
+        public ActionResult CreateXmlFile(string fileName, Filter filter)
+        {
+            var carEntities = _carRepository.GetFullCarsInfoWithFilter(filter);
+            var carsInfoInStringAsJson = ConvertToXmlString(carEntities);
+            
+            var byteArray = Encoding.UTF8.GetBytes(carsInfoInStringAsJson);
+            var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
+            {
+                FileDownloadName = fileName
+            };
+            return fileContentResult;
+        }
+
+        private string ConvertToXmlString(IEnumerable<Entities.Car> carEntities)
+        {
+             var xmlUniversalVersion = carEntities.Select(FileFormat.Xml.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
+             var root = new FileFormat.Xml.UniversalReadVersion.Root()
+             {
+                 Cars = xmlUniversalVersion
+             };
+             
+             using var writer = new StringWriter();
+             var serializer = new XmlSerializer(typeof(FileFormat.Xml.UniversalReadVersion.Root));
+             serializer.Serialize(writer, root);
+             return writer.ToString();
         }
     }
 }
