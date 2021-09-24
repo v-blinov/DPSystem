@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ApiDPSystem</name>
+    </assembly>
+    <members>
+        <member name="M:ApiDPSystem.Controllers.FileController.GetCarsByFilterInJson(ApiDPSystem.Models.Filter)">
+            <summary>
+            Create JSON with cars info for certain dealer by any condition
+            Category: 0,1 - all | 2 - sold | 3 - actual
+            </summary>
+            <param name="filter">
+            Category:
+                0 - all cars for dealer
+                1 - all filters
+                2 - only sold cars
+                3 - only actual cars
+            Dealer Name
+            </param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

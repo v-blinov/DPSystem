@@ -67,7 +67,20 @@ namespace ApiDPSystem.Controllers
                 };
             }
         }
-
+        
+        /// <summary>
+        /// Create JSON with cars info for certain dealer by any condition
+        /// Category: 0,1 - all | 2 - sold | 3 - actual
+        /// </summary>
+        /// <param name="filter">
+        /// Category:
+        ///     0 - all cars for dealer
+        ///     1 - all filters
+        ///     2 - only sold cars
+        ///     3 - only actual cars
+        /// Dealer Name
+        /// </param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult GetCarsByFilterInJson([FromForm] Filter filter)
         {

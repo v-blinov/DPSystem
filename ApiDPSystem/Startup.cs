@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Text;
 using ApiDPSystem.Data;
 using ApiDPSystem.Models;
@@ -103,9 +105,9 @@ namespace ApiDPSystem
             services.AddSwaggerGen(c =>
             {
                 //SwaggerXmlComments
-                //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                //c.IncludeXmlComments(xmlPath);
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
 
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "DPSystemAPI", Version = "v1" });
 

@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile></DocumentationFile>
+        <DocumentationFile>C:\Users\vblinov\source\repos\DPSystem\ApiDPSystem\ApiDPSystem.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
