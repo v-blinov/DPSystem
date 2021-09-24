@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -105,6 +105,36 @@ namespace ApiDPSystem.Services
              var serializer = new XmlSerializer(typeof(FileFormat.Xml.UniversalReadVersion.Root));
              serializer.Serialize(writer, root);
              return writer.ToString();
+        }
+        
+        
+        public ActionResult CreateYamlFile(string fileName, Filter filter)
+        {
+            var carEntities = _carRepository.GetFullCarsInfoWithFilter(filter);
+            var carsInfoInStringAsJson = ConvertToYamlString(carEntities);
+            
+            var byteArray = Encoding.UTF8.GetBytes(carsInfoInStringAsJson);
+            var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
+            {
+                FileDownloadName = fileName
+            };
+            return fileContentResult;
+        }
+        
+        
+        private string ConvertToYamlString(IEnumerable<Entities.Car> carEntities)
+        {
+            var yamlUniversalVersion = carEntities.Select(FileFormat.Yaml.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
+            var root = new FileFormat.Yaml.UniversalReadVersion.Root()
+            {
+                Cars = yamlUniversalVersion
+            };
+
+            using var writer = new StringWriter();
+            var serializer = new SerializerBuilder().Build();
+            serializer.Serialize(writer, root);
+            
+            return writer.ToString();
         }
     }
 }
