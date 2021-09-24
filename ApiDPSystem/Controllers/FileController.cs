@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using ApiDPSystem.Exceptions;
 using ApiDPSystem.Filters;
@@ -97,7 +97,7 @@ namespace ApiDPSystem.Controllers
             
             try
             {
-                var fileName = $"{filter.DealerName}_Actual.json";
+                var fileName = $"{filter.DealerName}_{Enum.GetName(filter.Category)}.json";
                 return _fileService.CreateJsonFile(fileName, filter);
             }
             catch (Exception ex)

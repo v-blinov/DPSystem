@@ -6,8 +6,8 @@ namespace ApiDPSystem.Models
     {
         Disabled = 0,
         All = 1,
-        IsSold = 2,
-        IsActual = 3
+        Sold = 2,
+        Actual = 3
     }
     
     public class Filter

@@ -22,8 +22,8 @@ namespace ApiDPSystem.Extensions
             query = filter.Category switch
                    {
                        Category.Disabled => query,
-                       Category.IsActual => query.Where(p => p.IsActual),
-                       Category.IsSold => query.Where(p => p.IsSold),
+                       Category.Actual => query.Where(p => p.IsActual),
+                       Category.Sold => query.Where(p => p.IsSold),
                        _ => query
                    };
 
