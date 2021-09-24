@@ -5,7 +5,7 @@ using YamlDotNet.Serialization;
 
 namespace ApiDPSystem.Models.Parser
 {
-    [XmlRoot(ElementName = "root")]
+    [XmlRoot(ElementName = "Root")]
     public class Version
     {
         [JsonPropertyName("version")]
