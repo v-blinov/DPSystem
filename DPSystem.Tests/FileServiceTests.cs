@@ -17,11 +17,10 @@ namespace DPSystem.Tests
     public class FileServiceTest
     {
         private const string DefaultDealer = "DefaultDealer";
-
         private const string TestConnectionString = "Server=mssql,8083;Database=DPSystem.Tests;User=sa;Password=Qwerty123!;";
         private readonly DbContextOptions<Context> _testContextOptions = new DbContextOptionsBuilder<Context>().UseSqlServer(TestConnectionString).Options;
 
-        public Fixture _fixture;
+        private Fixture _fixture;
         
         private void CreateDatabase()
         {

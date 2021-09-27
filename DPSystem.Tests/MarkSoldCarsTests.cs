@@ -17,6 +17,7 @@ namespace DPSystem.Tests
 
         private readonly Car _defaultExistedCar = new()
         {
+            IsActual = true,
             VinCode = "ABCDEFGH",
             Dealer = new Dealer { Name = DefaultDealer },
             Configuration = new Configuration
@@ -55,7 +56,7 @@ namespace DPSystem.Tests
             context.Cars.Add(_defaultExistedCar);
             context.SaveChanges();
         }
-        private Car CreateDefaultCarNewWithVincode(string vincode)
+        private Car CreateDefaultCarWithNewVincode(string vincode)
         {
             var copy = _defaultExistedCar.Copy();
             copy.VinCode = vincode;
@@ -69,15 +70,15 @@ namespace DPSystem.Tests
             //Arrange
             var oldCars = new List<Car>
             {
-                CreateDefaultCarNewWithVincode("Vincode1"),
-                CreateDefaultCarNewWithVincode("Vincode2"),
-                CreateDefaultCarNewWithVincode("Vincode3")
+                CreateDefaultCarWithNewVincode("Vincode1"),
+                CreateDefaultCarWithNewVincode("Vincode2"),
+                CreateDefaultCarWithNewVincode("Vincode3")
             };
             var newCars = new List<Car>
             {
-                CreateDefaultCarNewWithVincode("Vincode1"),
-                CreateDefaultCarNewWithVincode("Vincode2"),
-                CreateDefaultCarNewWithVincode("Vincode3")
+                CreateDefaultCarWithNewVincode("Vincode1"),
+                CreateDefaultCarWithNewVincode("Vincode2"),
+                CreateDefaultCarWithNewVincode("Vincode3")
             };
 
             CreateDatabase();
@@ -115,15 +116,15 @@ namespace DPSystem.Tests
             //Arrange
             var oldCars = new List<Car>
             {
-                CreateDefaultCarNewWithVincode("old_Vincode1"),
-                CreateDefaultCarNewWithVincode("old_Vincode2"),
-                CreateDefaultCarNewWithVincode("old_Vincode3")
+                CreateDefaultCarWithNewVincode("old_Vincode1"),
+                CreateDefaultCarWithNewVincode("old_Vincode2"),
+                CreateDefaultCarWithNewVincode("old_Vincode3")
             };
             var newCars = new List<Car>
             {
-                CreateDefaultCarNewWithVincode("new_Vincode1"),
-                CreateDefaultCarNewWithVincode("new_Vincode2"),
-                CreateDefaultCarNewWithVincode("old_Vincode2")
+                CreateDefaultCarWithNewVincode("new_Vincode1"),
+                CreateDefaultCarWithNewVincode("new_Vincode2"),
+                CreateDefaultCarWithNewVincode("old_Vincode2")
             };
 
             CreateDatabase();
@@ -164,15 +165,15 @@ namespace DPSystem.Tests
             //Arrange
             var oldCars = new List<Car>
             {
-                CreateDefaultCarNewWithVincode("old_Vincode1"),
-                CreateDefaultCarNewWithVincode("old_Vincode2"),
-                CreateDefaultCarNewWithVincode("old_Vincode3")
+                CreateDefaultCarWithNewVincode("old_Vincode1"),
+                CreateDefaultCarWithNewVincode("old_Vincode2"),
+                CreateDefaultCarWithNewVincode("old_Vincode3")
             };
             var newCars = new List<Car>
             {
-                CreateDefaultCarNewWithVincode("new_Vincode1"),
-                CreateDefaultCarNewWithVincode("new_Vincode2"),
-                CreateDefaultCarNewWithVincode("new_Vincode3")
+                CreateDefaultCarWithNewVincode("new_Vincode1"),
+                CreateDefaultCarWithNewVincode("new_Vincode2"),
+                CreateDefaultCarWithNewVincode("new_Vincode3")
             };
 
             CreateDatabase();
@@ -208,21 +209,21 @@ namespace DPSystem.Tests
         public void Add_cars_to_db__params_1sold_1thesame_1new__expected_3sold_3actual()
         {
             //Arrange
-            var soldCar = CreateDefaultCarNewWithVincode("old_Vincode");
+            var soldCar = CreateDefaultCarWithNewVincode("old_Vincode");
             soldCar.Version = 1;
 
             var oldCars = new List<Car>
             {
                 soldCar,
-                CreateDefaultCarNewWithVincode("old_Vincode1"),
-                CreateDefaultCarNewWithVincode("old_Vincode2"),
-                CreateDefaultCarNewWithVincode("old_Vincode3")
+                CreateDefaultCarWithNewVincode("old_Vincode1"),
+                CreateDefaultCarWithNewVincode("old_Vincode2"),
+                CreateDefaultCarWithNewVincode("old_Vincode3")
             };
             var newCars = new List<Car>
             {
-                CreateDefaultCarNewWithVincode("old_Vincode"),
-                CreateDefaultCarNewWithVincode("old_Vincode1"),
-                CreateDefaultCarNewWithVincode("new_Vincode3")
+                CreateDefaultCarWithNewVincode("old_Vincode"),
+                CreateDefaultCarWithNewVincode("old_Vincode1"),
+                CreateDefaultCarWithNewVincode("new_Vincode3")
             };
 
             CreateDatabase();
@@ -269,7 +270,7 @@ namespace DPSystem.Tests
             CreateDatabase();
             SetDefaultCarToDatabase();
 
-            var carWithNewEngine = CreateDefaultCarNewWithVincode("new_Vincode1");
+            var carWithNewEngine = CreateDefaultCarWithNewVincode("new_Vincode1");
             carWithNewEngine.Configuration.Engine = new Engine { Fuel = "Electricity", Capacity = null, Power = 600 };
 
             //Act
@@ -302,7 +303,7 @@ namespace DPSystem.Tests
             CreateDatabase();
             SetDefaultCarToDatabase();
 
-            var carWithNewEngine = CreateDefaultCarNewWithVincode("new_Vincode1");
+            var carWithNewEngine = CreateDefaultCarWithNewVincode("new_Vincode1");
             carWithNewEngine.Configuration.Producer = new Producer { Name = "NewProducer" };
 
             //Act
@@ -335,7 +336,7 @@ namespace DPSystem.Tests
             CreateDatabase();
             SetDefaultCarToDatabase();
 
-            var theSameCar = CreateDefaultCarNewWithVincode("new_Vincode1");
+            var theSameCar = CreateDefaultCarWithNewVincode("new_Vincode1");
             theSameCar.InteriorColor = new Color { Name = "Brown" };
             theSameCar.ExteriorColor = new Color { Name = "Brown" };
 
@@ -369,7 +370,7 @@ namespace DPSystem.Tests
             CreateDatabase();
             SetDefaultCarToDatabase();
 
-            var carWithNewFeature = CreateDefaultCarNewWithVincode("new_Vincode1");
+            var carWithNewFeature = CreateDefaultCarWithNewVincode("new_Vincode1");
             carWithNewFeature.CarFeatures = new List<CarFeature>
             {
                 new() { Feature = new Feature { Type = "Safety", Description = "New Safety feature" } },
