@@ -55,8 +55,8 @@ services:
         environment: 
             - ACCEPT_EULA=Y
             - SA_PASSWORD=${PASSWORD}
-        volumes:
-            - ./mssql-data:/var/opt/mssql
+#        volumes:
+#            - ./mssql-data:/var/opt/mssql
         ports:
             - 8083:1433
 
