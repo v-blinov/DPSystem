@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using ApiDPSystem.Interfaces;
 using CsvHelper;
+using CsvHelper.Configuration.Attributes;
 
 namespace ApiDPSystem.FileFormat.Csv.Version1
 {
@@ -15,7 +16,7 @@ namespace ApiDPSystem.FileFormat.Csv.Version1
             Cars = new List<Car>();
         }
 
-        [JsonPropertyName("cars")]
+        [Name("cars")]
         public List<Car> Cars { get; set; }
 
         public string FileFormat => ".csv";

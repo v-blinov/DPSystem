@@ -13,7 +13,7 @@ namespace ApiDPSystem.Models
     public class Filter
     {
         public Category Category { get; set; }
-        
-        public string DealerName { get; set; }
+
+        public string DealerName { get; set; } = "Izhevsk";
     }
 }
