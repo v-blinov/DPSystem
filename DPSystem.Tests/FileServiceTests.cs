@@ -3,8 +3,10 @@ using System.IO;
 using System.Threading.Tasks;
 using ApiDPSystem.Data;
 using ApiDPSystem.Entities;
+using ApiDPSystem.Repository.Interfaces;
 using ApiDPSystem.Services;
 using ApiDPSystem.Services.Interfaces;
+using AutoFixture;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -19,12 +21,16 @@ namespace DPSystem.Tests
         private const string TestConnectionString = "Server=mssql,8083;Database=DPSystem.Tests;User=sa;Password=Qwerty123!;";
         private readonly DbContextOptions<Context> _testContextOptions = new DbContextOptionsBuilder<Context>().UseSqlServer(TestConnectionString).Options;
 
+        public Fixture _fixture;
+        
         private void CreateDatabase()
         {
             using var context = new Context(_testContextOptions);
 
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
+            
+            _fixture = new Fixture();
         }
 
         [InlineData("Correct/DefaultJson.json")]
@@ -37,13 +43,14 @@ namespace DPSystem.Tests
             //Arrange
             var fileMock = GetIFormFile(fileNameParam);
             CreateDatabase();
-
+        
             var dcsMock = new Mock<IDataCheckerService>();
-            var sut = new FileService(dcsMock.Object);
-
+            var crMock = new Mock<ICarRepository>();
+            var sut = new FileService(dcsMock.Object, crMock.Object);
+        
             //Act
             await sut.ProcessFileAsync(fileMock.Object, DefaultDealer);
-
+        
             //Assert
             dcsMock.Verify(p => p.MarkSoldCars(It.IsAny<List<Car>>(), DefaultDealer), Times.Once);
             dcsMock.Verify(p => p.SetToDatabase(It.IsAny<List<Car>>()), Times.Once);
