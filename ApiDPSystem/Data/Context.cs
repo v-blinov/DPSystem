@@ -101,8 +101,8 @@ namespace ApiDPSystem.Data
 
                 builder.Property(p => p.IsSold)
                        .HasDefaultValue(false);
-                builder.Property(p => p.IsActual)
-                       .HasDefaultValue(true);
+                // builder.Property(p => p.IsActual)
+                //        .HasDefaultValue(true);
                 builder.Property(p => p.Version)
                        .HasDefaultValue(1);
 
