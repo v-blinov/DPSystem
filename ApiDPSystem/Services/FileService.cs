@@ -7,12 +7,12 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Transactions;
 using ApiDPSystem.Models.Parser;
-using ApiDPSystem.Repository;
 using ApiDPSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using System.Text.Unicode;
 using ApiDPSystem.Models;
+using ApiDPSystem.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using ServiceStack.Text;
 using YamlDotNet.Serialization;
@@ -23,7 +23,7 @@ namespace ApiDPSystem.Services
     public class FileService
     {
         private readonly IDataCheckerService _dataChecker;
-        private readonly CarRepository _carRepository;
+        private readonly ICarRepository _carRepository;
         
         private readonly JsonSerializerOptions _jsonSerializerOptions = new ()
         {
@@ -31,7 +31,7 @@ namespace ApiDPSystem.Services
             WriteIndented = true
         };
 
-        public FileService(IDataCheckerService dataCheckerService, CarRepository carRepository)
+        public FileService(IDataCheckerService dataCheckerService, ICarRepository carRepository)
         {
             _dataChecker = dataCheckerService;
             _carRepository = carRepository;

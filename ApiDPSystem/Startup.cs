@@ -6,6 +6,7 @@ using System.Text;
 using ApiDPSystem.Data;
 using ApiDPSystem.Models;
 using ApiDPSystem.Repository;
+using ApiDPSystem.Repository.Interfaces;
 using ApiDPSystem.Services;
 using ApiDPSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -178,7 +179,7 @@ namespace ApiDPSystem
             services.AddScoped<FileService>();
             services.AddScoped<IDataCheckerService, DataCheckerService>();
             services.AddScoped<AccountRepository>();
-            services.AddScoped<CarRepository>();
+            services.AddScoped<ICarRepository, CarRepository>();
             #endregion
         }
 

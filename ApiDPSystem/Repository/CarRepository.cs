@@ -5,11 +5,12 @@ using ApiDPSystem.Data;
 using ApiDPSystem.Entities;
 using ApiDPSystem.Extensions;
 using ApiDPSystem.Models;
+using ApiDPSystem.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiDPSystem.Repository
 {
-    public class CarRepository
+    public class CarRepository : ICarRepository
     {
         private readonly Context _context;
 
@@ -25,11 +26,9 @@ namespace ApiDPSystem.Repository
                     .Select(p => p.VinCode)
                     .ToList();
 
-        public Car GetLastVersionCarWithVincodeAndDealerName(string vincode, string dealer)
+        public Car GetLastVersionCarWithVincode(string vincode)
         {
-            var chosenCars = _context.Cars.Include(p => p.Dealer)
-                                     .Where(p => p.Dealer.Name == dealer && p.VinCode == vincode)
-                                     .ToList();
+            var chosenCars = _context.Cars.Where(p => p.VinCode == vincode).ToList();
             return chosenCars.FirstOrDefault(p => p.Version == chosenCars.Max(s => s.Version));
         }
 
