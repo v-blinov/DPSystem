@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,10 +11,11 @@ using ApiDPSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using System.Text.Unicode;
-using System.Xml.Serialization;
-using ApiDPSystem.Interfaces;
 using ApiDPSystem.Models;
 using Microsoft.AspNetCore.Mvc;
+using ServiceStack.Text;
+using YamlDotNet.Serialization;
+using XmlSerializer = System.Xml.Serialization.XmlSerializer;
 
 namespace ApiDPSystem.Services
 {
@@ -88,9 +88,9 @@ namespace ApiDPSystem.Services
         public ActionResult CreateXmlFile(string fileName, Filter filter)
         {
             var carEntities = _carRepository.GetFullCarsInfoWithFilter(filter);
-            var carsInfoInStringAsJson = ConvertToXmlString(carEntities);
+            var carsInfoInStringAsXml = ConvertToXmlString(carEntities);
             
-            var byteArray = Encoding.UTF8.GetBytes(carsInfoInStringAsJson);
+            var byteArray = Encoding.UTF8.GetBytes(carsInfoInStringAsXml);
             var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
             {
                 FileDownloadName = fileName
@@ -126,7 +126,6 @@ namespace ApiDPSystem.Services
             return fileContentResult;
         }
         
-        
         private string ConvertToYamlString(IEnumerable<Entities.Car> carEntities)
         {
             var yamlUniversalVersion = carEntities.Select(FileFormat.Yaml.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
@@ -140,6 +139,33 @@ namespace ApiDPSystem.Services
             serializer.Serialize(writer, root);
             
             return writer.ToString();
+        }
+        
+        
+        public ActionResult CreateCsvFile(string fileName, Filter filter)
+        {
+            var carEntities = _carRepository.GetFullCarsInfoWithFilter(filter);
+            var carsInfoInStringAsJson = ConvertToCsvString(carEntities);
+            
+            var byteArray = Encoding.UTF8.GetBytes(carsInfoInStringAsJson);
+            var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
+            {
+                FileDownloadName = fileName
+            };
+            return fileContentResult;
+        }
+        
+        private string ConvertToCsvString(IEnumerable<Entities.Car> carEntities)
+        {
+            var csvUniversalVersion = carEntities.Select(FileFormat.Csv.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
+            var root = new FileFormat.Csv.UniversalReadVersion.Root()
+            {
+                Cars = csvUniversalVersion
+            };
+            
+            var str = CsvSerializer.SerializeToString(root);
+
+            return str;
         }
     }
 }

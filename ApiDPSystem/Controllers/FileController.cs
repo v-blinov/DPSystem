@@ -187,5 +187,45 @@ namespace ApiDPSystem.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+        
+        
+        /// <summary>
+        /// Create CSV with cars info for certain dealer by any condition
+        /// Category: 0,1 - all | 2 - sold | 3 - actual
+        /// </summary>
+        /// <param name="filter">
+        /// Category:
+        ///     0 - all cars for dealer
+        ///     1 - all filters
+        ///     2 - only sold cars
+        ///     3 - only actual cars
+        /// Dealer Name
+        /// </param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult GetCarsByFilterInCsv([FromForm] Filter filter)
+        {
+            if (filter is null)
+            {
+                Log.Error("При обращении к методу GetCarsByFilterInCsv filter - null");
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+            if (string.IsNullOrEmpty(filter.DealerName))
+            {
+                Log.Warning("При обращении к методу GetCarsByFilterInCsv не отправлен обязательный параметр dealerName");
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+            
+            try
+            {
+                var fileName = $"{filter.DealerName}_{Enum.GetName(filter.Category)}.csv";
+                return _fileService.CreateCsvFile(fileName, filter);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }
