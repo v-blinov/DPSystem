@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using ApiDPSystem.Entities;
 using ApiDPSystem.Repository;
@@ -27,12 +27,12 @@ namespace ApiDPSystem.Services
 
         public void SetToDatabase(List<Car> models)
         {
+            var toAddModels = new List<Car>();
+            
             //foreach (var model in models)
             for (var i = 0; i < models.Count; i++)
             {
                 var model = models[i];
-
-                var dealerName = model.Dealer.Name;
 
                 SetColorIdIfExist(model);
                 SetCarImageIdsIfExist(model);
@@ -42,25 +42,24 @@ namespace ApiDPSystem.Services
                 SetProducerIdIfExist(model);
                 SetConfigurationIdIfExist(model);
 
-                var existedCar = _carRepository.GetLastVersionCarWithVincodeAndDealerName(model.VinCode, dealerName);
-                if (existedCar is not null)
-                {
-                    if (existedCar.IsSold)
-                    {
-                        model.Version = existedCar.Version + 1;
-                    }
-                    else if (IsCarModified(model, existedCar))
-                    {
-                        _carRepository.SetAsNotActual(existedCar);
-                        model.Version = existedCar.Version + 1;
-                    }
-                }
-                else
+                var existedCar = _carRepository.GetLastVersionCarWithVincode(model.VinCode);
+                if (existedCar is null)
                 {
                     model.Version = 1;
                 }
+                else 
+                {
+                    if (!IsCarModified(model, existedCar)) 
+                        continue;
+                    
+                    if (!existedCar.IsSold)
+                        _carRepository.SetAsNotActual(existedCar);
+                    
+                    model.Version = existedCar.Version + 1;
+                }
+                toAddModels.Add(model);
             }
-            _carRepository.AddCarRangeToDb(models);
+            _carRepository.AddCarRangeToDb(toAddModels);
         }
 
         private void SetColorIdIfExist(Car model)
