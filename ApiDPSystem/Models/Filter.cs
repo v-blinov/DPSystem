@@ -9,11 +9,20 @@ namespace ApiDPSystem.Models
         Sold = 2,
         Actual = 3
     }
+
+    public enum FileFormat
+    {
+        unknown = 0,
+        json = 1,
+        xml = 2,
+        yaml = 3,
+        csv = 4
+    }
     
     public class Filter
     {
+        public string DealerName { get; set; }
+        public FileFormat FileFormat { get; set; }
         public Category Category { get; set; }
-
-        public string DealerName { get; set; } = "Izhevsk";
     }
 }

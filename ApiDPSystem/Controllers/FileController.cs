@@ -6,6 +6,7 @@ using ApiDPSystem.Models;
 using ApiDPSystem.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Extensions;
 using Serilog;
 
 namespace ApiDPSystem.Controllers
@@ -70,7 +71,8 @@ namespace ApiDPSystem.Controllers
         
         
         /// <summary>
-        /// Create JSON with cars info for certain dealer by any condition
+        /// Create file with cars info for certain dealer by any condition
+        /// FileFormat: 0,1 - json | 2 - xml | 3 - yaml | 4 - csv
         /// Category: 0,1 - all | 2 - sold | 3 - actual
         /// </summary>
         /// <param name="filter">
@@ -83,127 +85,7 @@ namespace ApiDPSystem.Controllers
         /// </param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult GetCarsByFilterInJson([FromForm] Filter filter)
-        {
-            if (filter is null)
-            {
-                Log.Error("При обращении к методу GetCarsByFilterInJson filter - null");
-                return StatusCode(StatusCodes.Status400BadRequest);
-            }
-            if (string.IsNullOrEmpty(filter.DealerName))
-            {
-                Log.Warning("При обращении к методу GetCarsByFilterInJson не отправлен обязательный параметр dealerName");
-                return StatusCode(StatusCodes.Status400BadRequest);
-            }
-            
-            try
-            {
-                var fileName = $"{filter.DealerName}_{Enum.GetName(filter.Category)}.json";
-                return _fileService.CreateJsonFile(fileName, filter);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-        
-                
-        /// <summary>
-        /// Create XML with cars info for certain dealer by any condition
-        /// Category: 0,1 - all | 2 - sold | 3 - actual
-        /// </summary>
-        /// <param name="filter">
-        /// Category:
-        ///     0 - all cars for dealer
-        ///     1 - all filters
-        ///     2 - only sold cars
-        ///     3 - only actual cars
-        /// Dealer Name
-        /// </param>
-        /// <returns></returns>
-        [HttpPost]
-        public ActionResult GetCarsByFilterInXml([FromForm] Filter filter)
-        {
-            if (filter is null)
-            {
-                Log.Error("При обращении к методу GetCarsByFilterInXml filter - null");
-                return StatusCode(StatusCodes.Status400BadRequest);
-            }
-            if (string.IsNullOrEmpty(filter.DealerName))
-            {
-                Log.Warning("При обращении к методу GetCarsByFilterInXml не отправлен обязательный параметр dealerName");
-                return StatusCode(StatusCodes.Status400BadRequest);
-            }
-            
-            try
-            {
-                var fileName = $"{filter.DealerName}_{Enum.GetName(filter.Category)}.xml";
-                return _fileService.CreateXmlFile(fileName, filter);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-        
-        
-        /// <summary>
-        /// Create YAML with cars info for certain dealer by any condition
-        /// Category: 0,1 - all | 2 - sold | 3 - actual
-        /// </summary>
-        /// <param name="filter">
-        /// Category:
-        ///     0 - all cars for dealer
-        ///     1 - all filters
-        ///     2 - only sold cars
-        ///     3 - only actual cars
-        /// Dealer Name
-        /// </param>
-        /// <returns></returns>
-        [HttpPost]
-        public ActionResult GetCarsByFilterInYaml([FromForm] Filter filter)
-        {
-            if (filter is null)
-            {
-                Log.Error("При обращении к методу GetCarsByFilterInYaml filter - null");
-                return StatusCode(StatusCodes.Status400BadRequest);
-            }
-            if (string.IsNullOrEmpty(filter.DealerName))
-            {
-                Log.Warning("При обращении к методу GetCarsByFilterInYaml не отправлен обязательный параметр dealerName");
-                return StatusCode(StatusCodes.Status400BadRequest);
-            }
-            
-            try
-            {
-                var fileName = $"{filter.DealerName}_{Enum.GetName(filter.Category)}.yaml";
-                return _fileService.CreateYamlFile(fileName, filter);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-        
-        
-        /// <summary>
-        /// Create CSV with cars info for certain dealer by any condition
-        /// Category: 0,1 - all | 2 - sold | 3 - actual
-        /// </summary>
-        /// <param name="filter">
-        /// Category:
-        ///     0 - all cars for dealer
-        ///     1 - all filters
-        ///     2 - only sold cars
-        ///     3 - only actual cars
-        /// Dealer Name
-        /// </param>
-        /// <returns></returns>
-        [HttpPost]
-        public ActionResult GetCarsByFilterInCsv([FromForm] Filter filter)
+        public ActionResult GetFileWithCarsByFilterInfo([FromForm] Filter filter)
         {
             if (filter is null)
             {
@@ -215,11 +97,16 @@ namespace ApiDPSystem.Controllers
                 Log.Warning("При обращении к методу GetCarsByFilterInCsv не отправлен обязательный параметр dealerName");
                 return StatusCode(StatusCodes.Status400BadRequest);
             }
+            if (filter.FileFormat == Models.FileFormat.unknown)
+            {
+                filter.FileFormat = Models.FileFormat.json;
+                Log.Warning("Формат файла для метода десериализации данных не задан, по умолчанию будет использоваться формат .json");
+            }
             
             try
             {
-                var fileName = $"{filter.DealerName}_{Enum.GetName(filter.Category)}.csv";
-                return _fileService.CreateCsvFile(fileName, filter);
+                var fileName = $"{filter.DealerName}_{Enum.GetName(filter.Category)}.{filter.FileFormat.GetDisplayName()}";
+                return _fileService.CreateFile(fileName, filter);
             }
             catch (Exception ex)
             {
@@ -227,5 +114,6 @@ namespace ApiDPSystem.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
     }
 }

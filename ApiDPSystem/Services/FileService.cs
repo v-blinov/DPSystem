@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -60,17 +61,32 @@ namespace ApiDPSystem.Services
             using var reader = new StreamReader(file.OpenReadStream());
             return await reader.ReadToEndAsync();
         }
-
-        public ActionResult CreateJsonFile(string fileName, Filter filter)
+        
+        public ActionResult CreateFile(string fileName, Filter filter)
         {
             var carEntities = _carRepository.GetFullCarsInfoWithFilter(filter);
-            var carsInfoInStringAsJson = ConvertToJsonString(carEntities);
+
+            var convertToStringMethod = ChooseConvertMethodByFormat(filter);
+            var carsInfoInStringAsJson = convertToStringMethod(carEntities);
+            
             var byteArray = Encoding.UTF8.GetBytes(carsInfoInStringAsJson);
             var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
             {
                 FileDownloadName = fileName
             };
             return fileContentResult;
+        }
+        
+        private Func<IEnumerable<Entities.Car>, string> ChooseConvertMethodByFormat(Filter filter)
+        {
+            return filter.FileFormat switch
+                   {
+                       Models.FileFormat.json => ConvertToJsonString,
+                       Models.FileFormat.xml => ConvertToXmlString,
+                       Models.FileFormat.yaml => ConvertToYamlString,
+                       Models.FileFormat.csv => ConvertToCsvString,
+                       _ => ConvertToJsonString
+                   };
         }
         
         private string ConvertToJsonString(IEnumerable<Entities.Car> carEntities)
@@ -83,49 +99,19 @@ namespace ApiDPSystem.Services
 
             return  System.Text.Json.JsonSerializer.Serialize(root, _jsonSerializerOptions);
         }
-        
-        
-        public ActionResult CreateXmlFile(string fileName, Filter filter)
-        {
-            var carEntities = _carRepository.GetFullCarsInfoWithFilter(filter);
-            var carsInfoInStringAsXml = ConvertToXmlString(carEntities);
-            
-            var byteArray = Encoding.UTF8.GetBytes(carsInfoInStringAsXml);
-            var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
-            {
-                FileDownloadName = fileName
-            };
-            return fileContentResult;
-        }
-
         private string ConvertToXmlString(IEnumerable<Entities.Car> carEntities)
         {
-             var xmlUniversalVersion = carEntities.Select(FileFormat.Xml.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
-             var root = new FileFormat.Xml.UniversalReadVersion.Root()
-             {
-                 Cars = xmlUniversalVersion
-             };
-             
-             using var writer = new StringWriter();
-             var serializer = new XmlSerializer(typeof(FileFormat.Xml.UniversalReadVersion.Root));
-             serializer.Serialize(writer, root);
-             return writer.ToString();
-        }
-        
-        
-        public ActionResult CreateYamlFile(string fileName, Filter filter)
-        {
-            var carEntities = _carRepository.GetFullCarsInfoWithFilter(filter);
-            var carsInfoInStringAsJson = ConvertToYamlString(carEntities);
-            
-            var byteArray = Encoding.UTF8.GetBytes(carsInfoInStringAsJson);
-            var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
+            var xmlUniversalVersion = carEntities.Select(FileFormat.Xml.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
+            var root = new FileFormat.Xml.UniversalReadVersion.Root()
             {
-                FileDownloadName = fileName
+                Cars = xmlUniversalVersion
             };
-            return fileContentResult;
+             
+            using var writer = new StringWriter();
+            var serializer = new XmlSerializer(typeof(FileFormat.Xml.UniversalReadVersion.Root));
+            serializer.Serialize(writer, root);
+            return writer.ToString();
         }
-        
         private string ConvertToYamlString(IEnumerable<Entities.Car> carEntities)
         {
             var yamlUniversalVersion = carEntities.Select(FileFormat.Yaml.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
@@ -140,21 +126,6 @@ namespace ApiDPSystem.Services
             
             return writer.ToString();
         }
-        
-        
-        public ActionResult CreateCsvFile(string fileName, Filter filter)
-        {
-            var carEntities = _carRepository.GetFullCarsInfoWithFilter(filter);
-            var carsInfoInStringAsJson = ConvertToCsvString(carEntities);
-            
-            var byteArray = Encoding.UTF8.GetBytes(carsInfoInStringAsJson);
-            var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
-            {
-                FileDownloadName = fileName
-            };
-            return fileContentResult;
-        }
-        
         private string ConvertToCsvString(IEnumerable<Entities.Car> carEntities)
         {
             var csvUniversalVersion = carEntities.Select(FileFormat.Csv.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
