@@ -56,14 +56,8 @@ namespace ApiDPSystem
                     })
                     .AddGoogle(googleOptions =>
                     {
-                        //IConfigurationSection googleAuthNSection =
-                        //    Configuration.GetSection("Authentication:Google");
-                        //googleOptions.ClientId = googleAuthNSection["ClientId"];
-                        //googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
-
-                        //Надо придумать, как вынести эти данные в docker secret
-                        googleOptions.ClientId = "1015102078067-mo5ds31rjrtocd7dfk4vt663946ijftq.apps.googleusercontent.com";
-                        googleOptions.ClientSecret = "19-tLf4MHfV13WoYlUN_HXNF";
+                        googleOptions.ClientId = Configuration.GetValue<string>("OAuth:ClientId");
+                        googleOptions.ClientSecret = Configuration.GetValue<string>("OAuth:ClientSecret");
 
                         googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
                     })
@@ -197,11 +191,6 @@ namespace ApiDPSystem
             {
                 c.SwaggerEndpoint("swagger/v1/swagger.json", "ApiDPSystem v1");
                 c.RoutePrefix = string.Empty;
-
-                //c.OAuthClientId(Configuration.GetValue<string>("Authentication:Google:ClientId"));
-                //c.OAuthClientSecret(Configuration.GetValue<string>("Authentication:Google:ClientSecret"));
-                //c.OAuthAppName("OAuth-dpsystem");
-                //c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
             });
 
             app.UseHttpsRedirection();

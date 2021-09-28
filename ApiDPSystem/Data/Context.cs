@@ -10,7 +10,7 @@ namespace ApiDPSystem.Data
     {
         public Context(DbContextOptions<Context> options) : base(options)
         {
-            //Database.EnsureCreated();
+            Database.EnsureCreated();
         }
 
         public DbSet<RefreshTokenInfo> RefreshTokenInfoTable { get; set; }

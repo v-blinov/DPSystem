@@ -18,8 +18,9 @@ namespace ApiDPSystem.Controllers
     public class GoogleAccountController : Controller
     {
         private const string UserRole = "User";
-        private readonly AccountService _accountService;
         private readonly string _googleRedirectUrlEndpoint;
+
+        private readonly AccountService _accountService;
         private readonly SignInManager<User> _signInManager;
         private readonly UserService _userService;
 
