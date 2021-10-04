@@ -22,6 +22,8 @@ namespace ApiDPSystem
                          .CreateLogger();
             #endregion
 
+            Log.Information("Starting up");
+
             CreateHostBuilder(args).Build().Run();
         }
 

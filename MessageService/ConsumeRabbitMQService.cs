@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using MessageService.Models;
 using MessageService.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -46,7 +46,7 @@ namespace MessageService
             {
                 var body = e.Body;
                 var messageJson = Encoding.UTF8.GetString(body.ToArray());
-                var rabbitMessage = JsonConvert.DeserializeObject<RabbitMessage>(messageJson);
+                var rabbitMessage = JsonSerializer.Deserialize<RabbitMessage>(messageJson);
 
                 Console.WriteLine($"============================================ Received message: {rabbitMessage.Message}");
 
