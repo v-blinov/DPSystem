@@ -3,7 +3,7 @@
 namespace ApiDPSystem.FileFormat.Xml.UniversalReadVersion
 {
     [XmlRoot(ElementName = "colors")]
-    public record Colors()
+    public record Colors
     {
         [XmlElement(ElementName = "interior")]
         public string Interior { get; set; }

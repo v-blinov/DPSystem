@@ -131,19 +131,17 @@ namespace ApiDPSystem.Repository
             _context.SaveChanges();
         }
 
-        public List<Car> GetFullCarsInfoWithFilter(Filter filter)
-        {
-            return _context.Cars
-                           .AsNoTracking()
-                           .ApplyFilter(filter)
-                           .Include(p => p.Dealer)
-                           .Include(p => p.Configuration).ThenInclude(p => p.Engine)
-                           .Include(p => p.Configuration).ThenInclude(p => p.Producer)
-                           .Include(p => p.CarFeatures).ThenInclude(p => p.Feature)
-                           .Include(p => p.ExteriorColor)
-                           .Include(p => p.InteriorColor)
-                           .Include(p => p.CarImages).ThenInclude(p => p.Image)
-                           .ToList();
-        }
+        public List<Car> GetFullCarsInfoWithFilter(Filter filter) =>
+            _context.Cars
+                    .AsNoTracking()
+                    .ApplyFilter(filter)
+                    .Include(p => p.Dealer)
+                    .Include(p => p.Configuration).ThenInclude(p => p.Engine)
+                    .Include(p => p.Configuration).ThenInclude(p => p.Producer)
+                    .Include(p => p.CarFeatures).ThenInclude(p => p.Feature)
+                    .Include(p => p.ExteriorColor)
+                    .Include(p => p.InteriorColor)
+                    .Include(p => p.CarImages).ThenInclude(p => p.Image)
+                    .ToList();
     }
 }

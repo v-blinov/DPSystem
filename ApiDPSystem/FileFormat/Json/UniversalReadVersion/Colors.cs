@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.FileFormat.Json.UniversalReadVersion
 {
-    public record Colors()
+    public record Colors
     {
         [JsonPropertyName("interior")]
         public string Interior { get; set; }

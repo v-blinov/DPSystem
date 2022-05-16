@@ -3,7 +3,7 @@ using YamlDotNet.Serialization;
 
 namespace ApiDPSystem.FileFormat.Yaml.UniversalReadVersion
 {
-    public record OtherOptions()
+    public record OtherOptions
     {
         [YamlMember(Alias = "exterior")]
         public List<string> Exterior { get; set; }

@@ -68,20 +68,20 @@ namespace ApiDPSystem.Controllers
                 };
             }
         }
-        
-        
+
+
         /// <summary>
-        /// Create file with cars info for certain dealer by any condition
-        /// FileFormat: 0,1 - json | 2 - xml | 3 - yaml | 4 - csv
-        /// Category: 0,1 - all | 2 - sold | 3 - actual
+        ///     Create file with cars info for certain dealer by any condition
+        ///     FileFormat: 0,1 - json | 2 - xml | 3 - yaml | 4 - csv
+        ///     Category: 0,1 - all | 2 - sold | 3 - actual
         /// </summary>
         /// <param name="filter">
-        /// Category:
+        ///     Category:
         ///     0 - all cars for dealer
         ///     1 - all filters
         ///     2 - only sold cars
         ///     3 - only actual cars
-        /// Dealer Name
+        ///     Dealer Name
         /// </param>
         /// <returns></returns>
         [HttpPost]
@@ -102,7 +102,7 @@ namespace ApiDPSystem.Controllers
                 filter.FileFormat = Models.FileFormat.json;
                 Log.Warning("Формат файла для метода десериализации данных не задан, по умолчанию будет использоваться формат .json");
             }
-            
+
             try
             {
                 var fileName = $"{filter.DealerName}_{Enum.GetName(filter.Category)}.{filter.FileFormat.GetDisplayName()}";
@@ -114,6 +114,5 @@ namespace ApiDPSystem.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
     }
 }

@@ -3,7 +3,7 @@
 namespace ApiDPSystem.FileFormat.Xml.UniversalReadVersion
 {
     [XmlRoot(ElementName = "engine")]
-    public record Engine()
+    public record Engine
     {
         [XmlElement(ElementName = "fuel")]
         public string Fuel { get; set; }

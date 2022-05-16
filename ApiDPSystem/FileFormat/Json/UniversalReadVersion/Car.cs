@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace ApiDPSystem.FileFormat.Json.UniversalReadVersion
 {
-    public record Car()
+    public record Car
     {
         [JsonPropertyName("is actual")]
         public bool IsActual { get; set; }
@@ -42,9 +42,8 @@ namespace ApiDPSystem.FileFormat.Json.UniversalReadVersion
         [JsonPropertyName("price")]
         public string Price { get; set; }
 
-        public static Car ConvertFromDbModel(Entities.Car dbModel)
-        {
-            return new Car()
+        public static Car ConvertFromDbModel(Entities.Car dbModel) =>
+            new Car
             {
                 IsActual = dbModel.IsActual,
                 IsSold = dbModel.IsSold,
@@ -56,32 +55,31 @@ namespace ApiDPSystem.FileFormat.Json.UniversalReadVersion
                 Make = dbModel.Configuration.Producer.Name,
                 Images = dbModel.CarImages.Select(p => p.Image.Url).ToList(),
 
-                Colors = new Colors()
+                Colors = new Colors
                 {
                     Exterior = dbModel.ExteriorColor.Name,
-                    Interior = dbModel.InteriorColor.Name,
+                    Interior = dbModel.InteriorColor.Name
                 },
-                TechnicalOptions = new TechnicalOptions()
+                TechnicalOptions = new TechnicalOptions
                 {
                     Drive = dbModel.Configuration.Drive,
-                    Engine = new Engine()
+                    Engine = new Engine
                     {
                         Fuel = dbModel.Configuration.Engine.Fuel,
                         Power = dbModel.Configuration.Engine.Power.ToString(),
-                        Capacity = dbModel.Configuration.Engine.Capacity.ToString(),
+                        Capacity = dbModel.Configuration.Engine.Capacity.ToString()
                     },
-                    Transmission = dbModel.Configuration.Transmission,
+                    Transmission = dbModel.Configuration.Transmission
                 },
-                OtherOptions = new OtherOptions()
+                OtherOptions = new OtherOptions
                 {
                     Exterior = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Exterior)),
                     Interior = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Interior)),
                     Safety = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Safety)),
                     Multimedia = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Multimedia)),
-                    Comfort = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Comfort)),
+                    Comfort = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Comfort))
                 }
             };
-        }
 
         private static List<string> GetFeatureListOrNull(Entities.Car model, string optionsTypeName)
         {
@@ -93,5 +91,5 @@ namespace ApiDPSystem.FileFormat.Json.UniversalReadVersion
 
             return features.Count > 0 ? features : null;
         }
-    };
+    }
 }

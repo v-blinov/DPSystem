@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.FileFormat.Yaml.UniversalReadVersion
 {
-    public record Engine()
+    public record Engine
     {
         [YamlMember(Alias = "fuel")]
         public string Fuel { get; set; }

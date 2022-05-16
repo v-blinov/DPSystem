@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ApiDPSystem.Entities;
-using ApiDPSystem.Repository;
 using ApiDPSystem.Repository.Interfaces;
 using ApiDPSystem.Services.Interfaces;
 
@@ -28,7 +27,7 @@ namespace ApiDPSystem.Services
         public void SetToDatabase(List<Car> models)
         {
             var toAddModels = new List<Car>();
-            
+
             //foreach (var model in models)
             for (var i = 0; i < models.Count; i++)
             {
@@ -47,14 +46,14 @@ namespace ApiDPSystem.Services
                 {
                     model.Version = 1;
                 }
-                else 
+                else
                 {
-                    if (!IsCarModified(model, existedCar)) 
+                    if (!IsCarModified(model, existedCar))
                         continue;
-                    
+
                     if (!existedCar.IsSold)
                         _carRepository.SetAsNotActual(existedCar);
-                    
+
                     model.Version = existedCar.Version + 1;
                 }
                 toAddModels.Add(model);

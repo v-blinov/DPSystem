@@ -19,7 +19,7 @@ namespace DPSystem.Tests
         private const string TestConnectionString = "Server=mssql,8083;Database=DPSystem.Tests;User=sa;Password=Qwerty123!;";
         private readonly DbContextOptions<Context> _testContextOptions = new DbContextOptionsBuilder<Context>().UseSqlServer(TestConnectionString).Options;
 
-        private readonly Car _defaultDbCar = new Car
+        private readonly Car _defaultDbCar = new()
         {
             VinCode = "ABCDEFGH",
             Dealer = new Dealer { Name = DefaultDealer },
@@ -70,7 +70,7 @@ namespace DPSystem.Tests
                 Category = (Category)category,
                 FileFormat = FileFormat.unknown
             };
-            var secondDealer = new Dealer() { Name = "selectedDealer" };
+            var secondDealer = new Dealer { Name = "selectedDealer" };
             var existedCars = new List<Car>
             {
                 CreateDefaultCarWithNewVincode("1_dealer_Actual_1"),
@@ -124,11 +124,10 @@ namespace DPSystem.Tests
                 Assert.Equal(dealerName, car.Dealer.Name);
                 Assert.True(car.IsActual);
                 Assert.False(car.IsSold);
-
             }
         }
 
-        
+
         [InlineData("DefaultDealer", 2, 2)]
         [InlineData("selectedDealer", 2, 3)]
         [Theory]
@@ -141,7 +140,7 @@ namespace DPSystem.Tests
                 Category = (Category)category,
                 FileFormat = FileFormat.unknown
             };
-            var secondDealer = new Dealer() { Name = "selectedDealer" };
+            var secondDealer = new Dealer { Name = "selectedDealer" };
             var existedCars = new List<Car>
             {
                 CreateDefaultCarWithNewVincode("1_dealer_Actual_1"),
@@ -198,7 +197,7 @@ namespace DPSystem.Tests
             }
         }
 
-        
+
         [InlineData("DefaultDealer", 0, 5)]
         [InlineData("selectedDealer", 0, 5)]
         [Theory]
@@ -211,7 +210,7 @@ namespace DPSystem.Tests
                 Category = (Category)category,
                 FileFormat = FileFormat.unknown
             };
-            var secondDealer = new Dealer() { Name = "selectedDealer" };
+            var secondDealer = new Dealer { Name = "selectedDealer" };
             var existedCars = new List<Car>
             {
                 CreateDefaultCarWithNewVincode("1_dealer_Actual_1"),
@@ -263,7 +262,7 @@ namespace DPSystem.Tests
             foreach (var car in resultActuals)
                 Assert.Equal(dealerName, car.Dealer.Name);
         }
-        
+
         [Fact]
         public void Check_serialization_to_json()
         {
@@ -275,13 +274,13 @@ namespace DPSystem.Tests
                 Category = Category.Actual,
                 FileFormat = FileFormat.json
             };
-            
+
             var dcsMock = new Mock<IDataCheckerService>();
             var crMock = new Mock<ICarRepository>();
 
             crMock.Setup(cr => cr.GetFullCarsInfoWithFilter(filter))
                   .Returns(new List<Car> { _defaultDbCar });
-            
+
             //Act
             var sut = new FileService(dcsMock.Object, crMock.Object);
             var file = sut.CreateFile(fileName, filter);
@@ -290,9 +289,8 @@ namespace DPSystem.Tests
             var result = Assert.IsAssignableFrom<ActionResult>(file) as FileContentResult;
             Assert.NotNull(result);
             Assert.Equal(fileName, result.FileDownloadName);
-            Assert.Equal( "application/octet-stream", result.ContentType);
+            Assert.Equal("application/octet-stream", result.ContentType);
             Assert.Equal("dafsdfa", result.FileContents.ToString());
-
         }
     }
 }

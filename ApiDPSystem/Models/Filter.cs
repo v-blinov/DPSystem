@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace ApiDPSystem.Models
+﻿namespace ApiDPSystem.Models
 {
     public enum Category
     {
@@ -18,7 +16,7 @@ namespace ApiDPSystem.Models
         yaml = 3,
         csv = 4
     }
-    
+
     public class Filter
     {
         public string DealerName { get; set; }

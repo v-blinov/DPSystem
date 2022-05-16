@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using ApiDPSystem.Entities;
 using ApiDPSystem.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,12 +7,9 @@ namespace ApiDPSystem.Extensions
 {
     public static class FilterExtension
     {
-        public static IQueryable<Entities.Car> ApplyFilter(this IQueryable<Entities.Car> query, Filter filter)
+        public static IQueryable<Car> ApplyFilter(this IQueryable<Car> query, Filter filter)
         {
-            if (filter == null)
-            {
-                return query;
-            }
+            if (filter == null) return query;
 
             if (!string.IsNullOrEmpty(filter.DealerName))
             {
@@ -20,12 +18,12 @@ namespace ApiDPSystem.Extensions
             }
 
             query = filter.Category switch
-                   {
-                       Category.Disabled => query,
-                       Category.Actual => query.Where(p => p.IsActual),
-                       Category.Sold => query.Where(p => p.IsSold),
-                       _ => query
-                   };
+                    {
+                        Category.Disabled => query,
+                        Category.Actual => query.Where(p => p.IsActual),
+                        Category.Sold => query.Where(p => p.IsSold),
+                        _ => query
+                    };
 
             return query;
         }

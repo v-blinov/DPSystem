@@ -6,12 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Remove="ConsumeRabbitMQService.cs~RFc7cb1d2.TMP" />
+        <None Remove="ConsumeRabbitMQService.cs~RFc7cb1d2.TMP"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="MailKit" Version="2.15.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-        <PackageReference Include="RabbitMQ.Client" Version="6.2.2" />
+        <PackageReference Include="MailKit" Version="2.15.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0"/>
+        <PackageReference Include="RabbitMQ.Client" Version="6.2.2"/>
     </ItemGroup>
 </Project>

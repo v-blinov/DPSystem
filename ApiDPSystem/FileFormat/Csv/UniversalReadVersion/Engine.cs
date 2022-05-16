@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.FileFormat.Csv.UniversalReadVersion
 {
-    public record Engine()
+    public record Engine
     {
         [Name("techincal options/engine/fuel")]
         public string Fuel { get; set; }

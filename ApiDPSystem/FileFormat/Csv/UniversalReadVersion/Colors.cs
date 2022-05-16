@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.FileFormat.Csv.UniversalReadVersion
 {
-    public record Colors()
+    public record Colors
     {
         [Name("colors/interior")]
         public string Interior { get; set; }

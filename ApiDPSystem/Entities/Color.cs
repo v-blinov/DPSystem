@@ -18,7 +18,7 @@ namespace ApiDPSystem.Entities
                 return false;
 
             return color.HexCode == HexCode &&
-                   color.Name == Name;
+                color.Name == Name;
         }
 
         public override int GetHashCode() =>

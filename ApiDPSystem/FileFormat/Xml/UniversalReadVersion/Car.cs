@@ -12,10 +12,10 @@ namespace ApiDPSystem.FileFormat.Xml.UniversalReadVersion
 
         [XmlElement(ElementName = "is_sold")]
         public bool IsSold { get; set; }
-        
+
         [XmlElement(ElementName = "id")]
         public string Id { get; set; }
-        
+
         [XmlElement(ElementName = "year")]
         public string Year { get; set; }
 
@@ -42,10 +42,9 @@ namespace ApiDPSystem.FileFormat.Xml.UniversalReadVersion
 
         [XmlElement(ElementName = "price")]
         public string Price { get; set; }
-        
-         public static Car ConvertFromDbModel(Entities.Car dbModel)
-        {
-            return new Car()
+
+        public static Car ConvertFromDbModel(Entities.Car dbModel) =>
+            new Car
             {
                 IsActual = dbModel.IsActual,
                 IsSold = dbModel.IsSold,
@@ -56,31 +55,30 @@ namespace ApiDPSystem.FileFormat.Xml.UniversalReadVersion
                 ModelTrim = dbModel.Configuration.ModelTrim,
                 Make = dbModel.Configuration.Producer.Name,
                 Images = dbModel.CarImages.Select(p => p.Image.Url).ToList(),
-                
-                Colors = new Colors()
+
+                Colors = new Colors
                 {
                     Exterior = dbModel.ExteriorColor.Name,
-                    Interior = dbModel.InteriorColor.Name,
+                    Interior = dbModel.InteriorColor.Name
                 },
-                TechnicalOptions = new TechnicalOptions()
+                TechnicalOptions = new TechnicalOptions
                 {
                     Drive = dbModel.Configuration.Drive,
-                    Engine = new Engine()
+                    Engine = new Engine
                     {
                         Fuel = dbModel.Configuration.Engine.Fuel,
                         Power = dbModel.Configuration.Engine.Power.ToString(),
-                        Capacity = dbModel.Configuration.Engine.Capacity.ToString(),
+                        Capacity = dbModel.Configuration.Engine.Capacity.ToString()
                     },
-                    Transmission = dbModel.Configuration.Transmission,
+                    Transmission = dbModel.Configuration.Transmission
                 },
-                OtherOptions = new OtherOptions()
+                OtherOptions = new OtherOptions
                 {
                     Exterior = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Exterior)),
                     Interior = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Interior)),
-                    Safety = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Safety)),
+                    Safety = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Safety))
                 }
             };
-        }
 
         private static List<string> GetFeatureListOrNull(Entities.Car model, string optionsTypeName)
         {
@@ -89,7 +87,7 @@ namespace ApiDPSystem.FileFormat.Xml.UniversalReadVersion
                                 .Where(p => p.Type == optionsTypeName)
                                 .Select(p => p.Description)
                                 .ToList();
-            
+
             return features.Count > 0 ? features : null;
         }
     }

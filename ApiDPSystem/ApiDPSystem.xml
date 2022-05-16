@@ -6,17 +6,17 @@
     <members>
         <member name="M:ApiDPSystem.Controllers.FileController.GetFileWithCarsByFilterInfo(ApiDPSystem.Models.Filter)">
             <summary>
-            Create file with cars info for certain dealer by any condition
-            FileFormat: 0,1 - json | 2 - xml | 3 - yaml | 4 - csv
-            Category: 0,1 - all | 2 - sold | 3 - actual
+                Create file with cars info for certain dealer by any condition
+                FileFormat: 0,1 - json | 2 - xml | 3 - yaml | 4 - csv
+                Category: 0,1 - all | 2 - sold | 3 - actual
             </summary>
             <param name="filter">
-            Category:
+                Category:
                 0 - all cars for dealer
                 1 - all filters
                 2 - only sold cars
                 3 - only actual cars
-            Dealer Name
+                Dealer Name
             </param>
             <returns></returns>
         </member>

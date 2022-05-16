@@ -21,14 +21,14 @@ namespace DPSystem.Tests
         private readonly DbContextOptions<Context> _testContextOptions = new DbContextOptionsBuilder<Context>().UseSqlServer(TestConnectionString).Options;
 
         private Fixture _fixture;
-        
+
         private void CreateDatabase()
         {
             using var context = new Context(_testContextOptions);
 
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
-            
+
             _fixture = new Fixture();
         }
 
@@ -42,14 +42,14 @@ namespace DPSystem.Tests
             //Arrange
             var fileMock = GetIFormFile(fileNameParam);
             CreateDatabase();
-        
+
             var dcsMock = new Mock<IDataCheckerService>();
             var crMock = new Mock<ICarRepository>();
             var sut = new FileService(dcsMock.Object, crMock.Object);
-        
+
             //Act
             await sut.ProcessFileAsync(fileMock.Object, DefaultDealer);
-        
+
             //Assert
             dcsMock.Verify(p => p.MarkSoldCars(It.IsAny<List<Car>>(), DefaultDealer), Times.Once);
             dcsMock.Verify(p => p.SetToDatabase(It.IsAny<List<Car>>()), Times.Once);

@@ -32,12 +32,12 @@ namespace ApiDPSystem.Entities
                 return false;
 
             return conf.Year == Year &&
-                   conf.Model == Model &&
-                   conf.ModelTrim == ModelTrim &&
-                   conf.Transmission == Transmission &&
-                   conf.Drive == Drive &&
-                   (conf.Producer.Equals(Producer) || conf.ProducerId == ProducerId) &&
-                   (conf.Engine.Equals(Engine) || conf.EngineId == EngineId);
+                conf.Model == Model &&
+                conf.ModelTrim == ModelTrim &&
+                conf.Transmission == Transmission &&
+                conf.Drive == Drive &&
+                (conf.Producer.Equals(Producer) || conf.ProducerId == ProducerId) &&
+                (conf.Engine.Equals(Engine) || conf.EngineId == EngineId);
         }
 
         public override int GetHashCode() =>

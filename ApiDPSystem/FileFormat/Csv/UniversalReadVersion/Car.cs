@@ -4,14 +4,14 @@ using CsvHelper.Configuration.Attributes;
 
 namespace ApiDPSystem.FileFormat.Csv.UniversalReadVersion
 {
-    public record Car()
+    public record Car
     {
         [Name("is actual")]
         public bool IsActual { get; set; }
 
         [Name("is sold")]
         public bool IsSold { get; set; }
-        
+
         [Name("id")]
         public string Id { get; set; }
 
@@ -37,11 +37,10 @@ namespace ApiDPSystem.FileFormat.Csv.UniversalReadVersion
 
         [Name("price")]
         public string Price { get; set; }
-        
-        
-         public static Car ConvertFromDbModel(Entities.Car dbModel)
-        {
-            return new Car()
+
+
+        public static Car ConvertFromDbModel(Entities.Car dbModel) =>
+            new Car
             {
                 IsActual = dbModel.IsActual,
                 IsSold = dbModel.IsSold,
@@ -53,23 +52,23 @@ namespace ApiDPSystem.FileFormat.Csv.UniversalReadVersion
                 Make = dbModel.Configuration.Producer.Name,
                 Images = dbModel.CarImages.Select(p => p.Image.Url).ToList(),
 
-                Colors = new Colors()
+                Colors = new Colors
                 {
                     Exterior = dbModel.ExteriorColor.Name,
-                    Interior = dbModel.InteriorColor.Name,
+                    Interior = dbModel.InteriorColor.Name
                 },
-                TechnicalOptions = new TechnicalOptions()
+                TechnicalOptions = new TechnicalOptions
                 {
                     Drive = dbModel.Configuration.Drive,
-                    Engine = new Engine()
+                    Engine = new Engine
                     {
                         Fuel = dbModel.Configuration.Engine.Fuel,
                         Power = dbModel.Configuration.Engine.Power.ToString(),
-                        Capacity = dbModel.Configuration.Engine.Capacity.ToString(),
+                        Capacity = dbModel.Configuration.Engine.Capacity.ToString()
                     },
-                    Transmission = dbModel.Configuration.Transmission,
+                    Transmission = dbModel.Configuration.Transmission
                 },
-                OtherOptions = new OtherOptions()
+                OtherOptions = new OtherOptions
                 {
                     Exterior = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Exterior)),
                     Interior = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Interior)),
@@ -77,7 +76,6 @@ namespace ApiDPSystem.FileFormat.Csv.UniversalReadVersion
                     Multimedia = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Multimedia))
                 }
             };
-        }
 
         private static List<string> GetFeatureListOrNull(Entities.Car model, string optionsTypeName)
         {

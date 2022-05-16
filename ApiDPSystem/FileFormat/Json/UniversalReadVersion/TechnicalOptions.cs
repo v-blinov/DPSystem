@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.FileFormat.Json.UniversalReadVersion
 {
-    public record TechnicalOptions()
+    public record TechnicalOptions
     {
         [JsonPropertyName("engine")]
         public Engine Engine { get; set; }

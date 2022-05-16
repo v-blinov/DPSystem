@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.FileFormat.Csv.UniversalReadVersion
 {
-    public record TechnicalOptions()
+    public record TechnicalOptions
     {
         [Name("techincal options/engine")]
         public Engine Engine { get; set; }

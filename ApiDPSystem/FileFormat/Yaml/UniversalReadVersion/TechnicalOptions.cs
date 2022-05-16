@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.FileFormat.Yaml.UniversalReadVersion
 {
-    public record TechnicalOptions()
+    public record TechnicalOptions
     {
         [YamlMember(Alias = "engine")]
         public Engine Engine { get; set; }

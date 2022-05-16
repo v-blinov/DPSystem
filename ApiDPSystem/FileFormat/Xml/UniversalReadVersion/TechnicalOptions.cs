@@ -3,7 +3,7 @@
 namespace ApiDPSystem.FileFormat.Xml.UniversalReadVersion
 {
     [XmlRoot(ElementName = "techincal_options")]
-    public record TechnicalOptions()
+    public record TechnicalOptions
     {
         [XmlElement(ElementName = "engine")]
         public Engine Engine { get; set; }

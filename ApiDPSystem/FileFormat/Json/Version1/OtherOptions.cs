@@ -13,10 +13,10 @@ namespace ApiDPSystem.FileFormat.Json.Version1
 
         [JsonPropertyName("safety")]
         public List<string> Safety { get; set; }
-        
+
         [JsonPropertyName("comfort")]
         public List<string> Comfort { get; set; }
-        
+
         [JsonPropertyName("multimedia")]
         public List<string> Multimedia { get; set; }
     }

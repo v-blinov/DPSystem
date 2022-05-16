@@ -2,7 +2,7 @@
 
 namespace ApiDPSystem.FileFormat.Yaml.UniversalReadVersion
 {
-    public record Colors()
+    public record Colors
     {
         [YamlMember(Alias = "interior")]
         public string Interior { get; set; }

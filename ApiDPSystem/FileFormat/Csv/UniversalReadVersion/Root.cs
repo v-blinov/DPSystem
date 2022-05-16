@@ -3,7 +3,7 @@ using CsvHelper.Configuration.Attributes;
 
 namespace ApiDPSystem.FileFormat.Csv.UniversalReadVersion
 {
-    public record Root()
+    public record Root
     {
         [Name("cars")]
         public List<Car> Cars { get; set; }

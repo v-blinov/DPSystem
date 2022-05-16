@@ -4,14 +4,14 @@ using YamlDotNet.Serialization;
 
 namespace ApiDPSystem.FileFormat.Yaml.UniversalReadVersion
 {
-    public record Car()
+    public record Car
     {
         [YamlMember(Alias = "is_actual")]
         public bool IsActual { get; set; }
 
         [YamlMember(Alias = "is_sold")]
         public bool IsSold { get; set; }
-        
+
         [YamlMember(Alias = "id")]
         public string Id { get; set; }
 
@@ -41,11 +41,10 @@ namespace ApiDPSystem.FileFormat.Yaml.UniversalReadVersion
 
         [YamlMember(Alias = "price")]
         public string Price { get; set; }
-        
-        
-        public static Car ConvertFromDbModel(Entities.Car dbModel)
-        {
-            return new Car()
+
+
+        public static Car ConvertFromDbModel(Entities.Car dbModel) =>
+            new Car
             {
                 IsActual = dbModel.IsActual,
                 IsSold = dbModel.IsSold,
@@ -56,31 +55,30 @@ namespace ApiDPSystem.FileFormat.Yaml.UniversalReadVersion
                 ModelTrim = dbModel.Configuration.ModelTrim,
                 Make = dbModel.Configuration.Producer.Name,
                 Images = dbModel.CarImages.Select(p => p.Image.Url).ToList(),
-                
-                Colors = new Colors()
+
+                Colors = new Colors
                 {
                     Exterior = dbModel.ExteriorColor.Name,
-                    Interior = dbModel.InteriorColor.Name,
+                    Interior = dbModel.InteriorColor.Name
                 },
-                TechnicalOptions = new TechnicalOptions()
+                TechnicalOptions = new TechnicalOptions
                 {
                     Drive = dbModel.Configuration.Drive,
-                    Engine = new Engine()
+                    Engine = new Engine
                     {
                         Fuel = dbModel.Configuration.Engine.Fuel,
                         Power = dbModel.Configuration.Engine.Power.ToString(),
-                        Capacity = dbModel.Configuration.Engine.Capacity.ToString(),
+                        Capacity = dbModel.Configuration.Engine.Capacity.ToString()
                     },
-                    Transmission = dbModel.Configuration.Transmission,
+                    Transmission = dbModel.Configuration.Transmission
                 },
-                OtherOptions = new OtherOptions()
+                OtherOptions = new OtherOptions
                 {
                     Exterior = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Exterior)),
                     Interior = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Interior)),
-                    Safety = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Safety)),
+                    Safety = GetFeatureListOrNull(dbModel, nameof(Car.OtherOptions.Safety))
                 }
             };
-        }
 
         private static List<string> GetFeatureListOrNull(Entities.Car model, string optionsTypeName)
         {
@@ -89,7 +87,7 @@ namespace ApiDPSystem.FileFormat.Yaml.UniversalReadVersion
                                 .Where(p => p.Type == optionsTypeName)
                                 .Select(p => p.Description)
                                 .ToList();
-            
+
             return features.Count > 0 ? features : null;
         }
     }

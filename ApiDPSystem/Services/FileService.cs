@@ -4,28 +4,31 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading.Tasks;
-using System.Transactions;
-using ApiDPSystem.Models.Parser;
-using ApiDPSystem.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using System.Text.Unicode;
+using System.Threading.Tasks;
+using System.Transactions;
+using ApiDPSystem.FileFormat.Json.UniversalReadVersion;
 using ApiDPSystem.Models;
+using ApiDPSystem.Models.Parser;
 using ApiDPSystem.Repository.Interfaces;
+using ApiDPSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceStack.Text;
 using YamlDotNet.Serialization;
+using Car = ApiDPSystem.Entities.Car;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 using XmlSerializer = System.Xml.Serialization.XmlSerializer;
 
 namespace ApiDPSystem.Services
 {
     public class FileService
     {
-        private readonly IDataCheckerService _dataChecker;
         private readonly ICarRepository _carRepository;
-        
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new ()
+        private readonly IDataCheckerService _dataChecker;
+
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
             WriteIndented = true
@@ -61,14 +64,14 @@ namespace ApiDPSystem.Services
             using var reader = new StreamReader(file.OpenReadStream());
             return await reader.ReadToEndAsync();
         }
-        
+
         public ActionResult CreateFile(string fileName, Filter filter)
         {
             var carEntities = _carRepository.GetFullCarsInfoWithFilter(filter);
 
             var convertToStringMethod = ChooseConvertMethodByFormat(filter);
             var carsInfoInStringAsJson = convertToStringMethod(carEntities);
-            
+
             var byteArray = Encoding.UTF8.GetBytes(carsInfoInStringAsJson);
             var fileContentResult = new FileContentResult(byteArray, "application/octet-stream")
             {
@@ -76,46 +79,44 @@ namespace ApiDPSystem.Services
             };
             return fileContentResult;
         }
-        
-        private Func<IEnumerable<Entities.Car>, string> ChooseConvertMethodByFormat(Filter filter)
-        {
-            return filter.FileFormat switch
-                   {
-                       Models.FileFormat.json => ConvertToJsonString,
-                       Models.FileFormat.xml => ConvertToXmlString,
-                       Models.FileFormat.yaml => ConvertToYamlString,
-                       Models.FileFormat.csv => ConvertToCsvString,
-                       _ => ConvertToJsonString
-                   };
-        }
-        
-        private string ConvertToJsonString(IEnumerable<Entities.Car> carEntities)
+
+        private Func<IEnumerable<Car>, string> ChooseConvertMethodByFormat(Filter filter) =>
+            filter.FileFormat switch
+            {
+                Models.FileFormat.json => ConvertToJsonString,
+                Models.FileFormat.xml => ConvertToXmlString,
+                Models.FileFormat.yaml => ConvertToYamlString,
+                Models.FileFormat.csv => ConvertToCsvString,
+                _ => ConvertToJsonString
+            };
+
+        private string ConvertToJsonString(IEnumerable<Car> carEntities)
         {
             var jsonUniversalVersion = carEntities.Select(FileFormat.Json.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
-            var root = new FileFormat.Json.UniversalReadVersion.Root()
+            var root = new Root
             {
                 Cars = jsonUniversalVersion
             };
 
-            return  System.Text.Json.JsonSerializer.Serialize(root, _jsonSerializerOptions);
+            return JsonSerializer.Serialize(root, _jsonSerializerOptions);
         }
-        private string ConvertToXmlString(IEnumerable<Entities.Car> carEntities)
+        private string ConvertToXmlString(IEnumerable<Car> carEntities)
         {
             var xmlUniversalVersion = carEntities.Select(FileFormat.Xml.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
-            var root = new FileFormat.Xml.UniversalReadVersion.Root()
+            var root = new FileFormat.Xml.UniversalReadVersion.Root
             {
                 Cars = xmlUniversalVersion
             };
-             
+
             using var writer = new StringWriter();
             var serializer = new XmlSerializer(typeof(FileFormat.Xml.UniversalReadVersion.Root));
             serializer.Serialize(writer, root);
             return writer.ToString();
         }
-        private string ConvertToYamlString(IEnumerable<Entities.Car> carEntities)
+        private string ConvertToYamlString(IEnumerable<Car> carEntities)
         {
             var yamlUniversalVersion = carEntities.Select(FileFormat.Yaml.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
-            var root = new FileFormat.Yaml.UniversalReadVersion.Root()
+            var root = new FileFormat.Yaml.UniversalReadVersion.Root
             {
                 Cars = yamlUniversalVersion
             };
@@ -123,17 +124,17 @@ namespace ApiDPSystem.Services
             using var writer = new StringWriter();
             var serializer = new SerializerBuilder().Build();
             serializer.Serialize(writer, root);
-            
+
             return writer.ToString();
         }
-        private string ConvertToCsvString(IEnumerable<Entities.Car> carEntities)
+        private string ConvertToCsvString(IEnumerable<Car> carEntities)
         {
             var csvUniversalVersion = carEntities.Select(FileFormat.Csv.UniversalReadVersion.Car.ConvertFromDbModel).ToList();
-            var root = new FileFormat.Csv.UniversalReadVersion.Root()
+            var root = new FileFormat.Csv.UniversalReadVersion.Root
             {
                 Cars = csvUniversalVersion
             };
-            
+
             var str = CsvSerializer.SerializeToString(root);
 
             return str;
